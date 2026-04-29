@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panier | Marché Fooly - Finalisez vos achats à Sangarédi</title>
+  <meta name="description" content="Consultez votre panier Marché Fooly, ajustez vos quantités et finalisez vos achats auprès des vendeurs locaux de Sangarédi.">
+  <meta name="keywords" content="panier Marché Fooly, achat Sangarédi, marketplace Guinée, commander en ligne Sangarédi, boutique locale Guinée">
+  <meta name="author" content="Marché Fooly">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="Panier | Marché Fooly">
+  <meta property="og:description" content="Vérifiez vos articles et finalisez vos achats sur Marché Fooly.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://marchefooly.com/panier.html">
+  <meta property="og:image" content="assets/img/og-marche-fooly.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <style>
+    .cart-hero {
+      background:
+        radial-gradient(circle at 12% 20%, rgba(255, 122, 0, 0.14), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(22, 163, 74, 0.12), transparent 26%),
+        linear-gradient(135deg, #fff8ef 0%, #ffffff 52%, #f3fff7 100%);
+      padding: 54px 0;
+      border-bottom: 1px solid var(--mf-border);
+    }
+
+    .breadcrumb a {
+      color: var(--mf-muted);
+      font-weight: 700;
+    }
+
+    .breadcrumb .active {
+      color: var(--mf-dark);
+      font-weight: 900;
+    }
+
+    .cart-title {
+      font-size: clamp(2.1rem, 4.5vw, 4rem);
+      font-weight: 950;
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+    }
+
+    .cart-page {
+      padding: 56px 0 80px;
+      background: #ffffff;
+    }
+
+    .cart-card,
+    .summary-card,
+    .service-card,
+    .coupon-card {
+      background: #ffffff;
+      border: 1px solid var(--mf-border);
+      border-radius: 28px;
+      box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+    }
+
+    .cart-card {
+      padding: 24px;
+    }
+
+    .cart-product {
+      display: grid;
+      grid-template-columns: 92px 1fr auto;
+      gap: 18px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--mf-border);
+      align-items: center;
+    }
+
+    .cart-product:last-child {
+      border-bottom: 0;
+    }
+
+    .cart-product-img {
+      width: 92px;
+      height: 92px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #f8fafc, #fff4e8);
+      display: grid;
+      place-items: center;
+      color: rgba(21, 25, 34, 0.78);
+      font-size: 2.5rem;
+      flex: 0 0 auto;
+    }
+
+    .cart-product h2 {
+      font-size: 1.05rem;
+      font-weight: 950;
+      margin-bottom: 4px;
+    }
+
+    .cart-product-meta {
+      color: var(--mf-muted);
+      font-size: 0.88rem;
+      font-weight: 650;
+    }
+
+    .cart-product-price {
+      color: var(--mf-orange);
+      font-weight: 950;
+      font-size: 1.2rem;
+      white-space: nowrap;
+    }
+
+    .quantity-box {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--mf-border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .quantity-box button,
+    .quantity-box input {
+      width: 42px;
+      height: 42px;
+      border: 0;
+      text-align: center;
+      background: #ffffff;
+      font-weight: 900;
+    }
+
+    .quantity-box button:hover {
+      background: var(--mf-light);
+    }
+
+    .remove-link {
+      color: var(--mf-muted);
+      font-weight: 800;
+      font-size: 0.88rem;
+    }
+
+    .remove-link:hover {
+      color: #dc2626;
+    }
+
+    .summary-card {
+      padding: 26px;
+      position: sticky;
+      top: 148px;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--mf-border);
+      color: var(--mf-muted);
+      font-weight: 750;
+    }
+
+    .summary-line strong {
+      color: var(--mf-dark);
+    }
+
+    .summary-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 18px;
+      margin-top: 6px;
+    }
+
+    .summary-total span {
+      font-size: 1.05rem;
+      font-weight: 900;
+    }
+
+    .summary-total strong {
+      color: var(--mf-orange);
+      font-size: 1.6rem;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+      text-align: right;
+    }
+
+    .coupon-card {
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(255, 122, 0, 0.08), rgba(22, 163, 74, 0.08));
+    }
+
+    .coupon-card .form-control {
+      min-height: 50px;
+      border-radius: 16px;
+      border: 1px solid var(--mf-border);
+    }
+
+    .service-card {
+      padding: 22px;
+      height: 100%;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--mf-shadow);
+      border-color: rgba(255, 122, 0, 0.28);
+    }
+
+    .service-icon {
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      background: #fff3e5;
+      color: var(--mf-orange);
+      font-size: 1.4rem;
+      margin-bottom: 14px;
+    }
+
+    .empty-cart-box {
+      background: var(--mf-light);
+      border: 1px dashed rgba(255, 122, 0, 0.4);
+      border-radius: 28px;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .empty-cart-icon {
+      width: 82px;
+      height: 82px;
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      background: #fff3e5;
+      color: var(--mf-orange);
+      font-size: 2.3rem;
+      margin: 0 auto 18px;
+    }
+
+    @media (max-width: 991.98px) {
+      .summary-card {
+        position: static;
+      }
+    }
+
+    @media (max-width: 767.98px) {
+      .cart-product {
+        grid-template-columns: 76px 1fr;
+      }
+
+      .cart-product-img {
+        width: 76px;
+        height: 76px;
+        border-radius: 18px;
+        font-size: 2rem;
+      }
+
+      .cart-product-actions {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .cart-card,
+      .summary-card,
+      .coupon-card {
+        border-radius: 24px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar py-2">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <span><i class="bi bi-geo-alt me-1"></i>Sangarédi, Guinée</span>
+        <a href="tel:+224624273805"><i class="bi bi-telephone me-1"></i>+224 624 27 38 05</a>
+        <a href="mailto:contact@marchefooly.com"><i class="bi bi-envelope me-1"></i>contact@marchefooly.com</a>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="panier.html" aria-label="Version française">FR</a>
+        <span>/</span>
+        <a href="en/shop.html" aria-label="English version">EN</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="main-header">
+    <div class="container py-3">
+      <div class="row align-items-center g-3">
+        <div class="col-8 col-lg-3">
+          <a class="brand-logo" href="index.html" aria-label="Accueil Marché Fooly">
+            <span class="brand-mark"><i class="bi bi-bag-check-fill"></i></span>
+            <span class="brand-text">
+              <span class="brand-title d-block">Marché Fooly</span>
+              <span class="brand-slogan d-block">Le marché gagnant</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="col-12 col-lg-5 order-3 order-lg-2">
+          <form class="search-wrapper d-flex" action="boutique.html" method="get">
+            <input class="form-control" type="search" name="q" placeholder="Rechercher téléphone, maison, mode..." aria-label="Rechercher un produit">
+            <button class="btn btn-primary px-3" type="submit">
+              <i class="bi bi-search me-lg-1"></i><span class="d-none d-lg-inline">Rechercher</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="col-4 col-lg-4 order-2 order-lg-3">
+          <div class="d-flex align-items-center justify-content-end gap-1 gap-md-2">
+            <a class="header-action" href="mon-compte.html"><i class="bi bi-person"></i><span>Compte</span></a>
+            <a class="header-action" href="favoris.html"><i class="bi bi-heart"></i><span>Favoris</span></a>
+            <a class="header-action" href="panier.html">
+              <i class="bi bi-cart3"></i><span>Panier</span><em class="cart-badge not-italic">2</em>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="main-nav navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <button class="navbar-toggler border-0 ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Ouvrir le menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav align-items-lg-center">
+            <li class="nav-item"><a class="nav-link" href="index.html">Accueil</a></li>
+            <li class="nav-item"><a class="nav-link" href="boutique.html">Boutique</a></li>
+            <li class="nav-item"><a class="nav-link" href="categories.html">Catégories</a></li>
+            <li class="nav-item"><a class="nav-link" href="devenir-vendeur.html">Devenir vendeur</a></li>
+            <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          </ul>
+
+          <div class="ms-lg-auto mt-3 mt-lg-0">
+            <a class="btn btn-mf-primary btn-sm" href="devenir-vendeur.html">
+              <i class="bi bi-shop me-1"></i> Ouvrir une boutique
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="cart-hero">
+      <div class="container">
+        <nav aria-label="Fil d'Ariane" class="mb-4">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="index.html">Accueil</a></li>
+            <li class="breadcrumb-item"><a href="boutique.html">Boutique</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Panier</li>
+          </ol>
+        </nav>
+
+        <div class="row align-items-center g-4">
+          <div class="col-lg-8">
+            <span class="hero-badge mb-4 reveal">
+              <i class="bi bi-cart-check text-orange"></i>
+              Votre sélection Marché Fooly
+            </span>
+            <h1 class="cart-title mb-3 reveal">Votre panier</h1>
+            <p class="section-subtitle fs-5 mb-0 reveal">
+              Vérifiez vos articles, ajustez les quantités et finalisez votre commande auprès des vendeurs locaux.
+            </p>
+          </div>
+
+          <div class="col-lg-4 text-lg-end">
+            <a class="btn btn-mf-outline reveal" href="boutique.html">
+              <i class="bi bi-arrow-left me-1"></i> Continuer mes achats
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cart-page">
+      <div class="container">
+        <div class="row g-4 align-items-start">
+          <div class="col-lg-8">
+            <div class="cart-card reveal">
+              <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-2">
+                <div>
+                  <span class="text-orange fw-bold">Articles sélectionnés</span>
+                  <h2 class="h3 fw-bold mb-0">2 produits dans votre panier</h2>
+                </div>
+                <a class="fw-bold text-orange align-self-md-end" href="favoris.html">Voir mes favoris</a>
+              </div>
+
+              <div class="cart-product">
+                <div class="cart-product-img">
+                  <i class="bi bi-phone"></i>
+                </div>
+
+                <div>
+                  <h2>Téléphone Samsung A12</h2>
+                  <div class="cart-product-meta mb-2">Vendeur : Boutique Diallo · Couleur : Noir · Stockage : 64 Go</div>
+                  <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="badge rounded-pill bg-success">En stock</span>
+                    <a class="remove-link" href="panier.html"><i class="bi bi-trash me-1"></i>Retirer</a>
+                  </div>
+                </div>
+
+                <div class="cart-product-actions text-lg-end">
+                  <div class="quantity-box mb-2">
+                    <button type="button" aria-label="Diminuer">−</button>
+                    <input type="text" value="1" aria-label="Quantité Samsung A12">
+                    <button type="button" aria-label="Augmenter">+</button>
+                  </div>
+                  <div class="cart-product-price">1 200 000 Fr</div>
+                </div>
+              </div>
+
+              <div class="cart-product">
+                <div class="cart-product-img">
+                  <i class="bi bi-droplet-half"></i>
+                </div>
+
+                <div>
+                  <h2>Huile de peau naturelle</h2>
+                  <div class="cart-product-meta mb-2">Vendeur : Beauté Locale · Format : 250 ml</div>
+                  <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="badge rounded-pill bg-success">En stock</span>
+                    <a class="remove-link" href="panier.html"><i class="bi bi-trash me-1"></i>Retirer</a>
+                  </div>
+                </div>
+
+                <div class="cart-product-actions text-lg-end">
+                  <div class="quantity-box mb-2">
+                    <button type="button" aria-label="Diminuer">−</button>
+                    <input type="text" value="2" aria-label="Quantité huile de peau">
+                    <button type="button" aria-label="Augmenter">+</button>
+                  </div>
+                  <div class="cart-product-price">240 000 Fr</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="coupon-card mt-4 reveal">
+              <div class="row align-items-center g-3">
+                <div class="col-lg-5">
+                  <h2 class="h5 fw-bold mb-1">Code promo</h2>
+                  <p class="text-secondary small mb-0">Ajoutez votre coupon pour bénéficier d’une remise.</p>
+                </div>
+                <div class="col-lg-7">
+                  <form class="d-flex flex-column flex-sm-row gap-2" action="panier.html" method="get">
+                    <input class="form-control" type="text" placeholder="Ex : FOOLY10" aria-label="Code promo">
+                    <button class="btn btn-mf-primary px-4" type="submit">Appliquer</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="empty-cart-box mt-4 reveal">
+              <div class="empty-cart-icon"><i class="bi bi-bag-plus"></i></div>
+              <h2 class="h4 fw-bold">Envie d’ajouter d’autres produits ?</h2>
+              <p class="text-secondary mb-3">Explorez les catégories populaires et trouvez d’autres bonnes affaires locales.</p>
+              <a class="btn btn-mf-outline" href="categories.html">Explorer les catégories</a>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <aside class="summary-card reveal">
+              <h2 class="h4 fw-bold mb-3">Résumé de commande</h2>
+
+              <div class="summary-line">
+                <span>Sous-total</span>
+                <strong>1 440 000 Fr</strong>
+              </div>
+              <div class="summary-line">
+                <span>Livraison estimée</span>
+                <strong>À confirmer</strong>
+              </div>
+              <div class="summary-line">
+                <span>Remise</span>
+                <strong>0 Fr</strong>
+              </div>
+
+              <div class="summary-total">
+                <span>Total</span>
+                <strong>1 440 000 Fr</strong>
+              </div>
+
+              <a class="btn btn-mf-primary w-100 mt-4" href="checkout.html">
+                Passer à la caisse <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+
+              <a class="btn btn-mf-outline w-100 mt-2" href="boutique.html">
+                Continuer mes achats
+              </a>
+
+              <div class="mt-4 pt-3 border-top">
+                <div class="d-flex gap-2 mb-2">
+                  <i class="bi bi-shield-check text-success"></i>
+                  <span class="small text-secondary fw-semibold">Vendeurs locaux identifiés</span>
+                </div>
+                <div class="d-flex gap-2 mb-2">
+                  <i class="bi bi-truck text-orange"></i>
+                  <span class="small text-secondary fw-semibold">Livraison locale selon disponibilité</span>
+                </div>
+                <div class="d-flex gap-2">
+                  <i class="bi bi-headset text-primary"></i>
+                  <span class="small text-secondary fw-semibold">Support Marché Fooly</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-padding bg-soft">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="text-orange fw-bold">Pourquoi commander sur FOOLY ?</span>
+          <h2 class="section-title display-6 mb-2">Une expérience d’achat locale plus simple</h2>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-4 reveal">
+            <div class="service-card">
+              <div class="service-icon"><i class="bi bi-geo-alt"></i></div>
+              <h3 class="h5 fw-bold">Produits proches de vous</h3>
+              <p class="text-secondary mb-0">Achetez auprès de vendeurs basés à Sangarédi et dans les environs.</p>
+            </div>
+          </div>
+
+          <div class="col-md-4 reveal">
+            <div class="service-card">
+              <div class="service-icon"><i class="bi bi-shop"></i></div>
+              <h3 class="h5 fw-bold">Vendeurs locaux</h3>
+              <p class="text-secondary mb-0">Chaque produit met en avant le vendeur pour renforcer la confiance.</p>
+            </div>
+          </div>
+
+          <div class="col-md-4 reveal">
+            <div class="service-card">
+              <div class="service-icon"><i class="bi bi-bag-check"></i></div>
+              <h3 class="h5 fw-bold">Achat plus rapide</h3>
+              <p class="text-secondary mb-0">Panier clair, prix visibles et parcours simple jusqu’à la commande.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pb-5 bg-soft">
+      <div class="container">
+        <div class="newsletter-box reveal">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-6">
+              <h2 class="fw-bold mb-2">Recevez les meilleures offres</h2>
+              <p class="mb-0 text-white-75">Promos, nouveautés et bons plans directement dans votre boîte email.</p>
+            </div>
+            <div class="col-lg-6">
+              <form class="d-flex flex-column flex-sm-row gap-2" action="contact.html" method="get">
+                <input class="form-control" type="email" placeholder="Votre adresse email" aria-label="Votre email">
+                <button class="btn btn-dark px-4" type="submit">S’inscrire</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a class="brand-logo mb-3" href="index.html">
+            <span class="brand-mark"><i class="bi bi-bag-check-fill"></i></span>
+            <span class="brand-text">
+              <span class="brand-title d-block text-white">Marché Fooly</span>
+              <span class="brand-slogan d-block">Le marché gagnant</span>
+            </span>
+          </a>
+          <p>Marketplace locale basée à Sangarédi, Guinée, pour acheter et vendre facilement en ligne.</p>
+          <p class="mb-1"><i class="bi bi-geo-alt me-2"></i>Sangarédi, Guinée</p>
+          <p class="mb-1"><i class="bi bi-telephone me-2"></i>+224 624 27 38 05</p>
+          <p><i class="bi bi-envelope me-2"></i>contact@marchefooly.com</p>
+          <div>
+            <a class="social-link" href="contact.html" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a class="social-link" href="https://wa.me/224624273805" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+            <a class="social-link" href="contact.html" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h5>Liens utiles</h5>
+          <a href="boutique.html">Boutique</a>
+          <a href="categories.html">Catégories</a>
+          <a href="devenir-vendeur.html">Devenir vendeur</a>
+          <a href="mon-compte.html">Mon compte</a>
+          <a href="aide.html">Aide</a>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <h5>Catégories</h5>
+          <a href="categories.html">Téléphones & Accessoires</a>
+          <a href="categories.html">Maison / Cuisine</a>
+          <a href="categories.html">Électroménagers</a>
+          <a href="categories.html">Vêtements Femme</a>
+          <a href="categories.html">Automobile</a>
+        </div>
+
+        <div class="col-lg-3">
+          <h5>Confiance</h5>
+          <a href="commandes.html">Suivre mes commandes</a>
+          <a href="panier.html">Voir mon panier</a>
+          <a href="checkout.html">Finaliser l’achat</a>
+          <a href="favoris.html">Mes favoris</a>
+          <a href="contact.html">Contacter FOOLY</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
+        <span>© 2026 Marché Fooly. Tous droits réservés.</span>
+        <span>Marché Fooly - Le marché gagnant.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

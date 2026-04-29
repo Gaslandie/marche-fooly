@@ -1,0 +1,735 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mes favoris | Marché Fooly</title>
+  <meta name="description" content="Retrouvez vos produits favoris sur Marché Fooly et ajoutez-les rapidement au panier pour acheter localement à Sangarédi.">
+  <meta name="keywords" content="favoris Marché Fooly, liste envies Sangarédi, produits sauvegardés Guinée, marketplace Sangarédi">
+  <meta name="author" content="Marché Fooly">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="Mes favoris | Marché Fooly">
+  <meta property="og:description" content="Gardez vos produits préférés et retrouvez-les facilement sur Marché Fooly.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://marchefooly.com/favoris.html">
+  <meta property="og:image" content="assets/img/og-marche-fooly.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <style>
+    .wishlist-hero {
+      background:
+        radial-gradient(circle at 12% 20%, rgba(255, 122, 0, 0.14), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(22, 163, 74, 0.12), transparent 26%),
+        linear-gradient(135deg, #fff8ef 0%, #ffffff 52%, #f3fff7 100%);
+      padding: 56px 0;
+      border-bottom: 1px solid var(--mf-border);
+    }
+
+    .breadcrumb a {
+      color: var(--mf-muted);
+      font-weight: 700;
+    }
+
+    .breadcrumb .active {
+      color: var(--mf-dark);
+      font-weight: 900;
+    }
+
+    .wishlist-title {
+      font-size: clamp(2.1rem, 4.5vw, 4rem);
+      font-weight: 950;
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+    }
+
+    .wishlist-page {
+      padding: 56px 0 80px;
+      background: #ffffff;
+    }
+
+    .wishlist-toolbar,
+    .wishlist-card,
+    .wishlist-summary,
+    .tip-card {
+      background: #ffffff;
+      border: 1px solid var(--mf-border);
+      border-radius: 28px;
+      box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+    }
+
+    .wishlist-toolbar {
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+
+    .wishlist-toolbar .form-control,
+    .wishlist-toolbar .form-select {
+      min-height: 50px;
+      border-radius: 16px;
+      border: 1px solid var(--mf-border);
+    }
+
+    .wishlist-card {
+      padding: 18px;
+      height: 100%;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+      overflow: hidden;
+    }
+
+    .wishlist-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--mf-shadow);
+      border-color: rgba(255, 122, 0, 0.28);
+    }
+
+    .wishlist-media {
+      min-height: 190px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #f8fafc, #fff4e8);
+      display: grid;
+      place-items: center;
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .wishlist-media i {
+      font-size: 4.2rem;
+      color: rgba(21, 25, 34, 0.78);
+      transition: transform 0.25s ease;
+    }
+
+    .wishlist-card:hover .wishlist-media i {
+      transform: scale(1.08);
+    }
+
+    .wishlist-remove {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #ffffff;
+      color: #dc2626;
+      border: 1px solid var(--mf-border);
+      transition: transform 0.18s ease, background 0.18s ease;
+    }
+
+    .wishlist-remove:hover {
+      background: #fee2e2;
+      transform: translateY(-2px);
+    }
+
+    .wishlist-badge {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: var(--mf-orange);
+      color: #ffffff;
+      font-size: 0.76rem;
+      font-weight: 950;
+    }
+
+    .wishlist-vendor {
+      color: var(--mf-muted);
+      font-size: 0.84rem;
+      font-weight: 700;
+    }
+
+    .wishlist-price {
+      color: var(--mf-orange);
+      font-size: 1.28rem;
+      font-weight: 950;
+      letter-spacing: -0.03em;
+    }
+
+    .stock-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: rgba(22, 163, 74, 0.1);
+      color: var(--mf-green);
+      font-size: 0.75rem;
+      font-weight: 900;
+    }
+
+    .wishlist-actions {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .wishlist-actions .btn {
+      border-radius: 14px;
+      font-weight: 900;
+    }
+
+    .wishlist-summary {
+      padding: 24px;
+      position: sticky;
+      top: 148px;
+    }
+
+    .summary-stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 13px 0;
+      border-bottom: 1px solid var(--mf-border);
+      color: var(--mf-muted);
+      font-weight: 750;
+    }
+
+    .summary-stat strong {
+      color: var(--mf-dark);
+    }
+
+    .tip-card {
+      padding: 24px;
+      background:
+        radial-gradient(circle at 8% 18%, rgba(255, 255, 255, 0.25), transparent 22%),
+        linear-gradient(135deg, #151922, #243044);
+      color: #ffffff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .tip-card::after {
+      content: "";
+      position: absolute;
+      width: 210px;
+      height: 210px;
+      right: -95px;
+      bottom: -110px;
+      border-radius: 50%;
+      background: rgba(255, 122, 0, 0.32);
+    }
+
+    .tip-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .collection-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid var(--mf-border);
+      color: var(--mf-dark);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 900;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .collection-chip:hover,
+    .collection-chip.active {
+      background: var(--mf-orange);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .empty-wishlist {
+      background: var(--mf-light);
+      border: 1px dashed rgba(255, 122, 0, 0.42);
+      border-radius: 28px;
+      padding: 32px;
+      text-align: center;
+    }
+
+    .empty-wishlist-icon {
+      width: 82px;
+      height: 82px;
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      background: #fff3e5;
+      color: var(--mf-orange);
+      font-size: 2.3rem;
+      margin: 0 auto 18px;
+    }
+
+    @media (max-width: 991.98px) {
+      .wishlist-summary {
+        position: static;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .wishlist-toolbar,
+      .wishlist-card,
+      .wishlist-summary,
+      .tip-card,
+      .empty-wishlist {
+        border-radius: 24px;
+      }
+
+      .wishlist-actions {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar py-2">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <span><i class="bi bi-geo-alt me-1"></i>Sangarédi, Guinée</span>
+        <a href="tel:+224624273805"><i class="bi bi-telephone me-1"></i>+224 624 27 38 05</a>
+        <a href="mailto:contact@marchefooly.com"><i class="bi bi-envelope me-1"></i>contact@marchefooly.com</a>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="favoris.html" aria-label="Version française">FR</a>
+        <span>/</span>
+        <a href="en/shop.html" aria-label="English version">EN</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="main-header">
+    <div class="container py-3">
+      <div class="row align-items-center g-3">
+        <div class="col-8 col-lg-3">
+          <a class="brand-logo" href="index.html" aria-label="Accueil Marché Fooly">
+            <span class="brand-mark"><i class="bi bi-bag-check-fill"></i></span>
+            <span class="brand-text">
+              <span class="brand-title d-block">Marché Fooly</span>
+              <span class="brand-slogan d-block">Le marché gagnant</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="col-12 col-lg-5 order-3 order-lg-2">
+          <form class="search-wrapper d-flex" action="boutique.html" method="get">
+            <input class="form-control" type="search" name="q" placeholder="Rechercher téléphone, maison, mode..." aria-label="Rechercher un produit">
+            <button class="btn btn-primary px-3" type="submit">
+              <i class="bi bi-search me-lg-1"></i><span class="d-none d-lg-inline">Rechercher</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="col-4 col-lg-4 order-2 order-lg-3">
+          <div class="d-flex align-items-center justify-content-end gap-1 gap-md-2">
+            <a class="header-action" href="mon-compte.html"><i class="bi bi-person"></i><span>Compte</span></a>
+            <a class="header-action" href="favoris.html"><i class="bi bi-heart"></i><span>Favoris</span></a>
+            <a class="header-action" href="panier.html">
+              <i class="bi bi-cart3"></i><span>Panier</span><em class="cart-badge not-italic">2</em>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="main-nav navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <button class="navbar-toggler border-0 ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Ouvrir le menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav align-items-lg-center">
+            <li class="nav-item"><a class="nav-link" href="index.html">Accueil</a></li>
+            <li class="nav-item"><a class="nav-link" href="boutique.html">Boutique</a></li>
+            <li class="nav-item"><a class="nav-link" href="categories.html">Catégories</a></li>
+            <li class="nav-item"><a class="nav-link" href="devenir-vendeur.html">Devenir vendeur</a></li>
+            <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          </ul>
+
+          <div class="ms-lg-auto mt-3 mt-lg-0">
+            <a class="btn btn-mf-primary btn-sm" href="devenir-vendeur.html">
+              <i class="bi bi-shop me-1"></i> Ouvrir une boutique
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="wishlist-hero">
+      <div class="container">
+        <nav aria-label="Fil d'Ariane" class="mb-4">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="index.html">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Favoris</li>
+          </ol>
+        </nav>
+
+        <div class="row align-items-center g-4">
+          <div class="col-lg-8">
+            <span class="hero-badge mb-4 reveal">
+              <i class="bi bi-heart-fill text-orange"></i>
+              Produits sauvegardés
+            </span>
+            <h1 class="wishlist-title mb-3 reveal">Mes favoris</h1>
+            <p class="section-subtitle fs-5 mb-0 reveal">
+              Retrouvez rapidement les produits qui vous intéressent et ajoutez-les au panier quand vous êtes prêt à commander.
+            </p>
+          </div>
+
+          <div class="col-lg-4 text-lg-end">
+            <a class="btn btn-mf-outline reveal" href="boutique.html">
+              <i class="bi bi-bag me-1"></i> Découvrir plus de produits
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="wishlist-page">
+      <div class="container">
+        <div class="row g-4 align-items-start">
+          <div class="col-lg-9">
+            <div class="wishlist-toolbar reveal">
+              <div class="row align-items-center g-3">
+                <div class="col-md-4">
+                  <strong>8 produits favoris</strong>
+                  <span class="d-block text-secondary small">Produits sauvegardés récemment</span>
+                </div>
+
+                <div class="col-md-4">
+                  <input class="form-control" type="search" placeholder="Rechercher dans mes favoris..." aria-label="Rechercher dans les favoris">
+                </div>
+
+                <div class="col-md-4">
+                  <select class="form-select" aria-label="Trier les favoris">
+                    <option selected>Tri recommandé</option>
+                    <option>Prix croissant</option>
+                    <option>Prix décroissant</option>
+                    <option>Ajoutés récemment</option>
+                    <option>Disponibles en stock</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap gap-2 mb-4 reveal">
+              <a class="collection-chip active" href="favoris.html"><i class="bi bi-grid"></i>Tous</a>
+              <a class="collection-chip" href="boutique.html"><i class="bi bi-phone"></i>Téléphones</a>
+              <a class="collection-chip" href="boutique.html"><i class="bi bi-house"></i>Maison</a>
+              <a class="collection-chip" href="boutique.html"><i class="bi bi-bag-heart"></i>Mode</a>
+              <a class="collection-chip" href="boutique.html"><i class="bi bi-tv"></i>Électro</a>
+            </div>
+
+            <div class="row g-4">
+              <div class="col-sm-6 col-xl-4 reveal">
+                <article class="wishlist-card">
+                  <div class="wishlist-media">
+                    <span class="wishlist-badge">Top</span>
+                    <a class="wishlist-remove" href="favoris.html" aria-label="Retirer des favoris"><i class="bi bi-x-lg"></i></a>
+                    <i class="bi bi-phone-fill"></i>
+                  </div>
+                  <span class="stock-pill mb-2"><i class="bi bi-check-circle"></i> En stock</span>
+                  <h2 class="product-title">iPhone 12 occasion propre</h2>
+                  <div class="wishlist-vendor mb-2">Vendeur : Mobile Center</div>
+                  <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i> <span class="text-secondary">(41)</span></div>
+                  <div class="wishlist-price">5 000 Fr</div>
+                  <div class="wishlist-actions">
+                    <a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter au panier</a>
+                    <a class="btn btn-light btn-sm" href="produit.html">Voir</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-sm-6 col-xl-4 reveal">
+                <article class="wishlist-card">
+                  <div class="wishlist-media">
+                    <span class="wishlist-badge">Populaire</span>
+                    <a class="wishlist-remove" href="favoris.html" aria-label="Retirer des favoris"><i class="bi bi-x-lg"></i></a>
+                    <i class="bi bi-phone"></i>
+                  </div>
+                  <span class="stock-pill mb-2"><i class="bi bi-check-circle"></i> En stock</span>
+                  <h2 class="product-title">Téléphone Samsung A12</h2>
+                  <div class="wishlist-vendor mb-2">Vendeur : Boutique Diallo</div>
+                  <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i> <span class="text-secondary">(24)</span></div>
+                  <div class="wishlist-price">1 200 000 Fr</div>
+                  <div class="wishlist-actions">
+                    <a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter au panier</a>
+                    <a class="btn btn-light btn-sm" href="produit.html">Voir</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-sm-6 col-xl-4 reveal">
+                <article class="wishlist-card">
+                  <div class="wishlist-media">
+                    <a class="wishlist-remove" href="favoris.html" aria-label="Retirer des favoris"><i class="bi bi-x-lg"></i></a>
+                    <i class="bi bi-display"></i>
+                  </div>
+                  <span class="stock-pill mb-2"><i class="bi bi-check-circle"></i> En stock</span>
+                  <h2 class="product-title">Télévision écran plat</h2>
+                  <div class="wishlist-vendor mb-2">Vendeur : Electro Fooly</div>
+                  <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i><i class="bi bi-star"></i> <span class="text-secondary">(14)</span></div>
+                  <div class="wishlist-price">500 000 Fr</div>
+                  <div class="wishlist-actions">
+                    <a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter au panier</a>
+                    <a class="btn btn-light btn-sm" href="produit.html">Voir</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-sm-6 col-xl-4 reveal">
+                <article class="wishlist-card">
+                  <div class="wishlist-media">
+                    <span class="wishlist-badge">Local</span>
+                    <a class="wishlist-remove" href="favoris.html" aria-label="Retirer des favoris"><i class="bi bi-x-lg"></i></a>
+                    <i class="bi bi-bag-heart"></i>
+                  </div>
+                  <span class="stock-pill mb-2"><i class="bi bi-check-circle"></i> En stock</span>
+                  <h2 class="product-title">Sac tendance femme</h2>
+                  <div class="wishlist-vendor mb-2">Vendeur : Style Kadé</div>
+                  <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i> <span class="text-secondary">(21)</span></div>
+                  <div class="wishlist-price">85 000 Fr</div>
+                  <div class="wishlist-actions">
+                    <a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter au panier</a>
+                    <a class="btn btn-light btn-sm" href="produit.html">Voir</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-sm-6 col-xl-4 reveal">
+                <article class="wishlist-card">
+                  <div class="wishlist-media">
+                    <span class="wishlist-badge">Nouveau</span>
+                    <a class="wishlist-remove" href="favoris.html" aria-label="Retirer des favoris"><i class="bi bi-x-lg"></i></a>
+                    <i class="bi bi-droplet-half"></i>
+                  </div>
+                  <span class="stock-pill mb-2"><i class="bi bi-check-circle"></i> En stock</span>
+                  <h2 class="product-title">Huile de peau naturelle</h2>
+                  <div class="wishlist-vendor mb-2">Vendeur : Beauté Locale</div>
+                  <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i> <span class="text-secondary">(32)</span></div>
+                  <div class="wishlist-price">120 000 Fr</div>
+                  <div class="wishlist-actions">
+                    <a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter au panier</a>
+                    <a class="btn btn-light btn-sm" href="produit.html">Voir</a>
+                  </div>
+                </article>
+              </div>
+
+              <div class="col-sm-6 col-xl-4 reveal">
+                <article class="wishlist-card">
+                  <div class="wishlist-media">
+                    <a class="wishlist-remove" href="favoris.html" aria-label="Retirer des favoris"><i class="bi bi-x-lg"></i></a>
+                    <i class="bi bi-house-door"></i>
+                  </div>
+                  <span class="stock-pill mb-2"><i class="bi bi-check-circle"></i> Disponible</span>
+                  <h2 class="product-title">Location maison à Sangarédi</h2>
+                  <div class="wishlist-vendor mb-2">Vendeur : Immo Fooly</div>
+                  <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i> <span class="text-secondary">(9)</span></div>
+                  <div class="wishlist-price">12 000 000 Fr</div>
+                  <div class="wishlist-actions">
+                    <a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter au panier</a>
+                    <a class="btn btn-light btn-sm" href="produit.html">Voir</a>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <div class="empty-wishlist mt-4 reveal">
+              <div class="empty-wishlist-icon"><i class="bi bi-search-heart"></i></div>
+              <h2 class="h4 fw-bold">Continuez à sauvegarder vos coups de cœur</h2>
+              <p class="text-secondary mb-3">Parcourez la boutique et gardez les meilleurs produits pour les retrouver plus tard.</p>
+              <a class="btn btn-mf-outline" href="boutique.html">Explorer la boutique</a>
+            </div>
+          </div>
+
+          <div class="col-lg-3">
+            <aside class="wishlist-summary reveal">
+              <h2 class="h4 fw-bold mb-3">Résumé favoris</h2>
+
+              <div class="summary-stat">
+                <span>Total favoris</span>
+                <strong>8</strong>
+              </div>
+              <div class="summary-stat">
+                <span>En stock</span>
+                <strong>7</strong>
+              </div>
+              <div class="summary-stat">
+                <span>Promos</span>
+                <strong>2</strong>
+              </div>
+              <div class="summary-stat">
+                <span>Vendeurs locaux</span>
+                <strong>6</strong>
+              </div>
+
+              <a class="btn btn-mf-primary w-100 mt-4" href="panier.html">
+                Voir mon panier
+              </a>
+              <a class="btn btn-mf-outline w-100 mt-2" href="boutique.html">
+                Ajouter d’autres produits
+              </a>
+            </aside>
+
+            <div class="tip-card mt-4 reveal">
+              <span class="badge bg-warning text-dark rounded-pill mb-3">Conseil FOOLY</span>
+              <h2 class="h5 fw-bold">Les bons produits partent vite</h2>
+              <p class="text-white-50 mb-3">Ajoutez vos favoris au panier pour ne pas perdre les meilleures offres locales.</p>
+              <a class="btn btn-light fw-bold" href="panier.html">Passer au panier</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-padding bg-soft">
+      <div class="container">
+        <div class="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
+          <div>
+            <span class="text-orange fw-bold">Suggestions</span>
+            <h2 class="section-title display-6 mb-2">Produits à découvrir</h2>
+            <p class="section-subtitle mb-0">Complétez votre liste avec des articles populaires sur Marché Fooly.</p>
+          </div>
+          <a class="btn btn-mf-outline" href="boutique.html">Voir toute la boutique</a>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-sm-6 col-lg-3 reveal">
+            <article class="product-card">
+              <div class="product-media"><span class="product-badge">Promo</span><i class="bi bi-router"></i></div>
+              <div class="product-body">
+                <h3 class="product-title">Routeur WiFi</h3>
+                <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i> <span class="text-secondary">(18)</span></div>
+                <div class="product-price mb-3">5 000 Fr</div>
+                <div class="product-actions"><a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter</a><a class="btn btn-light btn-sm" href="produit.html">Voir</a></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-sm-6 col-lg-3 reveal">
+            <article class="product-card">
+              <div class="product-media"><i class="bi bi-usb-drive"></i></div>
+              <div class="product-body">
+                <h3 class="product-title">Chargeur rapide USB</h3>
+                <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i><i class="bi bi-star"></i> <span class="text-secondary">(12)</span></div>
+                <div class="product-price mb-3">45 000 Fr</div>
+                <div class="product-actions"><a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter</a><a class="btn btn-light btn-sm" href="produit.html">Voir</a></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-sm-6 col-lg-3 reveal">
+            <article class="product-card">
+              <div class="product-media"><span class="product-badge">Local</span><i class="bi bi-headphones"></i></div>
+              <div class="product-body">
+                <h3 class="product-title">Écouteurs Bluetooth</h3>
+                <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i> <span class="text-secondary">(20)</span></div>
+                <div class="product-price mb-3">95 000 Fr</div>
+                <div class="product-actions"><a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter</a><a class="btn btn-light btn-sm" href="produit.html">Voir</a></div>
+              </div>
+            </article>
+          </div>
+
+          <div class="col-sm-6 col-lg-3 reveal">
+            <article class="product-card">
+              <div class="product-media"><span class="product-badge">Nouveau</span><i class="bi bi-basket2"></i></div>
+              <div class="product-body">
+                <h3 class="product-title">Pack alimentation maison</h3>
+                <div class="rating mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i> <span class="text-secondary">(16)</span></div>
+                <div class="product-price mb-3">150 000 Fr</div>
+                <div class="product-actions"><a class="btn btn-mf-primary btn-sm" href="panier.html">Ajouter</a><a class="btn btn-light btn-sm" href="produit.html">Voir</a></div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pb-5 bg-soft">
+      <div class="container">
+        <div class="newsletter-box reveal">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-6">
+              <h2 class="fw-bold mb-2">Recevez les meilleures offres</h2>
+              <p class="mb-0 text-white-75">Promos, nouveautés et bons plans directement dans votre boîte email.</p>
+            </div>
+            <div class="col-lg-6">
+              <form class="d-flex flex-column flex-sm-row gap-2" action="contact.html" method="get">
+                <input class="form-control" type="email" placeholder="Votre adresse email" aria-label="Votre email">
+                <button class="btn btn-dark px-4" type="submit">S’inscrire</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a class="brand-logo mb-3" href="index.html">
+            <span class="brand-mark"><i class="bi bi-bag-check-fill"></i></span>
+            <span class="brand-text">
+              <span class="brand-title d-block text-white">Marché Fooly</span>
+              <span class="brand-slogan d-block">Le marché gagnant</span>
+            </span>
+          </a>
+          <p>Marketplace locale basée à Sangarédi, Guinée, pour acheter et vendre facilement en ligne.</p>
+          <p class="mb-1"><i class="bi bi-geo-alt me-2"></i>Sangarédi, Guinée</p>
+          <p class="mb-1"><i class="bi bi-telephone me-2"></i>+224 624 27 38 05</p>
+          <p><i class="bi bi-envelope me-2"></i>contact@marchefooly.com</p>
+          <div>
+            <a class="social-link" href="contact.html" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a class="social-link" href="https://wa.me/224624273805" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+            <a class="social-link" href="contact.html" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h5>Liens utiles</h5>
+          <a href="boutique.html">Boutique</a>
+          <a href="categories.html">Catégories</a>
+          <a href="devenir-vendeur.html">Devenir vendeur</a>
+          <a href="mon-compte.html">Mon compte</a>
+          <a href="aide.html">Aide</a>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <h5>Catégories</h5>
+          <a href="categories.html">Téléphones & Accessoires</a>
+          <a href="categories.html">Maison / Cuisine</a>
+          <a href="categories.html">Électroménagers</a>
+          <a href="categories.html">Vêtements Femme</a>
+          <a href="categories.html">Automobile</a>
+        </div>
+
+        <div class="col-lg-3">
+          <h5>Confiance</h5>
+          <a href="commandes.html">Suivre mes commandes</a>
+          <a href="panier.html">Voir mon panier</a>
+          <a href="checkout.html">Finaliser l’achat</a>
+          <a href="favoris.html">Mes favoris</a>
+          <a href="contact.html">Contacter FOOLY</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
+        <span>© 2026 Marché Fooly. Tous droits réservés.</span>
+        <span>Marché Fooly - Le marché gagnant.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mon compte | Marché Fooly - Marketplace locale à Sangarédi</title>
+  <meta name="description" content="Connectez-vous à votre compte Marché Fooly pour suivre vos commandes, gérer vos favoris, votre panier et vos informations client.">
+  <meta name="keywords" content="compte Marché Fooly, connexion marketplace Guinée, compte client Sangarédi, commandes Marché Fooly, favoris Marché Fooly">
+  <meta name="author" content="Marché Fooly">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="Mon compte | Marché Fooly">
+  <meta property="og:description" content="Gérez votre compte client Marché Fooly : commandes, panier, favoris et informations personnelles.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://marchefooly.com/mon-compte.html">
+  <meta property="og:image" content="assets/img/og-marche-fooly.jpg">
+
+  <!-- Analytics futur : coller ici Google Analytics / Meta Pixel -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <style>
+    .account-hero {
+      background:
+        radial-gradient(circle at 12% 20%, rgba(255, 122, 0, 0.16), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(22, 163, 74, 0.13), transparent 26%),
+        linear-gradient(135deg, #fff8ef 0%, #ffffff 52%, #f3fff7 100%);
+      padding: 58px 0;
+      border-bottom: 1px solid var(--mf-border);
+    }
+
+    .breadcrumb a {
+      color: var(--mf-muted);
+      font-weight: 700;
+    }
+
+    .breadcrumb .active {
+      color: var(--mf-dark);
+      font-weight: 900;
+    }
+
+    .account-title {
+      font-size: clamp(2.1rem, 4.5vw, 4rem);
+      font-weight: 950;
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+    }
+
+    .account-shell {
+      padding: 58px 0 80px;
+      background: #ffffff;
+    }
+
+    .auth-card,
+    .account-card,
+    .account-sidebar,
+    .security-card {
+      background: #ffffff;
+      border: 1px solid var(--mf-border);
+      border-radius: 28px;
+      box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+    }
+
+    .auth-card {
+      padding: 32px;
+      height: 100%;
+    }
+
+    .auth-card .nav-pills {
+      background: var(--mf-light);
+      padding: 6px;
+      border-radius: 18px;
+    }
+
+    .auth-card .nav-pills .nav-link {
+      border-radius: 14px;
+      color: var(--mf-dark);
+      font-weight: 900;
+    }
+
+    .auth-card .nav-pills .nav-link.active {
+      background: var(--mf-orange);
+      color: #ffffff;
+      box-shadow: 0 12px 24px rgba(255, 122, 0, 0.22);
+    }
+
+    .auth-card .form-control,
+    .auth-card .form-select,
+    .account-card .form-control,
+    .account-card .form-select {
+      min-height: 52px;
+      border-radius: 16px;
+      border: 1px solid var(--mf-border);
+    }
+
+    .auth-card .form-control:focus,
+    .auth-card .form-select:focus,
+    .account-card .form-control:focus,
+    .account-card .form-select:focus {
+      border-color: var(--mf-orange);
+      box-shadow: 0 0 0 5px rgba(255, 122, 0, 0.1);
+    }
+
+    .social-auth-btn {
+      min-height: 50px;
+      border-radius: 16px;
+      border: 1px solid var(--mf-border);
+      background: #ffffff;
+      font-weight: 900;
+      color: var(--mf-dark);
+      transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .social-auth-btn:hover {
+      background: var(--mf-light);
+      border-color: rgba(255, 122, 0, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .auth-separator {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--mf-muted);
+      font-weight: 800;
+      font-size: 0.9rem;
+    }
+
+    .auth-separator::before,
+    .auth-separator::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--mf-border);
+    }
+
+    .account-sidebar {
+      padding: 22px;
+      position: sticky;
+      top: 148px;
+    }
+
+    .user-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 24px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--mf-orange), var(--mf-green));
+      color: #ffffff;
+      font-size: 2rem;
+      box-shadow: 0 18px 34px rgba(255, 122, 0, 0.22);
+    }
+
+    .account-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      color: var(--mf-dark);
+      font-weight: 850;
+      margin-bottom: 6px;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .account-nav-link:hover,
+    .account-nav-link.active {
+      background: #fff3e5;
+      color: var(--mf-orange);
+      transform: translateX(2px);
+    }
+
+    .account-nav-link i {
+      font-size: 1.12rem;
+    }
+
+    .account-card {
+      padding: 26px;
+      height: 100%;
+    }
+
+    .account-stat {
+      background: var(--mf-light);
+      border-radius: 22px;
+      padding: 20px;
+      height: 100%;
+      transition: transform 0.2s ease;
+    }
+
+    .account-stat:hover {
+      transform: translateY(-4px);
+    }
+
+    .account-stat i {
+      width: 48px;
+      height: 48px;
+      border-radius: 17px;
+      display: grid;
+      place-items: center;
+      background: #fff3e5;
+      color: var(--mf-orange);
+      font-size: 1.35rem;
+      margin-bottom: 14px;
+    }
+
+    .account-stat strong {
+      display: block;
+      font-size: 1.65rem;
+      font-weight: 950;
+      letter-spacing: -0.04em;
+    }
+
+    .order-mini {
+      border: 1px solid var(--mf-border);
+      border-radius: 20px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+
+    .order-status {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      font-weight: 950;
+    }
+
+    .order-status.pending {
+      background: #fff3e5;
+      color: var(--mf-orange);
+    }
+
+    .order-status.done {
+      background: rgba(22, 163, 74, 0.10);
+      color: var(--mf-green);
+    }
+
+    .favorite-mini {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--mf-border);
+      border-radius: 18px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+
+    .favorite-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: #fff3e5;
+      color: var(--mf-orange);
+      flex: 0 0 auto;
+      font-size: 1.25rem;
+    }
+
+    .address-box {
+      border: 1px solid var(--mf-border);
+      border-radius: 20px;
+      padding: 18px;
+      background: #ffffff;
+    }
+
+    .security-card {
+      padding: 28px;
+      background:
+        radial-gradient(circle at 8% 20%, rgba(255,255,255,0.25), transparent 24%),
+        linear-gradient(135deg, #151922, #243044);
+      color: #ffffff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .security-card::after {
+      content: "";
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      right: -100px;
+      bottom: -120px;
+      border-radius: 50%;
+      background: rgba(255, 122, 0, 0.32);
+    }
+
+    .security-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .info-note {
+      background: linear-gradient(135deg, rgba(255, 122, 0, 0.09), rgba(22, 163, 74, 0.09));
+      border: 1px solid rgba(255, 122, 0, 0.16);
+      border-radius: 24px;
+      padding: 22px;
+    }
+
+    @media (max-width: 991.98px) {
+      .account-sidebar {
+        position: static;
+      }
+    }
+
+    @media (max-width: 575.98px) {
+      .auth-card,
+      .account-card,
+      .account-sidebar,
+      .security-card {
+        border-radius: 24px;
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar py-2">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <span><i class="bi bi-geo-alt me-1"></i>Sangarédi, Guinée</span>
+        <a href="tel:+224624273805"><i class="bi bi-telephone me-1"></i>+224 624 27 38 05</a>
+        <a href="mailto:contact@marchefooly.com"><i class="bi bi-envelope me-1"></i>contact@marchefooly.com</a>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="mon-compte.html" aria-label="Version française">FR</a>
+        <span>/</span>
+        <a href="en/index.html" aria-label="English version">EN</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="main-header">
+    <div class="container py-3">
+      <div class="row align-items-center g-3">
+        <div class="col-8 col-lg-3">
+          <a class="brand-logo" href="index.html" aria-label="Accueil Marché Fooly">
+            <span class="brand-mark"><i class="bi bi-bag-check-fill"></i></span>
+            <span class="brand-text">
+              <span class="brand-title d-block">Marché Fooly</span>
+              <span class="brand-slogan d-block">Le marché gagnant</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="col-12 col-lg-5 order-3 order-lg-2">
+          <form class="search-wrapper d-flex" action="boutique.html" method="get">
+            <input class="form-control" type="search" name="q" placeholder="Rechercher téléphone, maison, mode..." aria-label="Rechercher un produit">
+            <button class="btn btn-primary px-3" type="submit">
+              <i class="bi bi-search me-lg-1"></i><span class="d-none d-lg-inline">Rechercher</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="col-4 col-lg-4 order-2 order-lg-3">
+          <div class="d-flex align-items-center justify-content-end gap-1 gap-md-2">
+            <a class="header-action" href="mon-compte.html"><i class="bi bi-person"></i><span>Compte</span></a>
+            <a class="header-action" href="favoris.html"><i class="bi bi-heart"></i><span>Favoris</span></a>
+            <a class="header-action" href="panier.html">
+              <i class="bi bi-cart3"></i><span>Panier</span><em class="cart-badge not-italic">0</em>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="main-nav navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <button class="navbar-toggler border-0 ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Ouvrir le menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav align-items-lg-center">
+            <li class="nav-item"><a class="nav-link" href="index.html">Accueil</a></li>
+            <li class="nav-item"><a class="nav-link" href="boutique.html">Boutique</a></li>
+            <li class="nav-item"><a class="nav-link" href="categories.html">Catégories</a></li>
+            <li class="nav-item"><a class="nav-link" href="devenir-vendeur.html">Devenir vendeur</a></li>
+            <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          </ul>
+
+          <div class="ms-lg-auto mt-3 mt-lg-0">
+            <a class="btn btn-mf-primary btn-sm" href="devenir-vendeur.html">
+              <i class="bi bi-shop me-1"></i> Ouvrir une boutique
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="account-hero">
+      <div class="container">
+        <nav aria-label="Fil d'Ariane" class="mb-4">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="index.html">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Mon compte</li>
+          </ol>
+        </nav>
+
+        <div class="row align-items-center g-5">
+          <div class="col-lg-7">
+            <span class="hero-badge mb-4 reveal">
+              <i class="bi bi-person-circle text-orange"></i>
+              Espace client Marché Fooly
+            </span>
+            <h1 class="account-title mb-4 reveal">Gérez vos achats et vos informations</h1>
+            <p class="section-subtitle fs-5 mb-0 reveal">
+              Connectez-vous pour suivre vos commandes, retrouver vos favoris, gérer votre panier
+              et préparer vos futurs achats sur la marketplace locale de Sangarédi.
+            </p>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="info-note reveal">
+              <h2 class="h4 fw-bold mb-3">
+                <i class="bi bi-info-circle text-orange me-2"></i>Maquette statique
+              </h2>
+              <p class="text-secondary mb-3">
+                Cette page montre l’expérience compte client prévue. La connexion réelle sera activée plus tard avec le backend.
+              </p>
+              <a class="btn btn-mf-primary" href="#connexion">Accéder à la connexion</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="connexion" class="account-shell">
+      <div class="container">
+        <div class="row g-4 align-items-start">
+          <div class="col-lg-5">
+            <div class="auth-card reveal">
+              <ul class="nav nav-pills nav-fill mb-4" id="accountAuthTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login-pane" type="button" role="tab" aria-controls="login-pane" aria-selected="true">Connexion</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="register-tab" data-bs-toggle="pill" data-bs-target="#register-pane" type="button" role="tab" aria-controls="register-pane" aria-selected="false">Inscription</button>
+                </li>
+              </ul>
+
+              <div class="tab-content" id="accountAuthTabContent">
+                <div class="tab-pane fade show active" id="login-pane" role="tabpanel" aria-labelledby="login-tab" tabindex="0">
+                  <h2 class="h3 fw-bold mb-2">Bon retour sur FOOLY</h2>
+                  <p class="text-secondary mb-4">Connectez-vous pour retrouver votre panier, vos commandes et vos favoris.</p>
+
+                  <form action="mon-compte.html" method="get">
+                    <div class="mb-3">
+                      <label class="form-label fw-bold" for="loginEmail">Email ou téléphone</label>
+                      <input class="form-control" id="loginEmail" type="text" placeholder="email@exemple.com ou +224...">
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label fw-bold" for="loginPassword">Mot de passe</label>
+                      <input class="form-control" id="loginPassword" type="password" placeholder="Votre mot de passe">
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center gap-3 mb-4">
+                      <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label text-secondary" for="rememberMe">Se souvenir de moi</label>
+                      </div>
+                      <a class="fw-bold text-orange small" href="aide.html">Mot de passe oublié ?</a>
+                    </div>
+
+                    <button class="btn btn-mf-primary w-100 mb-3" type="submit">Se connecter</button>
+                  </form>
+
+                  <div class="auth-separator my-3">ou</div>
+
+                  <div class="d-grid gap-2">
+                    <a class="btn social-auth-btn" href="mon-compte.html"><i class="bi bi-google me-2"></i>Se connecter avec Google</a>
+                    <a class="btn social-auth-btn" href="mon-compte.html"><i class="bi bi-facebook me-2"></i>Se connecter avec Facebook</a>
+                  </div>
+
+                  <p class="text-center text-secondary mt-4 mb-0">
+                    Pas encore de compte ?
+                    <button class="btn btn-link p-0 fw-bold text-orange" type="button" data-bs-toggle="pill" data-bs-target="#register-pane">Inscription</button>
+                  </p>
+                </div>
+
+                <div class="tab-pane fade" id="register-pane" role="tabpanel" aria-labelledby="register-tab" tabindex="0">
+                  <h2 class="h3 fw-bold mb-2">Créer un compte FOOLY</h2>
+                  <p class="text-secondary mb-4">Inscrivez-vous pour acheter plus vite et sauvegarder vos produits préférés.</p>
+
+                  <form action="mon-compte.html" method="get">
+                    <div class="row g-3">
+                      <div class="col-md-6">
+                        <label class="form-label fw-bold" for="firstName">Prénom</label>
+                        <input class="form-control" id="firstName" type="text" placeholder="Votre prénom">
+                      </div>
+
+                      <div class="col-md-6">
+                        <label class="form-label fw-bold" for="lastName">Nom</label>
+                        <input class="form-control" id="lastName" type="text" placeholder="Votre nom">
+                      </div>
+
+                      <div class="col-12">
+                        <label class="form-label fw-bold" for="registerPhone">Téléphone</label>
+                        <input class="form-control" id="registerPhone" type="tel" placeholder="+224 6XX XX XX XX">
+                      </div>
+
+                      <div class="col-12">
+                        <label class="form-label fw-bold" for="registerEmail">Email</label>
+                        <input class="form-control" id="registerEmail" type="email" placeholder="votre@email.com">
+                      </div>
+
+                      <div class="col-12">
+                        <label class="form-label fw-bold" for="registerPassword">Mot de passe</label>
+                        <input class="form-control" id="registerPassword" type="password" placeholder="Créer un mot de passe">
+                      </div>
+
+                      <div class="col-12">
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="termsAgree">
+                          <label class="form-check-label text-secondary" for="termsAgree">
+                            J’accepte les conditions futures de Marché Fooly.
+                          </label>
+                        </div>
+                      </div>
+
+                      <div class="col-12">
+                        <button class="btn btn-mf-primary w-100" type="submit">Créer mon compte</button>
+                      </div>
+                    </div>
+                  </form>
+
+                  <div class="auth-separator my-3">ou</div>
+
+                  <div class="d-grid gap-2">
+                    <a class="btn social-auth-btn" href="mon-compte.html"><i class="bi bi-google me-2"></i>S’inscrire avec Google</a>
+                    <a class="btn social-auth-btn" href="mon-compte.html"><i class="bi bi-facebook me-2"></i>S’inscrire avec Facebook</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="row g-4">
+              <div class="col-lg-4">
+                <aside class="account-sidebar reveal">
+                  <div class="text-center mb-4">
+                    <div class="user-avatar mx-auto mb-3"><i class="bi bi-person"></i></div>
+                    <h2 class="h5 fw-bold mb-1">Client FOOLY</h2>
+                    <p class="text-secondary small mb-0">Compte maquette</p>
+                  </div>
+
+                  <nav aria-label="Navigation compte">
+                    <a class="account-nav-link active" href="mon-compte.html"><i class="bi bi-speedometer2"></i> Tableau de bord</a>
+                    <a class="account-nav-link" href="commandes.html"><i class="bi bi-box-seam"></i> Commandes</a>
+                    <a class="account-nav-link" href="favoris.html"><i class="bi bi-heart"></i> Favoris</a>
+                    <a class="account-nav-link" href="panier.html"><i class="bi bi-cart3"></i> Panier</a>
+                    <a class="account-nav-link" href="checkout.html"><i class="bi bi-credit-card"></i> Checkout</a>
+                    <a class="account-nav-link" href="aide.html"><i class="bi bi-question-circle"></i> Aide</a>
+                    <a class="account-nav-link" href="index.html"><i class="bi bi-box-arrow-right"></i> Déconnexion</a>
+                  </nav>
+                </aside>
+              </div>
+
+              <div class="col-lg-8">
+                <div class="account-card reveal">
+                  <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+                    <div>
+                      <span class="text-orange fw-bold">Aperçu client</span>
+                      <h2 class="h3 fw-bold mb-0">Tableau de bord</h2>
+                    </div>
+                    <a class="btn btn-mf-outline" href="boutique.html">Continuer mes achats</a>
+                  </div>
+
+                  <div class="row g-3">
+                    <div class="col-sm-6">
+                      <div class="account-stat">
+                        <i class="bi bi-box-seam"></i>
+                        <strong>3</strong>
+                        <span class="text-secondary fw-semibold">Commandes</span>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                      <div class="account-stat">
+                        <i class="bi bi-heart"></i>
+                        <strong>8</strong>
+                        <span class="text-secondary fw-semibold">Favoris</span>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                      <div class="account-stat">
+                        <i class="bi bi-cart3"></i>
+                        <strong>2</strong>
+                        <span class="text-secondary fw-semibold">Articles panier</span>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-6">
+                      <div class="account-stat">
+                        <i class="bi bi-geo-alt"></i>
+                        <strong>1</strong>
+                        <span class="text-secondary fw-semibold">Adresse</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="account-card mt-4 reveal">
+                  <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <h2 class="h4 fw-bold mb-0">Commandes récentes</h2>
+                    <a class="fw-bold text-orange" href="commandes.html">Voir tout</a>
+                  </div>
+
+                  <div class="order-mini">
+                    <div class="d-flex justify-content-between gap-3">
+                      <div>
+                        <strong class="d-block">Commande #MF-1024</strong>
+                        <span class="text-secondary small">Samsung A12 · 1 article</span>
+                      </div>
+                      <span class="order-status pending">En attente</span>
+                    </div>
+                  </div>
+
+                  <div class="order-mini">
+                    <div class="d-flex justify-content-between gap-3">
+                      <div>
+                        <strong class="d-block">Commande #MF-1018</strong>
+                        <span class="text-secondary small">Huile de peau · 2 articles</span>
+                      </div>
+                      <span class="order-status done">Livrée</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="account-card mt-4 reveal">
+                  <div class="d-flex justify-content-between align-items-center gap-3 mb-3">
+                    <h2 class="h4 fw-bold mb-0">Favoris récents</h2>
+                    <a class="fw-bold text-orange" href="favoris.html">Voir tout</a>
+                  </div>
+
+                  <div class="favorite-mini">
+                    <div class="favorite-icon"><i class="bi bi-phone"></i></div>
+                    <div class="flex-grow-1">
+                      <strong class="d-block">iPhone 12</strong>
+                      <span class="text-secondary small">5 000 Fr</span>
+                    </div>
+                    <a class="btn btn-light btn-sm fw-bold" href="produit.html">Voir</a>
+                  </div>
+
+                  <div class="favorite-mini">
+                    <div class="favorite-icon"><i class="bi bi-display"></i></div>
+                    <div class="flex-grow-1">
+                      <strong class="d-block">Télévision</strong>
+                      <span class="text-secondary small">500 000 Fr</span>
+                    </div>
+                    <a class="btn btn-light btn-sm fw-bold" href="produit.html">Voir</a>
+                  </div>
+                </div>
+
+                <div class="account-card mt-4 reveal">
+                  <h2 class="h4 fw-bold mb-3">Adresse principale</h2>
+                  <div class="address-box">
+                    <div class="d-flex align-items-start justify-content-between gap-3">
+                      <div>
+                        <strong class="d-block">Sangarédi centre</strong>
+                        <span class="text-secondary">Sangarédi, Guinée</span>
+                        <p class="text-secondary small mb-0 mt-2">Adresse exemple pour préparer la livraison locale future.</p>
+                      </div>
+                      <a class="btn btn-light btn-sm fw-bold" href="checkout.html">Modifier</a>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="security-card mt-4 reveal">
+                  <span class="badge bg-warning text-dark rounded-pill mb-3">Sécurité</span>
+                  <h2 class="h4 fw-bold mb-2">Protégez votre compte</h2>
+                  <p class="text-white-50">
+                    La sécurité réelle sera gérée avec le backend : mot de passe chiffré,
+                    sessions, vérification email/téléphone et protections anti-abus.
+                  </p>
+                  <a class="btn btn-light fw-bold" href="aide.html">Voir les conseils</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pb-5">
+      <div class="container">
+        <div class="newsletter-box reveal">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-6">
+              <h2 class="fw-bold mb-2">Recevez les meilleures offres</h2>
+              <p class="mb-0 text-white-75">Promos, nouveautés et bons plans directement dans votre boîte email.</p>
+            </div>
+            <div class="col-lg-6">
+              <form class="d-flex flex-column flex-sm-row gap-2" action="contact.html" method="get">
+                <input class="form-control" type="email" placeholder="Votre adresse email" aria-label="Votre email">
+                <button class="btn btn-dark px-4" type="submit">S’inscrire</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a class="brand-logo mb-3" href="index.html">
+            <span class="brand-mark"><i class="bi bi-bag-check-fill"></i></span>
+            <span class="brand-text">
+              <span class="brand-title d-block text-white">Marché Fooly</span>
+              <span class="brand-slogan d-block">Le marché gagnant</span>
+            </span>
+          </a>
+          <p>Marketplace locale basée à Sangarédi, Guinée, pour acheter et vendre facilement en ligne.</p>
+          <p class="mb-1"><i class="bi bi-geo-alt me-2"></i>Sangarédi, Guinée</p>
+          <p class="mb-1"><i class="bi bi-telephone me-2"></i>+224 624 27 38 05</p>
+          <p><i class="bi bi-envelope me-2"></i>contact@marchefooly.com</p>
+          <div>
+            <a class="social-link" href="contact.html" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a class="social-link" href="https://wa.me/224624273805" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+            <a class="social-link" href="contact.html" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h5>Liens utiles</h5>
+          <a href="boutique.html">Boutique</a>
+          <a href="categories.html">Catégories</a>
+          <a href="devenir-vendeur.html">Devenir vendeur</a>
+          <a href="mon-compte.html">Mon compte</a>
+          <a href="aide.html">Aide</a>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <h5>Catégories</h5>
+          <a href="categories.html">Téléphones & Accessoires</a>
+          <a href="categories.html">Maison / Cuisine</a>
+          <a href="categories.html">Électroménagers</a>
+          <a href="categories.html">Vêtements Femme</a>
+          <a href="categories.html">Automobile</a>
+        </div>
+
+        <div class="col-lg-3">
+          <h5>Confiance</h5>
+          <a href="commandes.html">Suivre mes commandes</a>
+          <a href="panier.html">Voir mon panier</a>
+          <a href="checkout.html">Finaliser l’achat</a>
+          <a href="favoris.html">Mes favoris</a>
+          <a href="contact.html">Contacter FOOLY</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
+        <span>© 2026 Marché Fooly. Tous droits réservés.</span>
+        <span>Maquette front-end statique HTML5, CSS3, Bootstrap 5.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

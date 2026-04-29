@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Centre d’aide | Marché Fooly</title>
+  <meta name="description" content="Centre d’aide Marché Fooly : réponses aux questions sur les achats, commandes, vendeurs, livraison, paiement, compte client et support à Sangarédi.">
+  <meta name="keywords" content="aide Marché Fooly, support marketplace Sangarédi, FAQ Marché Fooly, commandes Sangarédi, devenir vendeur Guinée">
+  <meta name="author" content="Marché Fooly">
+  <meta name="robots" content="index, follow">
+
+  <meta property="og:title" content="Centre d’aide | Marché Fooly">
+  <meta property="og:description" content="Trouvez rapidement de l’aide pour acheter, vendre et suivre vos commandes sur Marché Fooly.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://marchefooly.com/aide.html">
+  <meta property="og:image" content="assets/img/og-marche-fooly.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="assets/css/style.css" rel="stylesheet">
+
+  <style>
+    .help-hero {
+      background:
+        radial-gradient(circle at 12% 20%, rgba(255, 122, 0, 0.16), transparent 28%),
+        radial-gradient(circle at 88% 14%, rgba(22, 163, 74, 0.13), transparent 26%),
+        linear-gradient(135deg, #fff8ef 0%, #ffffff 52%, #f3fff7 100%);
+      padding: 62px 0;
+      border-bottom: 1px solid var(--mf-border);
+    }
+
+    .breadcrumb a {
+      color: var(--mf-muted);
+      font-weight: 700;
+    }
+
+    .breadcrumb .active {
+      color: var(--mf-dark);
+      font-weight: 900;
+    }
+
+    .help-title {
+      font-size: clamp(2.2rem, 5vw, 4.35rem);
+      font-weight: 950;
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+    }
+
+    .help-search-card {
+      background: #ffffff;
+      border: 1px solid var(--mf-border);
+      border-radius: 30px;
+      padding: 26px;
+      box-shadow: var(--mf-shadow);
+    }
+
+    .help-search-card .form-control {
+      min-height: 56px;
+      border-radius: 18px;
+      border: 1px solid var(--mf-border);
+    }
+
+    .help-search-card .form-control:focus {
+      border-color: var(--mf-orange);
+      box-shadow: 0 0 0 5px rgba(255, 122, 0, 0.1);
+    }
+
+    .help-category-card,
+    .guide-card,
+    .faq-panel,
+    .contact-help-card,
+    .quick-link-card {
+      background: #ffffff;
+      border: 1px solid var(--mf-border);
+      border-radius: 28px;
+      box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+    }
+
+    .help-category-card,
+    .guide-card,
+    .quick-link-card {
+      padding: 24px;
+      height: 100%;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+
+    .help-category-card:hover,
+    .guide-card:hover,
+    .quick-link-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--mf-shadow);
+      border-color: rgba(255, 122, 0, 0.28);
+    }
+
+    .help-icon,
+    .guide-icon,
+    .quick-icon {
+      width: 58px;
+      height: 58px;
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: #fff3e5;
+      color: var(--mf-orange);
+      font-size: 1.55rem;
+      margin-bottom: 18px;
+    }
+
+    .help-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #ffffff;
+      border: 1px solid var(--mf-border);
+      color: var(--mf-dark);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 900;
+      transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    }
+
+    .help-tag:hover {
+      background: var(--mf-orange);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    .faq-panel {
+      padding: 28px;
+    }
+
+    .accordion-item {
+      border: 1px solid var(--mf-border);
+      border-radius: 18px !important;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .accordion-button {
+      font-weight: 900;
+    }
+
+    .accordion-button:not(.collapsed) {
+      background: #fff3e5;
+      color: var(--mf-orange);
+      box-shadow: none;
+    }
+
+    .accordion-button:focus {
+      box-shadow: 0 0 0 5px rgba(255, 122, 0, 0.1);
+      border-color: var(--mf-orange);
+    }
+
+    .contact-help-card {
+      padding: 32px;
+      background:
+        radial-gradient(circle at 8% 18%, rgba(255,255,255,0.25), transparent 22%),
+        linear-gradient(135deg, #151922, #243044);
+      color: #ffffff;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .contact-help-card::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      right: -115px;
+      bottom: -130px;
+      border-radius: 50%;
+      background: rgba(255, 122, 0, 0.32);
+    }
+
+    .contact-help-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .guide-step {
+      display: flex;
+      gap: 14px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--mf-border);
+    }
+
+    .guide-step:last-child {
+      border-bottom: 0;
+    }
+
+    .guide-step-number {
+      width: 34px;
+      height: 34px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: var(--mf-orange);
+      color: #ffffff;
+      font-weight: 950;
+      flex: 0 0 auto;
+    }
+
+    .popular-question {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--mf-border);
+      color: var(--mf-dark);
+      font-weight: 850;
+    }
+
+    .popular-question:last-child {
+      border-bottom: 0;
+    }
+
+    .popular-question:hover {
+      color: var(--mf-orange);
+    }
+
+    @media (max-width: 575.98px) {
+      .help-search-card,
+      .help-category-card,
+      .guide-card,
+      .faq-panel,
+      .contact-help-card,
+      .quick-link-card {
+        border-radius: 24px;
+        padding: 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar py-2">
+    <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <span><i class="bi bi-geo-alt me-1"></i>Sangarédi, Guinée</span>
+        <a href="tel:+224624273805"><i class="bi bi-telephone me-1"></i>+224 624 27 38 05</a>
+        <a href="mailto:contact@marchefooly.com"><i class="bi bi-envelope me-1"></i>contact@marchefooly.com</a>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <a href="aide.html" aria-label="Version française">FR</a>
+        <span>/</span>
+        <a href="en/contact.html" aria-label="English version">EN</a>
+      </div>
+    </div>
+  </div>
+
+  <header class="main-header">
+    <div class="container py-3">
+      <div class="row align-items-center g-3">
+        <div class="col-8 col-lg-3">
+          <a class="brand-logo" href="index.html" aria-label="Accueil Marché Fooly">
+            <span class="brand-mark"><i class="bi bi-bag-check-fill"></i></span>
+            <span class="brand-text">
+              <span class="brand-title d-block">Marché Fooly</span>
+              <span class="brand-slogan d-block">Le marché gagnant</span>
+            </span>
+          </a>
+        </div>
+
+        <div class="col-12 col-lg-5 order-3 order-lg-2">
+          <form class="search-wrapper d-flex" action="boutique.html" method="get">
+            <input class="form-control" type="search" name="q" placeholder="Rechercher téléphone, maison, mode..." aria-label="Rechercher un produit">
+            <button class="btn btn-primary px-3" type="submit">
+              <i class="bi bi-search me-lg-1"></i><span class="d-none d-lg-inline">Rechercher</span>
+            </button>
+          </form>
+        </div>
+
+        <div class="col-4 col-lg-4 order-2 order-lg-3">
+          <div class="d-flex align-items-center justify-content-end gap-1 gap-md-2">
+            <a class="header-action" href="mon-compte.html"><i class="bi bi-person"></i><span>Compte</span></a>
+            <a class="header-action" href="favoris.html"><i class="bi bi-heart"></i><span>Favoris</span></a>
+            <a class="header-action" href="panier.html">
+              <i class="bi bi-cart3"></i><span>Panier</span><em class="cart-badge not-italic">2</em>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="main-nav navbar navbar-expand-lg navbar-light">
+      <div class="container">
+        <button class="navbar-toggler border-0 ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Ouvrir le menu">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav align-items-lg-center">
+            <li class="nav-item"><a class="nav-link" href="index.html">Accueil</a></li>
+            <li class="nav-item"><a class="nav-link" href="boutique.html">Boutique</a></li>
+            <li class="nav-item"><a class="nav-link" href="categories.html">Catégories</a></li>
+            <li class="nav-item"><a class="nav-link" href="devenir-vendeur.html">Devenir vendeur</a></li>
+            <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          </ul>
+
+          <div class="ms-lg-auto mt-3 mt-lg-0">
+            <a class="btn btn-mf-primary btn-sm" href="devenir-vendeur.html">
+              <i class="bi bi-shop me-1"></i> Ouvrir une boutique
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="help-hero">
+      <div class="container">
+        <nav aria-label="Fil d'Ariane" class="mb-4">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="index.html">Accueil</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Aide</li>
+          </ol>
+        </nav>
+
+        <div class="row align-items-center g-5">
+          <div class="col-lg-7">
+            <span class="hero-badge mb-4 reveal">
+              <i class="bi bi-question-circle text-orange"></i>
+              Centre d’aide Marché Fooly
+            </span>
+            <h1 class="help-title mb-4 reveal">Comment pouvons-nous vous aider ?</h1>
+            <p class="section-subtitle fs-5 mb-0 reveal">
+              Trouvez des réponses rapides sur les achats, les commandes, les vendeurs,
+              le compte client, la livraison locale et le fonctionnement de Marché Fooly.
+            </p>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="help-search-card reveal">
+              <h2 class="h4 fw-bold mb-3">Rechercher une réponse</h2>
+              <form action="aide.html" method="get">
+                <div class="d-flex flex-column flex-sm-row gap-2">
+                  <input class="form-control" type="search" name="q" placeholder="Ex : livraison, vendeur, commande..." aria-label="Rechercher dans l’aide">
+                  <button class="btn btn-mf-primary px-4" type="submit">Rechercher</button>
+                </div>
+              </form>
+
+              <div class="d-flex flex-wrap gap-2 mt-4">
+                <a class="help-tag" href="#faq">Commandes</a>
+                <a class="help-tag" href="#guides">Acheter</a>
+                <a class="help-tag" href="#vendeurs">Vendre</a>
+                <a class="help-tag" href="contact.html">Support</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-padding">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="text-orange fw-bold">Assistance rapide</span>
+          <h2 class="section-title display-6 mb-2">Choisissez votre besoin</h2>
+          <p class="section-subtitle mx-auto mb-0">Accédez directement aux informations qui correspondent à votre situation.</p>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3 reveal">
+            <a class="help-category-card d-block text-dark" href="boutique.html">
+              <div class="help-icon"><i class="bi bi-bag-check"></i></div>
+              <h3 class="h5 fw-bold">Acheter un produit</h3>
+              <p class="text-secondary mb-3">Trouver un article, comparer les offres et passer commande.</p>
+              <span class="fw-bold text-orange">Voir la boutique <i class="bi bi-arrow-right"></i></span>
+            </a>
+          </div>
+
+          <div class="col-md-6 col-lg-3 reveal">
+            <a class="help-category-card d-block text-dark" href="commandes.html">
+              <div class="help-icon"><i class="bi bi-truck"></i></div>
+              <h3 class="h5 fw-bold">Suivre une commande</h3>
+              <p class="text-secondary mb-3">Vérifier le statut, les produits et les informations de réception.</p>
+              <span class="fw-bold text-orange">Mes commandes <i class="bi bi-arrow-right"></i></span>
+            </a>
+          </div>
+
+          <div class="col-md-6 col-lg-3 reveal">
+            <a class="help-category-card d-block text-dark" href="devenir-vendeur.html">
+              <div class="help-icon"><i class="bi bi-shop"></i></div>
+              <h3 class="h5 fw-bold">Devenir vendeur</h3>
+              <p class="text-secondary mb-3">Ouvrir une boutique, présenter vos produits et toucher plus de clients.</p>
+              <span class="fw-bold text-orange">Créer ma boutique <i class="bi bi-arrow-right"></i></span>
+            </a>
+          </div>
+
+          <div class="col-md-6 col-lg-3 reveal">
+            <a class="help-category-card d-block text-dark" href="contact.html">
+              <div class="help-icon"><i class="bi bi-headset"></i></div>
+              <h3 class="h5 fw-bold">Contacter FOOLY</h3>
+              <p class="text-secondary mb-3">Obtenir une aide personnalisée pour votre demande.</p>
+              <span class="fw-bold text-orange">Nous écrire <i class="bi bi-arrow-right"></i></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="guides" class="section-padding bg-soft">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="text-orange fw-bold">Guides pratiques</span>
+          <h2 class="section-title display-6 mb-2">Bien utiliser Marché Fooly</h2>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-lg-6 reveal">
+            <div class="guide-card">
+              <div class="guide-icon"><i class="bi bi-bag-check"></i></div>
+              <h3 class="h4 fw-bold mb-3">Acheter sur Marché Fooly</h3>
+
+              <div class="guide-step">
+                <div class="guide-step-number">1</div>
+                <div>
+                  <strong>Recherchez votre produit</strong>
+                  <p class="text-secondary mb-0">Utilisez la barre de recherche ou parcourez les catégories.</p>
+                </div>
+              </div>
+
+              <div class="guide-step">
+                <div class="guide-step-number">2</div>
+                <div>
+                  <strong>Consultez la fiche produit</strong>
+                  <p class="text-secondary mb-0">Vérifiez le prix, le vendeur, la disponibilité et les détails.</p>
+                </div>
+              </div>
+
+              <div class="guide-step">
+                <div class="guide-step-number">3</div>
+                <div>
+                  <strong>Ajoutez au panier</strong>
+                  <p class="text-secondary mb-0">Validez les quantités et passez à la finalisation de commande.</p>
+                </div>
+              </div>
+
+              <a class="btn btn-mf-primary mt-3" href="boutique.html">Commencer mes achats</a>
+            </div>
+          </div>
+
+          <div id="vendeurs" class="col-lg-6 reveal">
+            <div class="guide-card">
+              <div class="guide-icon"><i class="bi bi-shop"></i></div>
+              <h3 class="h4 fw-bold mb-3">Vendre sur Marché Fooly</h3>
+
+              <div class="guide-step">
+                <div class="guide-step-number">1</div>
+                <div>
+                  <strong>Créez votre boutique</strong>
+                  <p class="text-secondary mb-0">Présentez votre activité, votre localisation et vos produits.</p>
+                </div>
+              </div>
+
+              <div class="guide-step">
+                <div class="guide-step-number">2</div>
+                <div>
+                  <strong>Publiez vos articles</strong>
+                  <p class="text-secondary mb-0">Ajoutez les prix, descriptions, catégories et informations utiles.</p>
+                </div>
+              </div>
+
+              <div class="guide-step">
+                <div class="guide-step-number">3</div>
+                <div>
+                  <strong>Recevez des commandes</strong>
+                  <p class="text-secondary mb-0">Gagnez en visibilité auprès des clients locaux de Sangarédi.</p>
+                </div>
+              </div>
+
+              <a class="btn btn-mf-primary mt-3" href="devenir-vendeur.html">Devenir vendeur</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="section-padding">
+      <div class="container">
+        <div class="row g-4 align-items-start">
+          <div class="col-lg-8">
+            <div class="faq-panel reveal">
+              <span class="text-orange fw-bold">FAQ</span>
+              <h2 class="section-title display-6 mb-4">Questions fréquentes</h2>
+
+              <div class="accordion" id="helpFaq">
+                <div class="accordion-item">
+                  <h3 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqOne" aria-expanded="true" aria-controls="faqOne">
+                      Comment rechercher un produit sur Marché Fooly ?
+                    </button>
+                  </h3>
+                  <div id="faqOne" class="accordion-collapse collapse show" data-bs-parent="#helpFaq">
+                    <div class="accordion-body text-secondary">
+                      Utilisez la barre de recherche en haut du site ou cliquez sur une catégorie. Vous pouvez ensuite filtrer les résultats par catégorie, prix, disponibilité ou vendeur local.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqTwo" aria-expanded="false" aria-controls="faqTwo">
+                      Comment suivre ma commande ?
+                    </button>
+                  </h3>
+                  <div id="faqTwo" class="accordion-collapse collapse" data-bs-parent="#helpFaq">
+                    <div class="accordion-body text-secondary">
+                      Allez dans la page Mes commandes. Vous y trouverez le statut de chaque commande, les produits achetés, le vendeur concerné et les étapes de traitement.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqThree" aria-expanded="false" aria-controls="faqThree">
+                      Comment contacter un vendeur ?
+                    </button>
+                  </h3>
+                  <div id="faqThree" class="accordion-collapse collapse" data-bs-parent="#helpFaq">
+                    <div class="accordion-body text-secondary">
+                      Depuis une fiche produit ou une commande, utilisez les boutons de contact disponibles pour demander plus d’informations ou organiser la réception.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFour" aria-expanded="false" aria-controls="faqFour">
+                      Comment devenir vendeur ?
+                    </button>
+                  </h3>
+                  <div id="faqFour" class="accordion-collapse collapse" data-bs-parent="#helpFaq">
+                    <div class="accordion-body text-secondary">
+                      Cliquez sur Devenir vendeur, remplissez vos informations de boutique, votre catégorie principale, votre localisation et le nombre de produits que vous souhaitez proposer.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqFive" aria-expanded="false" aria-controls="faqFive">
+                      Quels produits peut-on vendre sur Marché Fooly ?
+                    </button>
+                  </h3>
+                  <div id="faqFive" class="accordion-collapse collapse" data-bs-parent="#helpFaq">
+                    <div class="accordion-body text-secondary">
+                      Les vendeurs peuvent proposer des produits locaux, téléphones, accessoires, vêtements, électroménagers, maison, cuisine, alimentation, meubles, bijoux et autres articles adaptés au commerce local.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="accordion-item">
+                  <h3 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqSix" aria-expanded="false" aria-controls="faqSix">
+                      Comment modifier mon panier ?
+                    </button>
+                  </h3>
+                  <div id="faqSix" class="accordion-collapse collapse" data-bs-parent="#helpFaq">
+                    <div class="accordion-body text-secondary">
+                      Depuis la page Panier, vous pouvez modifier les quantités, retirer un article ou continuer vos achats avant de passer à la caisse.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="quick-link-card reveal">
+              <div class="quick-icon"><i class="bi bi-lightning-charge"></i></div>
+              <h2 class="h4 fw-bold mb-3">Questions populaires</h2>
+
+              <a class="popular-question" href="commandes.html">
+                <span>Où est ma commande ?</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+              <a class="popular-question" href="panier.html">
+                <span>Comment modifier mon panier ?</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+              <a class="popular-question" href="devenir-vendeur.html">
+                <span>Comment ouvrir une boutique ?</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+              <a class="popular-question" href="contact.html">
+                <span>Comment joindre le support ?</span>
+                <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="contact-help-card mt-4 reveal">
+              <span class="badge bg-warning text-dark rounded-pill mb-3">Support direct</span>
+              <h2 class="h4 fw-bold mb-3">Besoin d’une aide personnalisée ?</h2>
+              <p class="text-white-50">
+                Contactez l’équipe Marché Fooly pour une question sur un produit, une commande ou une boutique vendeur.
+              </p>
+              <div class="d-grid gap-2">
+                <a class="btn btn-light fw-bold" href="contact.html">Contacter FOOLY</a>
+                <a class="btn btn-outline-light fw-bold" href="https://wa.me/224624273805">WhatsApp</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-padding bg-soft">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="text-orange fw-bold">Liens utiles</span>
+          <h2 class="section-title display-6 mb-2">Accès rapide</h2>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3 reveal">
+            <a class="quick-link-card d-block text-dark" href="boutique.html">
+              <div class="quick-icon"><i class="bi bi-bag"></i></div>
+              <h3 class="h5 fw-bold">Boutique</h3>
+              <p class="text-secondary mb-0">Parcourir tous les produits disponibles.</p>
+            </a>
+          </div>
+
+          <div class="col-md-6 col-lg-3 reveal">
+            <a class="quick-link-card d-block text-dark" href="categories.html">
+              <div class="quick-icon"><i class="bi bi-grid"></i></div>
+              <h3 class="h5 fw-bold">Catégories</h3>
+              <p class="text-secondary mb-0">Trouver un produit par rayon.</p>
+            </a>
+          </div>
+
+          <div class="col-md-6 col-lg-3 reveal">
+            <a class="quick-link-card d-block text-dark" href="mon-compte.html">
+              <div class="quick-icon"><i class="bi bi-person"></i></div>
+              <h3 class="h5 fw-bold">Mon compte</h3>
+              <p class="text-secondary mb-0">Gérer vos informations et achats.</p>
+            </a>
+          </div>
+
+          <div class="col-md-6 col-lg-3 reveal">
+            <a class="quick-link-card d-block text-dark" href="favoris.html">
+              <div class="quick-icon"><i class="bi bi-heart"></i></div>
+              <h3 class="h5 fw-bold">Favoris</h3>
+              <p class="text-secondary mb-0">Retrouver vos produits sauvegardés.</p>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="pb-5 bg-soft">
+      <div class="container">
+        <div class="newsletter-box reveal">
+          <div class="row align-items-center g-4">
+            <div class="col-lg-6">
+              <h2 class="fw-bold mb-2">Recevez les meilleures offres</h2>
+              <p class="mb-0 text-white-75">Promos, nouveautés et bons plans directement dans votre boîte email.</p>
+            </div>
+            <div class="col-lg-6">
+              <form class="d-flex flex-column flex-sm-row gap-2" action="contact.html" method="get">
+                <input class="form-control" type="email" placeholder="Votre adresse email" aria-label="Votre email">
+                <button class="btn btn-dark px-4" type="submit">S’inscrire</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <a class="brand-logo mb-3" href="index.html">
+            <span class="brand-mark"><i class="bi bi-bag-check-fill"></i></span>
+            <span class="brand-text">
+              <span class="brand-title d-block text-white">Marché Fooly</span>
+              <span class="brand-slogan d-block">Le marché gagnant</span>
+            </span>
+          </a>
+          <p>Marketplace locale basée à Sangarédi, Guinée, pour acheter et vendre facilement en ligne.</p>
+          <p class="mb-1"><i class="bi bi-geo-alt me-2"></i>Sangarédi, Guinée</p>
+          <p class="mb-1"><i class="bi bi-telephone me-2"></i>+224 624 27 38 05</p>
+          <p><i class="bi bi-envelope me-2"></i>contact@marchefooly.com</p>
+          <div>
+            <a class="social-link" href="contact.html" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+            <a class="social-link" href="https://wa.me/224624273805" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+            <a class="social-link" href="contact.html" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          </div>
+        </div>
+
+        <div class="col-6 col-lg-2">
+          <h5>Liens utiles</h5>
+          <a href="boutique.html">Boutique</a>
+          <a href="categories.html">Catégories</a>
+          <a href="devenir-vendeur.html">Devenir vendeur</a>
+          <a href="mon-compte.html">Mon compte</a>
+          <a href="aide.html">Aide</a>
+        </div>
+
+        <div class="col-6 col-lg-3">
+          <h5>Catégories</h5>
+          <a href="categories.html">Téléphones & Accessoires</a>
+          <a href="categories.html">Maison / Cuisine</a>
+          <a href="categories.html">Électroménagers</a>
+          <a href="categories.html">Vêtements Femme</a>
+          <a href="categories.html">Automobile</a>
+        </div>
+
+        <div class="col-lg-3">
+          <h5>Confiance</h5>
+          <a href="commandes.html">Suivre mes commandes</a>
+          <a href="panier.html">Voir mon panier</a>
+          <a href="checkout.html">Finaliser l’achat</a>
+          <a href="favoris.html">Mes favoris</a>
+          <a href="contact.html">Contacter FOOLY</a>
+        </div>
+      </div>
+
+      <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between gap-2">
+        <span>© 2026 Marché Fooly. Tous droits réservés.</span>
+        <span>Marché Fooly - Le marché gagnant.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

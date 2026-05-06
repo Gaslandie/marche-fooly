@@ -40,6 +40,7 @@ Objectif :
 - Ne jamais commiter `.env`, secrets, clés, fichiers générés ou données sensibles.
 - Après modification, exécuter les validations adaptées à la tâche.
 - Indiquer les tests manuels recommandés après chaque tâche.
+- les message de commit doivent etre en français stp
 
 ## Règles spécifiques à Marché Fooly
 

@@ -98,11 +98,16 @@ img {
   border-radius: 16px;
   display: grid;
   place-items: center;
-  color: #ffffff;
-  background:
-    radial-gradient(circle at 22% 20%, rgba(255, 255, 255, 0.5), transparent 24%),
-    linear-gradient(135deg, var(--mf-orange), var(--mf-green));
+  overflow: hidden;
+  background: #ffffff;
   box-shadow: 0 14px 26px rgba(255, 122, 0, 0.22);
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .brand-text {
@@ -544,11 +549,15 @@ img {
 }
 
 .seller-media-card {
-  height: 240px;
+  height: 360px;
   border-radius: 26px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.74);
   box-shadow: 0 16px 38px rgba(21, 25, 34, 0.08);
+}
+
+.seller-local-image {
+  object-position: center 30%;
 }
 
 .seller-feature {

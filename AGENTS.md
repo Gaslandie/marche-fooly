@@ -30,6 +30,16 @@ Objectif :
 
 - Lire ce fichier avant toute modification.
 - Comprendre la tâche avant d’agir.
+- Pour toute question, problème, bug ou demande ambiguë, discuter d’abord avec l’utilisateur avant de modifier le code.
+- Avant de coder, expliquer en un paragraphe simple :
+  - ce qui se passe ;
+  - ce qu’on va faire ;
+  - pourquoi on va le faire ;
+  - comment on va procéder.
+- Ne jamais commencer le code tant que le plan d’action n’a pas été expliqué clairement.
+- Donner les explications en deux niveaux quand c’est utile :
+  - d’abord avec les termes techniques corrects ;
+  - ensuite avec une analogie simple de la vie réelle.
 - Ne pas explorer inutilement tout le projet.
 - Demander ou lire uniquement les fichiers nécessaires à la tâche.
 - Travailler étape par étape.
@@ -40,7 +50,7 @@ Objectif :
 - Ne jamais commiter `.env`, secrets, clés, fichiers générés ou données sensibles.
 - Après modification, exécuter les validations adaptées à la tâche.
 - Indiquer les tests manuels recommandés après chaque tâche.
-- les message de commit doivent etre en français stp
+- Les messages de commit doivent être en français.
 
 ## Règles spécifiques à Marché Fooly
 
@@ -225,17 +235,34 @@ Avant commit :
 - lancer `git status` ;
 - vérifier qu’aucun fichier sensible ou hors scope n’est inclus ;
 - utiliser `git add .` seulement si le périmètre est propre ;
-- écrire un message de commit court et clair.
+- écrire un message de commit court et clair en français.
+
+Si une validation échoue :
+- expliquer clairement l’erreur rencontrée ;
+- indiquer la cause probable ;
+- proposer une solution simple avant de continuer.
 
 ## Communication attendue
 
+Avant chaque tâche :
+- discuter d’abord avec l’utilisateur s’il y a une question, un problème, un bug ou une ambiguïté ;
+- expliquer clairement ce qui se passe ;
+- expliquer le plan d’action avant de modifier le code ;
+- utiliser si possible une explication technique puis une analogie simple de la vie réelle.
+
 Après chaque tâche, l’agent doit fournir :
+- résumé de ce qui a été fait ;
 - résumé des fichiers modifiés ;
 - résumé des validations lancées ;
 - résultat des validations ;
 - tests manuels recommandés ;
 - message de commit proposé ;
-- signalement clair de toute modification connexe.
+- signalement clair de toute modification connexe importante.
+
+À la fin d’une tâche :
+- proposer éventuellement des pistes pour aller plus loin ;
+- ne pas appliquer ces améliorations automatiquement ;
+- laisser l’utilisateur décider s’il veut continuer ou non.
 
 ## Règle globale
 

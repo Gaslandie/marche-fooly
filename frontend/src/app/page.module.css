@@ -1,142 +1,551 @@
 .page {
-  --background: #fafafa;
-  --foreground: #fff;
-
-  --text-primary: #000;
-  --text-secondary: #666;
-
-  --button-primary-hover: #383838;
-  --button-secondary-hover: #f2f2f2;
-  --button-secondary-border: #ebebeb;
-
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-geist-sans);
-  background-color: var(--background);
+  padding-bottom: 5rem;
 }
 
-.main {
+.heroSection {
+  position: relative;
+  overflow: hidden;
+  padding: 4rem 0 3rem;
+  background:
+    radial-gradient(circle at top left, rgba(255, 122, 0, 0.16), transparent 32%),
+    linear-gradient(180deg, #fffaf3 0%, #ffffff 72%);
+}
+
+.heroSection::after {
+  content: "";
+  position: absolute;
+  inset: auto -8rem -9rem auto;
+  width: 18rem;
+  height: 18rem;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.08);
+  filter: blur(6px);
+}
+
+.heroBadge,
+.eyebrow,
+.newsletterEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--mf-orange-dark);
+  text-transform: uppercase;
+}
+
+.heroBadge {
+  margin-bottom: 1.25rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid rgba(255, 122, 0, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(12px);
+}
+
+.heroTitle {
+  max-width: 12ch;
+  margin-bottom: 1.25rem;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+
+.heroText,
+.sectionSubtitle,
+.imageStoryContent p,
+.testimonialCard p,
+.newsletterBox p,
+.reasonCard p,
+.stepCard p,
+.sellerFeature p,
+.heroStat span,
+.reviewCount,
+.productBody h3,
+.productPrice {
+  color: var(--mf-muted);
+}
+
+.heroText {
+  max-width: 34rem;
+  margin-bottom: 1.75rem;
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+.heroStat {
   display: flex;
-  flex: 1;
-  width: 100%;
-  max-width: 800px;
   flex-direction: column;
-  align-items: flex-start;
+  gap: 0.2rem;
+}
+
+.heroStat strong {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--mf-dark);
+}
+
+.heroStat span {
+  font-size: 0.92rem;
+}
+
+.heroCard,
+.sellerImageCard,
+.imageStoryCard,
+.trustCard {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  box-shadow: var(--mf-shadow);
+}
+
+.heroCard {
+  min-height: 30rem;
+}
+
+.coverImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroOverlay {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  display: flex;
+  align-items: end;
   justify-content: space-between;
-  background-color: var(--foreground);
-  padding: 120px 60px;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 22px;
+  background: rgba(21, 25, 34, 0.72);
+  backdrop-filter: blur(16px);
+  color: var(--mf-white);
 }
 
-.intro {
+.heroOverlay strong,
+.trustCardContent strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.heroOverlay span,
+.trustCardContent span,
+.testimonialCard span {
+  display: block;
+  font-size: 0.94rem;
+}
+
+.sectionBlock {
+  padding: 4.75rem 0 0;
+}
+
+.softSection {
+  padding-bottom: 4.75rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+}
+
+.sectionHeader {
+  margin-bottom: 2rem;
+}
+
+.sectionHeaderSplit {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 24px;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
 }
 
-.intro h1 {
-  max-width: 320px;
-  font-size: 40px;
-  font-weight: 600;
-  line-height: 48px;
-  letter-spacing: -2.4px;
-  text-wrap: balance;
-  color: var(--text-primary);
+.sectionHeaderCentered {
+  max-width: 44rem;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
 }
 
-.intro p {
-  max-width: 440px;
-  font-size: 18px;
-  line-height: 32px;
-  text-wrap: balance;
-  color: var(--text-secondary);
+.sectionTitle,
+.newsletterBox h2,
+.imageStoryContent h3,
+.trustCardContent strong {
+  color: var(--mf-dark);
 }
 
-.intro a {
-  font-weight: 500;
-  color: var(--text-primary);
+.sectionTitle {
+  margin: 0.55rem 0 0.8rem;
+  font-size: clamp(1.95rem, 3vw, 3rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
 }
 
-.ctas {
-  display: flex;
-  flex-direction: row;
-  width: 100%;
-  max-width: 440px;
-  gap: 16px;
-  font-size: 14px;
+.sectionSubtitle {
+  max-width: 42rem;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.75;
 }
 
-.ctas a {
-  display: flex;
-  justify-content: center;
+.categoryCard,
+.productCard,
+.sellerFeature,
+.stepCard,
+.reasonCard,
+.testimonialCard {
+  display: block;
+  height: 100%;
+  border: 1px solid var(--mf-border);
+  border-radius: 24px;
+  background: var(--mf-white);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.categoryCard:hover,
+.productCard:hover,
+.sellerFeature:hover,
+.stepCard:hover,
+.reasonCard:hover,
+.testimonialCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 122, 0, 0.3);
+  box-shadow: 0 24px 44px rgba(21, 25, 34, 0.08);
+}
+
+.categoryCard {
+  padding: 1.4rem;
+}
+
+.categoryIcon {
+  display: inline-flex;
   align-items: center;
-  height: 40px;
-  padding: 0 16px;
-  border-radius: 128px;
-  border: 1px solid transparent;
-  transition: 0.2s;
-  cursor: pointer;
-  width: fit-content;
-  font-weight: 500;
+  justify-content: center;
+  width: 3.3rem;
+  height: 3.3rem;
+  margin-bottom: 1rem;
+  border-radius: 18px;
+  background: rgba(255, 122, 0, 0.12);
+  color: var(--mf-orange-dark);
+  font-size: 1.4rem;
 }
 
-a.primary {
-  background: var(--text-primary);
-  color: var(--background);
-  gap: 8px;
+.categoryCard h3,
+.productBody h3,
+.stepCard h3,
+.reasonCard h3,
+.imageStoryContent h3,
+.newsletterBox h2 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
-a.secondary {
-  border-color: var(--button-secondary-border);
+.categoryCard h3,
+.reasonCard h3 {
+  margin-bottom: 0.45rem;
+  font-size: 1.05rem;
 }
 
-/* Enable hover only on non-touch devices */
-@media (hover: hover) and (pointer: fine) {
-  a.primary:hover {
-    background: var(--button-primary-hover);
-    border-color: transparent;
+.categoryCard p,
+.reasonCard p,
+.stepCard p,
+.sellerFeature p,
+.imageStoryContent p,
+.testimonialCard p,
+.newsletterBox p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.productCard {
+  overflow: hidden;
+}
+
+.productMedia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 13rem;
+  position: relative;
+  background:
+    radial-gradient(circle at top left, rgba(255, 122, 0, 0.2), transparent 32%),
+    linear-gradient(135deg, #151922 0%, #2b3446 100%);
+  color: var(--mf-white);
+  font-size: 3rem;
+}
+
+.productBadge {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.productBody {
+  padding: 1.35rem;
+}
+
+.productBody h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1.12rem;
+  color: var(--mf-dark);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-bottom: 0.75rem;
+  color: #f59e0b;
+}
+
+.reviewCount {
+  margin-left: 0.35rem;
+  font-size: 0.92rem;
+}
+
+.productPrice {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--mf-dark);
+}
+
+.productActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.sellerPanel {
+  padding: 2rem;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+  box-shadow: var(--mf-shadow);
+}
+
+.sellerImageCard {
+  min-height: 19rem;
+  margin-bottom: 1rem;
+}
+
+.sellerFeature {
+  display: flex;
+  gap: 0.85rem;
+  padding: 1rem;
+}
+
+.sellerFeature i,
+.reasonCard i,
+.trustCardContent i {
+  flex-shrink: 0;
+}
+
+.sellerFeature i {
+  font-size: 1.35rem;
+  color: var(--mf-orange-dark);
+}
+
+.sellerFeature strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.stepCard,
+.reasonCard,
+.testimonialCard {
+  padding: 1.6rem;
+}
+
+.stepNumber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  border-radius: 50%;
+  background: rgba(255, 122, 0, 0.12);
+  color: var(--mf-orange-dark);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.stepCard h3,
+.reasonCard h3 {
+  margin-bottom: 0.6rem;
+  font-size: 1.15rem;
+}
+
+.imageStoryCard,
+.trustCard {
+  min-height: 100%;
+  background: var(--mf-white);
+}
+
+.imageStoryContent,
+.trustCardContent {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  padding: 1.2rem;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+}
+
+.imageStoryContent h3 {
+  margin: 0.5rem 0 0.5rem;
+  font-size: 1.4rem;
+}
+
+.trustCardContent {
+  display: flex;
+  gap: 0.9rem;
+  align-items: start;
+  background: rgba(21, 25, 34, 0.78);
+  color: var(--mf-white);
+}
+
+.trustCardContent i {
+  font-size: 1.55rem;
+  color: #fbbf24;
+}
+
+.trustCardContent strong {
+  color: var(--mf-white);
+}
+
+.reasonCard i {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  font-size: 2rem;
+}
+
+.orangeAccent {
+  color: var(--mf-orange-dark);
+}
+
+.greenAccent {
+  color: var(--mf-green);
+}
+
+.blueAccent {
+  color: var(--mf-blue);
+}
+
+.testimonialCard p {
+  margin: 1rem 0 1.2rem;
+}
+
+.testimonialCard strong {
+  display: block;
+  color: var(--mf-dark);
+}
+
+.newsletterSection {
+  padding: 4.75rem 0 0;
+}
+
+.newsletterBox {
+  padding: 2.1rem;
+  border-radius: 32px;
+  background: linear-gradient(135deg, #ff7a00 0%, #ff9c3f 100%);
+  color: var(--mf-white);
+  box-shadow: 0 26px 50px rgba(232, 104, 0, 0.28);
+}
+
+.newsletterEyebrow {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.newsletterBox h2 {
+  margin: 0.55rem 0 0.75rem;
+  color: var(--mf-white);
+}
+
+.newsletterBox p {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.newsletterForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.newsletterForm input {
+  min-height: 3.5rem;
+  flex: 1 1 16rem;
+  border: 0;
+}
+
+.newsletterForm button {
+  white-space: nowrap;
+}
+
+@media (max-width: 991.98px) {
+  .heroTitle {
+    max-width: none;
   }
 
-  a.secondary:hover {
-    background: var(--button-secondary-hover);
-    border-color: transparent;
+  .heroCard {
+    min-height: 24rem;
+  }
+
+  .sellerPanel,
+  .newsletterBox {
+    padding: 1.5rem;
   }
 }
 
-@media (max-width: 600px) {
-  .main {
-    padding: 48px 24px;
-  }
-
-  .intro {
-    gap: 16px;
-  }
-
-  .intro h1 {
-    font-size: 32px;
-    line-height: 40px;
-    letter-spacing: -1.92px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .logo {
-    filter: invert();
-  }
-
+@media (max-width: 767.98px) {
   .page {
-    --background: #000;
-    --foreground: #000;
+    padding-bottom: 4rem;
+  }
 
-    --text-primary: #ededed;
-    --text-secondary: #999;
+  .heroSection,
+  .sectionBlock,
+  .newsletterSection {
+    padding-top: 3.5rem;
+  }
 
-    --button-primary-hover: #ccc;
-    --button-secondary-hover: #1a1a1a;
-    --button-secondary-border: #1a1a1a;
+  .softSection {
+    padding-bottom: 3.5rem;
+  }
+
+  .heroOverlay,
+  .imageStoryContent,
+  .trustCardContent {
+    position: static;
+    margin: 1rem;
+  }
+
+  .heroOverlay,
+  .trustCardContent {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .productActions,
+  .newsletterForm {
+    flex-direction: column;
+  }
+
+  .productActions :global(.btn),
+  .newsletterForm :global(.btn) {
+    width: 100%;
   }
 }

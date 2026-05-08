@@ -1,19 +1,12 @@
-"use client";
-
-import { FormEvent } from "react";
-
 export default function SearchBar() {
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-  };
-
   return (
-    <form className="mf-searchbar" role="search" onSubmit={handleSubmit}>
+    <form className="mf-searchbar" role="search" action="/boutique" method="get">
       <input
         type="search"
+        name="q"
         className="form-control"
-        placeholder="Rechercher un produit, une catégorie..."
-        aria-label="Rechercher"
+        placeholder="Rechercher téléphone, maison, mode..."
+        aria-label="Rechercher un produit"
       />
       <button type="submit" className="btn btn-warning">
         Rechercher

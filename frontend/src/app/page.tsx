@@ -1,19 +1,12 @@
-import Link from "next/link";
-import { siteConfig } from "@/config/site";
+import type { Metadata } from "next";
+import HomePage from "@/components/sections/HomePage";
 
-export default function Home() {
-  return (
-    <section className="container py-5">
-      <h1 className="fw-bold mb-2">{siteConfig.name}</h1>
-      <p className="text-muted mb-4">{siteConfig.slogan}</p>
-      <div className="d-flex flex-wrap gap-2">
-        <Link href="/boutique" className="btn btn-warning">
-          Voir la boutique
-        </Link>
-        <Link href="/categories" className="btn btn-outline-dark">
-          Parcourir les catégories
-        </Link>
-      </div>
-    </section>
-  );
+export const metadata: Metadata = {
+  title: "Accueil",
+  description:
+    "Achetez et vendez facilement à Sangarédi avec Marché Fooly, la marketplace locale pour produits, services et bonnes affaires.",
+};
+
+export default function Page() {
+  return <HomePage />;
 }

@@ -24,6 +24,12 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: var(--mf-dark);
+  background: var(--mf-white);
+}
+
+main {
+  flex: 1;
 }
 
 *,
@@ -39,4 +45,70 @@ a {
 
 a:hover {
   text-decoration: none;
+}
+
+.mf-topbar {
+  background: var(--mf-light);
+  border-bottom: 1px solid var(--mf-border);
+}
+
+.mf-topbar a:hover,
+.mf-nav a:hover,
+.mf-footer a:hover {
+  color: var(--mf-orange-dark);
+}
+
+.mf-header {
+  background: var(--mf-white);
+}
+
+.mf-header-search {
+  width: min(100%, 520px);
+  flex: 1;
+}
+
+.mf-searchbar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mf-searchbar .btn {
+  white-space: nowrap;
+}
+
+.mf-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--mf-border);
+  border-radius: 999px;
+  font-size: 1.1rem;
+}
+
+.mf-footer {
+  background: var(--mf-light);
+  border-top: 1px solid var(--mf-border);
+}
+
+.mf-newsletter-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mf-newsletter-form .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+  .mf-searchbar,
+  .mf-newsletter-form {
+    flex-direction: column;
+  }
+
+  .mf-searchbar .btn,
+  .mf-newsletter-form .btn {
+    width: 100%;
+  }
 }

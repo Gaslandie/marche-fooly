@@ -277,3 +277,51 @@ Toute modification doit améliorer ou préserver :
 - expérience premium.
 
 Si une modification dégrade un de ces points, elle doit être corrigée.
+
+## État récent du projet
+
+Travaux déjà réalisés :
+- les textes visibles indiquant “maquette”, “statique”, “prototype” ou équivalents ont été retirés des pages HTML ;
+- les prix visibles ont été uniformisés en `GNF` ;
+- les images permanentes du site ont été ajoutées dans `assets/images/` ;
+- les images permanentes ont été optimisées pour le web ;
+- les images originales lourdes ne doivent pas être commitées.
+
+Images permanentes disponibles :
+- `assets/images/banners/home-hero-marketplace.jpg`
+- `assets/images/banners/local-marketplace.jpg`
+- `assets/images/banners/seller-hero.jpg`
+- `assets/images/banners/trust-delivery.jpg`
+- `assets/images/logo/marche-fooly-logo.jpeg`
+- `assets/images/vendors/local-seller.jpg`
+
+## Stratégie de migration Next.js
+
+- Garder la maquette HTML actuelle comme référence visuelle.
+- Créer la nouvelle application dans un dossier `frontend/`.
+- Ne pas modifier massivement les anciens fichiers HTML sauf nécessité.
+- Garder Bootstrap au début de la migration pour éviter de casser le design.
+- Ne pas migrer tout le site en une seule tâche.
+- Migrer étape par étape :
+  1. structure Next.js ;
+  2. layout global ;
+  3. page accueil ;
+  4. données statiques temporaires ;
+  5. boutique et catégories ;
+  6. produit, panier, favoris ;
+  7. checkout, commandes, compte ;
+  8. contact, aide, devenir vendeur ;
+  9. nettoyage global ;
+  10. backend Express/MongoDB.
+- Centraliser les informations répétées dans une configuration, par exemple :
+  - nom du site ;
+  - slogan ;
+  - téléphone ;
+  - email ;
+  - WhatsApp ;
+  - localisation ;
+  - liens sociaux.
+- Le nettoyage complet des liens sociaux doit être fait pendant la création des composants Next.js `Header`, `Footer` et `TopBar`, pas en modifiant toutes les anciennes pages HTML.
+- Utiliser des composants réutilisables pour éviter les duplications.
+- Préparer les données temporaires dans `src/data/` avant la connexion MongoDB.
+- Ne connecter le backend Express/MongoDB qu’après stabilisation du frontend Next.js.

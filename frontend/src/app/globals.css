@@ -47,21 +47,33 @@ a:hover {
   text-decoration: none;
 }
 
+/* ── Topbar ────────────────────────────────────────────────── */
 .mf-topbar {
-  background: var(--mf-light);
-  border-bottom: 1px solid var(--mf-border);
+  background: #111827;
+  color: rgba(255, 255, 255, 0.82);
+  border-bottom: none;
+  font-size: 0.88rem;
 }
 
-.mf-topbar a:hover,
-.mf-nav a:hover,
-.mf-footer a:hover {
-  color: var(--mf-orange-dark);
+.mf-topbar a {
+  color: rgba(255, 255, 255, 0.82);
 }
 
+.mf-topbar a:hover {
+  color: #ffffff;
+}
+
+/* ── Header ────────────────────────────────────────────────── */
 .mf-header {
   background: var(--mf-white);
+  border-bottom: 1px solid var(--mf-border);
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  box-shadow: 0 4px 20px rgba(21, 25, 34, 0.06);
 }
 
+/* ── Search bar ────────────────────────────────────────────── */
 .mf-header-search {
   width: min(100%, 520px);
   flex: 1;
@@ -69,13 +81,57 @@ a:hover {
 
 .mf-searchbar {
   display: flex;
-  gap: 0.5rem;
+  border: 2px solid rgba(255, 122, 0, 0.18);
+  background: #fffaf4;
+  border-radius: 18px;
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mf-searchbar:focus-within {
+  border-color: var(--mf-orange);
+  box-shadow: 0 0 0 5px rgba(255, 122, 0, 0.10);
+}
+
+.mf-searchbar input {
+  border: 0;
+  background: transparent;
+  min-height: 48px;
+  flex: 1;
+}
+
+.mf-searchbar input:focus {
+  box-shadow: none;
+  outline: none;
 }
 
 .mf-searchbar .btn {
+  border-radius: 14px;
+  margin: 5px;
+  background: var(--mf-orange);
+  border: 0;
+  color: #ffffff;
+  font-weight: 800;
   white-space: nowrap;
 }
 
+.mf-searchbar .btn:hover {
+  background: var(--mf-orange-dark);
+  color: #ffffff;
+}
+
+/* ── Nav ───────────────────────────────────────────────────── */
+.mf-nav a {
+  font-weight: 800;
+  padding: 10px 0;
+  transition: color 0.18s ease;
+}
+
+.mf-nav a:hover {
+  color: var(--mf-orange);
+}
+
+/* ── Icon links (panier, favoris, compte) ──────────────────── */
 .mf-icon-link {
   display: inline-flex;
   align-items: center;
@@ -85,30 +141,91 @@ a:hover {
   border: 1px solid var(--mf-border);
   border-radius: 999px;
   font-size: 1.1rem;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
 }
 
-.mf-footer {
+.mf-icon-link:hover {
   background: var(--mf-light);
-  border-top: 1px solid var(--mf-border);
+  color: var(--mf-orange);
+  border-color: rgba(255, 122, 0, 0.3);
 }
 
+/* ── Footer ────────────────────────────────────────────────── */
+.mf-footer {
+  background: #10131a;
+  border-top: none;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.mf-footer h5 {
+  color: #ffffff;
+  font-weight: 900;
+  margin-bottom: 1rem;
+}
+
+.mf-footer p,
+.mf-footer .text-muted {
+  color: rgba(255, 255, 255, 0.55) !important;
+}
+
+.mf-footer a {
+  color: rgba(255, 255, 255, 0.72);
+  transition: color 0.18s ease;
+}
+
+.mf-footer a:hover {
+  color: #ffffff;
+}
+
+.mf-footer hr {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Newsletter (dans footer) ──────────────────────────────── */
 .mf-newsletter-form {
   display: flex;
   gap: 0.5rem;
+}
+
+.mf-newsletter-form .form-control {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+.mf-newsletter-form .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.mf-newsletter-form .form-control:focus {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--mf-orange);
+  box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.15);
+  color: #ffffff;
 }
 
 .mf-newsletter-form .btn {
   white-space: nowrap;
 }
 
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 991.98px) {
+  .mf-topbar {
+    display: none;
+  }
+}
+
 @media (max-width: 767.98px) {
   .mf-searchbar,
   .mf-newsletter-form {
     flex-direction: column;
+    border-radius: 14px;
   }
 
   .mf-searchbar .btn,
   .mf-newsletter-form .btn {
     width: 100%;
+    border-radius: 10px;
+    margin: 0 5px 5px;
   }
 }

@@ -13,7 +13,7 @@ const navLinks = [
 
 export default function Header() {
   return (
-    <header className="mf-header border-bottom">
+    <header className="mf-header">
       <div className="container py-3">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
           <Link href="/" className="d-inline-flex align-items-center gap-2">
@@ -54,11 +54,11 @@ export default function Header() {
           </div>
         </div>
 
-        <nav className="mf-nav mt-3" aria-label="Navigation principale">
-          <ul className="d-flex flex-wrap gap-3 list-unstyled mb-0">
+        <nav className="mf-nav" aria-label="Navigation principale">
+          <ul className="d-flex flex-wrap list-unstyled mb-0" style={{ gap: "0.25rem" }}>
             {navLinks.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="fw-bold">
+                <Link href={item.href}>
                   {item.label}
                 </Link>
               </li>

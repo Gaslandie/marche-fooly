@@ -1,0 +1,41 @@
+.quantityBox {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--mf-border);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: #ffffff;
+  font-weight: 900;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: var(--mf-dark);
+  transition: background 0.18s ease;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.btn:hover {
+  background: var(--mf-light);
+}
+
+.qty {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-left: 1px solid var(--mf-border);
+  border-right: 1px solid var(--mf-border);
+  text-align: center;
+  background: #ffffff;
+  font-weight: 900;
+  font-size: 1rem;
+  color: var(--mf-dark);
+  flex: 0 0 auto;
+}

@@ -75,8 +75,7 @@ a:hover {
 
 /* ── Search bar ────────────────────────────────────────────── */
 .mf-header-search {
-  width: min(100%, 520px);
-  flex: 1;
+  width: min(100%, 400px);
 }
 
 .mf-searchbar {

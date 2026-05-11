@@ -1,0 +1,301 @@
+.sellerHero {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 122, 0, 0.18), transparent 30%),
+    radial-gradient(circle at 88% 16%, rgba(22, 163, 74, 0.15), transparent 28%),
+    linear-gradient(135deg, #fff8ef 0%, #ffffff 50%, #f3fff7 100%);
+  padding: 70px 0;
+  border-bottom: 1px solid var(--mf-border);
+  overflow: hidden;
+}
+
+.sellerTitle {
+  font-size: clamp(2.25rem, 5vw, 4.6rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.breadcrumbLink {
+  color: var(--mf-muted);
+  font-weight: 700;
+  text-decoration: none;
+}
+.breadcrumbLink:hover { color: var(--mf-dark); }
+.breadcrumbCurrent { color: var(--mf-dark) !important; font-weight: 900; }
+
+/* ── Hero visual ───────────────────────────────────────────── */
+.sellerVisual {
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.74);
+  border-radius: 36px;
+  padding: 24px;
+  box-shadow: var(--mf-shadow);
+  backdrop-filter: blur(14px);
+}
+
+.sellerHeroImage {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 22px;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+/* ── Dashboard preview ─────────────────────────────────────── */
+.dashboardCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  padding: 22px;
+}
+
+.dashTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.dashAvatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--mf-orange), var(--mf-green));
+  color: #ffffff;
+  font-size: 1.45rem;
+}
+
+.dashStat {
+  background: var(--mf-light);
+  border-radius: 20px;
+  padding: 16px;
+  height: 100%;
+}
+
+.dashStatValue {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--mf-orange);
+}
+
+.miniProductRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--mf-border);
+  border-radius: 18px;
+  margin-top: 12px;
+}
+
+.miniProductIcon {
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  background: #fff3e5;
+  color: var(--mf-orange);
+  flex-shrink: 0;
+}
+
+/* ── Benefit & step cards ──────────────────────────────────── */
+.benefitCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 24px;
+  height: 100%;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.benefitCard:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--mf-shadow);
+  border-color: rgba(255, 122, 0, 0.28);
+}
+
+.benefitIcon {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  background: #fff3e5;
+  color: var(--mf-orange);
+  font-size: 1.55rem;
+  margin-bottom: 18px;
+}
+
+.stepsSection { background: var(--mf-light); padding: 4rem 0; }
+
+.stepCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 24px;
+  height: 100%;
+  transition: transform 0.22s ease;
+}
+.stepCard:hover { transform: translateY(-4px); }
+
+.stepNumber {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  background: var(--mf-orange);
+  color: #ffffff;
+  font-size: 1.2rem;
+  font-weight: 900;
+  margin-bottom: 18px;
+}
+
+/* ── Proof section ─────────────────────────────────────────── */
+.proofSection {
+  background: linear-gradient(135deg, #151922, #243044);
+  color: #ffffff;
+  border-radius: 34px;
+  padding: 38px;
+  overflow: hidden;
+  position: relative;
+}
+.proofSection::after {
+  content: "";
+  position: absolute;
+  right: -85px;
+  bottom: -115px;
+  width: 270px;
+  height: 270px;
+  border-radius: 50%;
+  background: rgba(255, 122, 0, 0.32);
+}
+.proofSection > * { position: relative; z-index: 1; }
+
+.proofItem {
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 22px;
+  padding: 18px;
+}
+
+.proofValue {
+  display: block;
+  font-size: 2rem;
+  font-weight: 900;
+}
+
+/* ── Plans section ─────────────────────────────────────────── */
+.plansSection { background: var(--mf-light); padding: 4rem 0; }
+
+.planCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 28px;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s ease;
+}
+.planCard:hover { transform: translateY(-4px); }
+.planCardFeatured {
+  border-color: rgba(255, 122, 0, 0.42);
+  box-shadow: 0 22px 50px rgba(255, 122, 0, 0.12);
+}
+
+.planBadge {
+  display: inline-flex;
+  background: var(--mf-orange);
+  color: #ffffff;
+  font-weight: 900;
+  border-radius: 999px;
+  padding: 7px 11px;
+  font-size: 0.78rem;
+  margin-bottom: 14px;
+}
+
+.planPrice {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--mf-orange);
+  letter-spacing: -0.05em;
+}
+
+.planList {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0;
+  display: grid;
+  gap: 12px;
+}
+.planListItem {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--mf-muted);
+  font-weight: 600;
+}
+.planListIcon { color: var(--mf-green); flex-shrink: 0; }
+
+/* ── Seller form card ──────────────────────────────────────── */
+.formCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 30px;
+}
+
+.inputLabel {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.inputField {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--mf-border);
+  border-radius: 16px;
+  min-height: 50px;
+  font-size: 0.9375rem;
+  color: var(--mf-dark);
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.inputField:focus {
+  border-color: var(--mf-orange);
+  box-shadow: 0 0 0 5px rgba(255, 122, 0, 0.1);
+}
+textarea.inputField { min-height: 130px; resize: vertical; }
+
+.helpCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 24px;
+  margin-top: 1.5rem;
+}
+
+/* ── FAQ card ──────────────────────────────────────────────── */
+.faqSection { background: var(--mf-light); padding: 4rem 0; }
+
+.faqCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 24px;
+}

@@ -1,0 +1,220 @@
+.contactHero {
+  background:
+    radial-gradient(circle at 12% 20%, rgba(255, 122, 0, 0.16), transparent 28%),
+    radial-gradient(circle at 88% 14%, rgba(22, 163, 74, 0.13), transparent 26%),
+    linear-gradient(135deg, #fff8ef 0%, #ffffff 52%, #f3fff7 100%);
+  padding: 62px 0;
+  border-bottom: 1px solid var(--mf-border);
+}
+
+.contactTitle {
+  font-size: clamp(2.25rem, 5vw, 4.25rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.breadcrumbLink {
+  color: var(--mf-muted);
+  font-weight: 700;
+  text-decoration: none;
+}
+.breadcrumbLink:hover { color: var(--mf-dark); }
+.breadcrumbCurrent { color: var(--mf-dark) !important; font-weight: 900; }
+
+/* ── Info cards (hero grid) ────────────────────────────────── */
+.contactCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 24px;
+  height: 100%;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.contactCard:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--mf-shadow);
+  border-color: rgba(255, 122, 0, 0.28);
+}
+
+.contactIcon {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  background: #fff3e5;
+  color: var(--mf-orange);
+  font-size: 1.55rem;
+  margin-bottom: 18px;
+}
+
+/* ── Side panel ────────────────────────────────────────────── */
+.sidepanel {
+  background: linear-gradient(135deg, #151922, #243044);
+  color: #ffffff;
+  border-radius: 32px;
+  padding: 30px;
+  position: sticky;
+  top: 148px;
+  overflow: hidden;
+}
+.sidepanel::after {
+  content: "";
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  right: -95px;
+  bottom: -105px;
+  border-radius: 50%;
+  background: rgba(255, 122, 0, 0.34);
+}
+@media (max-width: 991.98px) { .sidepanel { position: static; } }
+
+.sideInfoItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  z-index: 1;
+}
+.sideInfoItem:last-child { border-bottom: 0; }
+.sideInfoIcon { color: #ffb25c; font-size: 1.3rem; flex-shrink: 0; }
+
+.sideInfoLink {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 0.875rem;
+}
+.sideInfoLink:hover { color: #ffffff; }
+
+/* ── Contact form card ─────────────────────────────────────── */
+.formCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 32px;
+}
+
+.inputLabel {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.inputField {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--mf-border);
+  border-radius: 16px;
+  min-height: 52px;
+  font-size: 0.9375rem;
+  color: var(--mf-dark);
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.inputField:focus {
+  border-color: var(--mf-orange);
+  box-shadow: 0 0 0 5px rgba(255, 122, 0, 0.1);
+}
+.inputField[aria-multiline="true"],
+textarea.inputField { min-height: 150px; resize: vertical; }
+
+/* ── WhatsApp banner ───────────────────────────────────────── */
+.whatsappBanner {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.10), rgba(255, 122, 0, 0.10));
+  border: 1px solid rgba(22, 163, 74, 0.16);
+  border-radius: 28px;
+  padding: 26px;
+}
+
+/* ── Support cards ─────────────────────────────────────────── */
+.supportSection { background: var(--mf-light); padding: 4rem 0; }
+
+.supportCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 24px;
+  height: 100%;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.supportCard:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--mf-shadow);
+  border-color: rgba(255, 122, 0, 0.28);
+}
+
+.supportIcon {
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  background: #fff3e5;
+  color: var(--mf-orange);
+  font-size: 1.55rem;
+  margin-bottom: 18px;
+}
+
+.supportLink {
+  font-weight: 700;
+  color: var(--mf-orange);
+  text-decoration: none;
+}
+.supportLink:hover { text-decoration: underline; }
+
+/* ── Map + FAQ section ─────────────────────────────────────── */
+.mapCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 18px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.mapPlaceholder {
+  min-height: 360px;
+  border-radius: 24px;
+  background:
+    linear-gradient(90deg, rgba(21,25,34,0.05) 1px, transparent 1px),
+    linear-gradient(rgba(21,25,34,0.05) 1px, transparent 1px),
+    radial-gradient(circle at 45% 45%, rgba(255,122,0,0.22), transparent 22%),
+    linear-gradient(135deg, #f8fafc, #fff4e8);
+  background-size: 38px 38px, 38px 38px, auto, auto;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 24px;
+}
+
+.mapMarker {
+  width: 72px;
+  height: 72px;
+  border-radius: 26px;
+  display: grid;
+  place-items: center;
+  background: var(--mf-orange);
+  color: #ffffff;
+  font-size: 2rem;
+  margin: 0 auto 18px;
+  box-shadow: 0 18px 32px rgba(255, 122, 0, 0.26);
+}
+
+.faqCard {
+  background: #ffffff;
+  border: 1px solid var(--mf-border);
+  border-radius: 28px;
+  box-shadow: 0 14px 40px rgba(21, 25, 34, 0.05);
+  padding: 28px;
+  height: 100%;
+}

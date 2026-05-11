@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AccordionFaq from "@/components/common/AccordionFaq";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
+import { siteConfig } from "@/config/site";
 import styles from "@/styles/aide.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
@@ -308,7 +309,7 @@ export default function AidePage() {
                   <Link href="/contact" className="btn btn-light fw-bold">
                     Contacter FOOLY
                   </Link>
-                  <a href="https://wa.me/224624273805" className="btn btn-outline-light fw-bold">
+                  <a href={siteConfig.whatsappHref} className="btn btn-outline-light fw-bold">
                     WhatsApp
                   </a>
                 </div>

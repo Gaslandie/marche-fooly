@@ -3,6 +3,7 @@ import Link from "next/link";
 import ContactForm from "@/components/contact/ContactForm";
 import AccordionFaq from "@/components/common/AccordionFaq";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
+import { siteConfig } from "@/config/site";
 import styles from "@/styles/contact.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
@@ -102,11 +103,11 @@ export default function ContactPage() {
                 Marché Fooly vous accompagne pour acheter et vendre plus facilement à Sangarédi.
               </p>
               <div className="d-flex flex-wrap gap-3">
-                <a className="btn btn-warning fw-bold" href="tel:+224624273805">
+                <a className="btn btn-warning fw-bold" href={siteConfig.phoneHref}>
                   <i className="bi bi-telephone me-1" aria-hidden="true"></i>
                   Appeler maintenant
                 </a>
-                <a className="btn btn-outline-dark fw-bold" href="https://wa.me/224624273805">
+                <a className="btn btn-outline-dark fw-bold" href={siteConfig.whatsappHref}>
                   <i className="bi bi-whatsapp me-1" aria-hidden="true"></i>
                   WhatsApp
                 </a>
@@ -156,14 +157,14 @@ export default function ContactPage() {
                     {
                       icon: "bi bi-telephone",
                       label: "Téléphone",
-                      value: "+224 624 27 38 05",
-                      href: "tel:+224624273805",
+                      value: siteConfig.phone,
+                      href: siteConfig.phoneHref,
                     },
                     {
                       icon: "bi bi-envelope",
                       label: "Email",
-                      value: "contact@marchefooly.com",
-                      href: "mailto:contact@marchefooly.com",
+                      value: siteConfig.email,
+                      href: `mailto:${siteConfig.email}`,
                     },
                     {
                       icon: "bi bi-clock",
@@ -186,7 +187,7 @@ export default function ContactPage() {
                   ))}
 
                   <div className="mt-4 d-flex flex-wrap gap-2">
-                    <a className="btn btn-light fw-bold" href="https://wa.me/224624273805">
+                    <a className="btn btn-light fw-bold" href={siteConfig.whatsappHref}>
                       WhatsApp
                     </a>
                     <Link href="/devenir-vendeur" className="btn btn-outline-light fw-bold">
@@ -214,7 +215,7 @@ export default function ContactPage() {
                     </p>
                   </div>
                   <div className="col-lg-4 text-lg-end">
-                    <a className="btn btn-success fw-bold" href="https://wa.me/224624273805">
+                    <a className="btn btn-success fw-bold" href={siteConfig.whatsappHref}>
                       Écrire sur WhatsApp
                     </a>
                   </div>

@@ -36,6 +36,9 @@ export default function Header() {
           </div>
 
           <div className="d-flex align-items-center gap-3">
+            <Link href="/favoris" className="mf-icon-link" aria-label="Mes favoris">
+              <i className="bi bi-heart" aria-hidden="true"></i>
+            </Link>
             <Link href="/panier" className="mf-icon-link" aria-label="Panier">
               <i className="bi bi-cart3" aria-hidden="true"></i>
             </Link>

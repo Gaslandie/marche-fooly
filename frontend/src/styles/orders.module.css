@@ -1,0 +1,261 @@
+.ordersHero {
+  background: linear-gradient(135deg, var(--mf-dark) 0%, #2c3e50 100%);
+  padding: 2.5rem 0;
+  color: var(--mf-white);
+}
+
+.ordersTitle {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  font-weight: 900;
+  color: var(--mf-white);
+  margin: 0;
+}
+
+.breadcrumbLink {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+}
+.breadcrumbLink:hover {
+  color: var(--mf-white);
+}
+.breadcrumbCurrent {
+  color: var(--mf-orange) !important;
+}
+
+.ordersPage {
+  background: var(--mf-light);
+  padding: 3rem 0;
+}
+
+/* ── Toolbar ────────────────────────────────────────────────── */
+.toolbar {
+  background: var(--mf-white);
+  border-radius: var(--mf-radius);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--mf-shadow);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* ── Order card ─────────────────────────────────────────────── */
+.orderCard {
+  background: var(--mf-white);
+  border-radius: var(--mf-radius);
+  box-shadow: var(--mf-shadow);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.orderCard:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.orderHeader {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--mf-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+}
+
+.orderId {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--mf-dark);
+}
+
+.orderMeta {
+  font-size: 0.8rem;
+  color: var(--mf-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.orderBody {
+  padding: 1.25rem 1.5rem;
+}
+
+/* ── Order item row ─────────────────────────────────────────── */
+.orderItem {
+  display: grid;
+  grid-template-columns: 52px 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--mf-border);
+}
+
+.orderItem:last-child {
+  border-bottom: none;
+}
+
+.orderItemIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: var(--mf-light);
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+  color: var(--mf-orange);
+}
+
+.orderItemName {
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--mf-dark);
+  margin: 0 0 0.2rem;
+}
+
+.orderItemMeta {
+  font-size: 0.8rem;
+  color: var(--mf-muted);
+}
+
+.orderItemPrice {
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--mf-dark);
+  white-space: nowrap;
+}
+
+/* ── Timeline ───────────────────────────────────────────────── */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 1rem 1.5rem;
+  background: var(--mf-light);
+  border-radius: 0 0 var(--mf-radius) var(--mf-radius);
+}
+
+.timelineStep {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+
+.timelineStep:last-child {
+  padding-bottom: 0;
+}
+
+.timelineStep:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 17px;
+  top: 36px;
+  bottom: 0;
+  width: 2px;
+  background: var(--mf-border);
+}
+
+.timelineStepDone:not(:last-child)::before {
+  background: var(--mf-green);
+}
+
+.timelineStepActive:not(:last-child)::before {
+  background: var(--mf-orange);
+}
+
+.timelineIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--mf-border);
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  color: var(--mf-muted);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.timelineStepDone .timelineIcon {
+  background: var(--mf-green);
+  color: var(--mf-white);
+}
+
+.timelineStepActive .timelineIcon {
+  background: var(--mf-orange);
+  color: var(--mf-white);
+}
+
+.timelineLabel {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--mf-dark);
+  margin: 0 0 0.2rem;
+}
+
+.timelineDesc {
+  font-size: 0.8rem;
+  color: var(--mf-muted);
+  margin: 0;
+}
+
+/* ── Order footer ───────────────────────────────────────────── */
+.orderFooter {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--mf-border);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.orderTotal {
+  font-size: 1rem;
+}
+
+.orderTotalValue {
+  font-weight: 900;
+  font-size: 1.15rem;
+  color: var(--mf-orange);
+}
+
+/* ── Sidebar stats ──────────────────────────────────────────── */
+.statCard {
+  background: var(--mf-white);
+  border-radius: var(--mf-radius);
+  padding: 1.25rem;
+  box-shadow: var(--mf-shadow);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 1.75rem;
+  font-weight: 900;
+  color: var(--mf-orange);
+  display: block;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: var(--mf-muted);
+  font-weight: 600;
+}
+
+.emptyState {
+  background: var(--mf-white);
+  border-radius: var(--mf-radius);
+  box-shadow: var(--mf-shadow);
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 4rem;
+  color: var(--mf-border);
+  margin-bottom: 1rem;
+}

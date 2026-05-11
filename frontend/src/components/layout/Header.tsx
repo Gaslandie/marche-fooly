@@ -15,7 +15,7 @@ export default function Header() {
   return (
     <header className="mf-header">
       <div className="container py-3">
-        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
           <Link href="/" className="d-inline-flex align-items-center gap-2">
             <span className="mf-logo-mark">
               <Image

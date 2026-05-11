@@ -208,6 +208,76 @@ a:hover {
   white-space: nowrap;
 }
 
+/* ── Bootstrap overrides ───────────────────────────────────── */
+
+/* btn-warning → orange primary CTA (était jaune Bootstrap) */
+.btn-warning {
+  background-color: var(--mf-orange) !important;
+  border-color: var(--mf-orange) !important;
+  color: #ffffff !important;
+  border-radius: 14px;
+  font-weight: 800;
+  box-shadow: 0 10px 26px rgba(255, 122, 0, 0.2);
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.btn-warning:hover,
+.btn-warning:focus-visible,
+.btn-warning:active {
+  background-color: var(--mf-orange-dark) !important;
+  border-color: var(--mf-orange-dark) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(255, 122, 0, 0.28);
+}
+
+/* btn-outline-dark → arrondi + hover orange */
+.btn-outline-dark {
+  border-radius: 14px;
+  font-weight: 800;
+  transition: transform 0.18s ease, color 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.btn-outline-dark:hover {
+  transform: translateY(-2px);
+  background-color: var(--mf-dark);
+  color: #ffffff;
+}
+
+/* btn-light, btn-outline-light, btn-success → arrondi cohérent */
+.btn-light,
+.btn-outline-light,
+.btn-success {
+  border-radius: 14px;
+  font-weight: 800;
+}
+
+.btn-light:hover,
+.btn-outline-light:hover {
+  transform: translateY(-1px);
+}
+
+/* Focus ring orange sur tous les inputs */
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--mf-orange);
+  box-shadow: 0 0 0 4px rgba(255, 122, 0, 0.12);
+}
+
+/* Checkbox orange */
+.form-check-input:checked {
+  background-color: var(--mf-orange);
+  border-color: var(--mf-orange);
+}
+
+/* ── Logo mark glow ─────────────────────────────────────────── */
+.mf-logo-mark {
+  display: inline-flex;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(255, 122, 0, 0.2);
+}
+
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 991.98px) {
   .mf-topbar {

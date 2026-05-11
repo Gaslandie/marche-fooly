@@ -17,17 +17,23 @@ export default function Header() {
       <div className="container py-3">
         <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
           <Link href="/" className="d-inline-flex align-items-center gap-2">
-            <Image
-              src="/images/logo/marche-fooly-logo.jpeg"
-              alt={`Logo ${siteConfig.name}`}
-              width={48}
-              height={48}
-              className="rounded-circle"
-              priority
-            />
+            <span className="mf-logo-mark">
+              <Image
+                src="/images/logo/marche-fooly-logo.jpeg"
+                alt={`Logo ${siteConfig.name}`}
+                width={48}
+                height={48}
+                style={{ display: "block" }}
+                priority
+              />
+            </span>
             <div>
-              <strong className="d-block lh-1">{siteConfig.name}</strong>
-              <span className="small text-muted">{siteConfig.slogan}</span>
+              <strong className="d-block lh-1" style={{ fontSize: "1.15rem", letterSpacing: "-0.03em" }}>
+                {siteConfig.name}
+              </strong>
+              <span className="small" style={{ color: "var(--mf-muted)", fontWeight: 700 }}>
+                {siteConfig.slogan}
+              </span>
             </div>
           </Link>
 
@@ -52,7 +58,7 @@ export default function Header() {
           <ul className="d-flex flex-wrap gap-3 list-unstyled mb-0">
             {navLinks.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="fw-medium">
+                <Link href={item.href} className="fw-bold">
                   {item.label}
                 </Link>
               </li>

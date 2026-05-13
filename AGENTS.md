@@ -29,6 +29,7 @@ Objectif :
 ## Règles de travail
 
 - Lire ce fichier avant toute modification.
+- chercher en ligne la documentation officielle avant tout changement qui merite d'aller verifier
 - Comprendre la tâche avant d’agir.
 - Pour toute question, problème, bug ou demande ambiguë, discuter d’abord avec l’utilisateur avant de modifier le code.
 - Avant de coder, expliquer en un paragraphe simple :

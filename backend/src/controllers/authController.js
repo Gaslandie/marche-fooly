@@ -131,7 +131,19 @@ const login = async (req, res, next) => {
   }
 };
 
+const me = async (req, res) => {
+  // req.user est garanti par le middleware authenticate.
+  return res.status(200).json({
+    success: true,
+    message: "Utilisateur authentifie",
+    data: {
+      user: toPublicUser(req.user),
+    },
+  });
+};
+
 module.exports = {
   register,
   login,
+  me,
 };

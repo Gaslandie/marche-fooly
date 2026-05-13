@@ -1,6 +1,9 @@
 const User = require("../models/User");
 const { hashPassword, comparePassword } = require("../utils/password");
 const { signAuthToken } = require("../utils/jwt");
+const {
+  UPDATE_ME_ALLOWED_FIELDS,
+} = require("../validators/authValidators");
 
 /**
  * Format de sortie commun pour un utilisateur expose via l'API.
@@ -18,6 +21,15 @@ const toPublicUser = (userDoc) => ({
   avatarUrl: userDoc.avatarUrl || "",
   isEmailVerified: userDoc.isEmailVerified,
   isPhoneVerified: userDoc.isPhoneVerified,
+  address: userDoc.address
+    ? {
+        street: userDoc.address.street || "",
+        city: userDoc.address.city || "",
+        region: userDoc.address.region || "",
+        country: userDoc.address.country || "",
+        postalCode: userDoc.address.postalCode || "",
+      }
+    : null,
   createdAt: userDoc.createdAt,
 });
 
@@ -142,8 +154,67 @@ const me = async (req, res) => {
   });
 };
 
+const updateMe = async (req, res, next) => {
+  try {
+    const user = req.user;
+
+    // Whitelist stricte: tout champ hors UPDATE_ME_ALLOWED_FIELDS est
+    // ignore. Cela bloque toute tentative de modifier role, status,
+    // email, passwordHash, isEmailVerified, etc. via PATCH /me.
+    for (const field of UPDATE_ME_ALLOWED_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(req.body, field)) {
+        if (field === "address" && req.body.address) {
+          // Merge partiel: on ne remplace que les sous-champs fournis
+          // pour ne pas effacer ceux que le client n'a pas envoyes.
+          user.address = {
+            ...(user.address ? user.address.toObject() : {}),
+            ...req.body.address,
+          };
+        } else {
+          user[field] = req.body[field];
+        }
+      }
+    }
+
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profil mis a jour",
+      data: { user: toPublicUser(user) },
+    });
+  } catch (error) {
+    // Telephone en doublon -> 409 lisible.
+    if (error && error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Ces informations sont deja utilisees par un autre compte",
+        data: { field: Object.keys(error.keyPattern || {})[0] || null },
+      });
+    }
+    return next(error);
+  }
+};
+
+/**
+ * Logout sans etat: avec un JWT pur (sans refresh token), la revocation
+ * cote serveur n'est pas possible sans store partage (Redis + jti).
+ * L'endpoint existe pour homogeneite cote client (qui doit supprimer
+ * son token local) et pour permettre d'ajouter plus tard une blacklist
+ * sans casser le contrat d'API.
+ */
+const logout = async (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "Deconnexion effectuee",
+    data: null,
+  });
+};
+
 module.exports = {
   register,
   login,
   me,
+  updateMe,
+  logout,
 };

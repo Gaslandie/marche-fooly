@@ -16,6 +16,13 @@ const bcryptSaltRounds =
     ? parsedSaltRounds
     : 12;
 
+const corsOriginRaw =
+  process.env.CORS_ORIGIN || "http://localhost:3000";
+const corsOrigins = corsOriginRaw
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 module.exports = {
   port: Number(process.env.PORT) || 5000,
   mongoUri: process.env.MONGODB_URI,
@@ -23,4 +30,5 @@ module.exports = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || "7d",
   bcryptSaltRounds,
+  corsOrigins,
 };

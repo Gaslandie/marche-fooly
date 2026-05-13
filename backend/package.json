@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
+    "check:db": "node src/utils/checkDatabaseConnection.js",
     "test": "echo \"No tests configured\""
   },
   "keywords": [],
@@ -13,7 +14,9 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

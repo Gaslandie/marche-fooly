@@ -92,7 +92,6 @@ const productSchema = new mongoose.Schema(
       trim: true,
       uppercase: true,
       maxlength: 64,
-      sparse: true,
     },
     images: {
       type: [imageSchema],
@@ -144,7 +143,10 @@ const productSchema = new mongoose.Schema(
 );
 
 // On derive les champs repetitifs pour eviter les incoherences cote API.
-productSchema.pre("validate", function normalizeProductFields(next) {
+// Note (Mongoose 7+): les hooks pre("validate") ne recoivent PLUS de
+// callback `next`. La fonction doit etre soit synchrone (return implicite)
+// soit async. Ne pas reintroduire de parametre `next` ici.
+productSchema.pre("validate", function normalizeProductFields() {
   if (!this.slug && this.name) {
     this.slug = slugify(this.name);
   }
@@ -158,8 +160,6 @@ productSchema.pre("validate", function normalizeProductFields(next) {
 
   const normalizedTags = Array.isArray(this.tags) ? this.tags : [];
   this.tags = [...new Set(normalizedTags.map((tag) => slugify(tag)).filter(Boolean))];
-
-  next();
 });
 
 productSchema.index({ seller: 1, slug: 1 }, { unique: true });

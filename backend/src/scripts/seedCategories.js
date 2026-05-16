@@ -45,17 +45,6 @@
  */
 
 require("dotenv").config();
-
-// Compat Node 18: le driver MongoDB (mongodb >= 6) suppose `crypto` global
-// (disponible nativement a partir de Node 19). On le polyfill ici pour
-// que SCRAM-SHA-256 utilise par MongoDB Atlas fonctionne avec le Node 18
-// embarque actuellement par l'environnement de developpement. A retirer
-// si la team passe sur Node >= 19 (cf. backend/.nvmrc qui demande deja 24).
-if (typeof globalThis.crypto === "undefined" || !globalThis.crypto.randomBytes) {
-  // eslint-disable-next-line global-require
-  globalThis.crypto = require("crypto");
-}
-
 const mongoose = require("mongoose");
 
 const Category = require("../models/Category");

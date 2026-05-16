@@ -69,14 +69,12 @@ call() {
 }
 
 # Helper Node: promotion admin et cleanup utilisent MongoDB directement.
-# Le polyfill `globalThis.crypto` corrige un bug du driver MongoDB sur Node 18.
+# Requiert Node >= 24 (driver MongoDB >= 6 suppose crypto global, dispo
+# nativement depuis Node 19; on standardise sur Node 24 via .nvmrc).
 run_mongo() {
   local script="$1"
   ( cd "$(dirname "$0")/.." && node -e "
 require('dotenv').config();
-if (typeof globalThis.crypto === 'undefined' || !globalThis.crypto.randomBytes) {
-  globalThis.crypto = require('crypto');
-}
 const mongoose = require('mongoose');
 const User = require('./src/models/User');
 const Category = require('./src/models/Category');

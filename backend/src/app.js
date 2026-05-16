@@ -6,6 +6,7 @@ const { corsOrigins } = require("./config/env");
 const { authRateLimiter } = require("./middlewares/rateLimiters");
 const healthRoutes = require("./routes/healthRoutes");
 const authRoutes = require("./routes/authRoutes");
+const sellerRoutes = require("./routes/sellerRoutes");
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use("/api/auth", authRateLimiter);
 
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/sellers", sellerRoutes);
 
 app.get("/", (req, res) => {
   res.json({

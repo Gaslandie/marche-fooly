@@ -12,6 +12,7 @@ const authRoutes = require("./routes/authRoutes");
 const sellerRoutes = require("./routes/sellerRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const productRoutes = require("./routes/productRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 
@@ -36,12 +37,14 @@ app.use("/api/auth", authRateLimiter);
 app.use("/api/sellers", generalApiRateLimiter);
 app.use("/api/categories", generalApiRateLimiter);
 app.use("/api/products", generalApiRateLimiter);
+app.use("/api/orders", generalApiRateLimiter);
 
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/sellers", sellerRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/orders", orderRoutes);
 
 app.get("/", (req, res) => {
   res.json({

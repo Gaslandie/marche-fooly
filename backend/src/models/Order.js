@@ -77,6 +77,20 @@ const orderItemSchema = new mongoose.Schema(
  */
 const orderSchema = new mongoose.Schema(
   {
+    // Identifiant metier lisible (ORD-YYYYMMDD-XXXXX). Genere cote
+    // controleur via utils/orderReference.generateOrderReference() avant
+    // Order.create(). En cas de collision (E11000) le controleur retry.
+    reference: {
+      type: String,
+      required: true,
+      // `unique: true` cree deja un index unique. Pas besoin de `index: true`
+      // en plus (eviterait Mongoose de potentiellement warn duplicate dans
+      // une version future).
+      unique: true,
+      trim: true,
+      uppercase: true,
+      match: /^ORD-\d{8}-[A-Z2-9]{5}$/,
+    },
     customer: {
       type: ObjectId,
       ref: "User",
@@ -184,7 +198,10 @@ const orderSchema = new mongoose.Schema(
   }),
 );
 
-orderSchema.pre("validate", function recalculateOrderTotals(next) {
+// Note (Mongoose 7+): les hooks pre("validate") ne recoivent PLUS de
+// callback `next`. La fonction doit etre soit synchrone (return implicite)
+// soit async. Ne pas reintroduire de parametre `next` ici.
+orderSchema.pre("validate", function recalculateOrderTotals() {
   const normalizedItems = Array.isArray(this.items) ? this.items : [];
 
   this.items = normalizedItems.map((item) => {
@@ -202,8 +219,6 @@ orderSchema.pre("validate", function recalculateOrderTotals(next) {
   }
 
   this.totalAmount = this.subtotalAmount + this.deliveryFee;
-
-  next();
 });
 
 orderSchema.index({ customer: 1, createdAt: -1 });

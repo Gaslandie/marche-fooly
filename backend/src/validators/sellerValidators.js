@@ -23,10 +23,11 @@
  *     et des sous-schemas Mongoose pour rester coherent.
  */
 
-const { body, query } = require("express-validator");
+const { body, param, query } = require("express-validator");
 
 const PHONE_REGEX = /^\+?[0-9\s\-()]{8,20}$/;
 const HTTP_URL_REGEX = /^https?:\/\/.+/i;
+const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 // Whitelist stricte: tout champ hors de cette liste est ignore par
 // sellerController.updateMe. Toute extension future du modele doit etre
@@ -150,6 +151,19 @@ const updateMeSellerValidators = [
   body("address.postalCode").optional().isString().trim().isLength({ max: 20 }),
 ];
 
+// GET /api/sellers/:slug : valide le format strict du slug.
+// Sans ce validator, le controleur recoit n'importe quelle chaine et
+// renvoie 404 silencieux. Ici on prefere un 422 explicite "Slug invalide"
+// quand le format est anormal, pour rester coherent avec categories et
+// products.
+const paramSellerSlugValidator = [
+  param("slug")
+    .isString()
+    .bail()
+    .matches(SLUG_REGEX)
+    .withMessage("Slug vendeur invalide"),
+];
+
 // GET /api/sellers?page=...&limit=... : valide la pagination publique.
 // Les valeurs hors bornes sont rejetees avec un 422 plutot que clampees
 // silencieusement, pour ne pas masquer une erreur cote client.
@@ -168,5 +182,6 @@ module.exports = {
   applyValidators,
   updateMeSellerValidators,
   listSellersQueryValidators,
+  paramSellerSlugValidator,
   UPDATE_SELLER_ME_ALLOWED_FIELDS,
 };

@@ -77,6 +77,7 @@ const {
   applyValidators,
   updateMeSellerValidators,
   listSellersQueryValidators,
+  paramSellerSlugValidator,
 } = require("../validators/sellerValidators");
 
 const router = express.Router();
@@ -107,6 +108,6 @@ router.patch(
 
 router.get("/", runValidators(listSellersQueryValidators), listPublic);
 
-router.get("/:slug", getPublicBySlug);
+router.get("/:slug", runValidators(paramSellerSlugValidator), getPublicBySlug);
 
 module.exports = router;

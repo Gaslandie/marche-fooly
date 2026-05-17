@@ -3,7 +3,10 @@ const helmet = require("helmet");
 const cors = require("cors");
 
 const { corsOrigins } = require("./config/env");
-const { authRateLimiter } = require("./middlewares/rateLimiters");
+const {
+  authRateLimiter,
+  generalApiRateLimiter,
+} = require("./middlewares/rateLimiters");
 const healthRoutes = require("./routes/healthRoutes");
 const authRoutes = require("./routes/authRoutes");
 const sellerRoutes = require("./routes/sellerRoutes");
@@ -25,8 +28,14 @@ app.use(
 
 app.use(express.json());
 
-// Rate limiting cible sur l'authentification (anti brute-force).
+// Rate limiting cible sur l'authentification (anti brute-force, 30/15min).
 app.use("/api/auth", authRateLimiter);
+
+// Rate limiting general sur les routes API metier (anti-scraping, 300/15min).
+// /api/health et "/" restent libres (sondes infra).
+app.use("/api/sellers", generalApiRateLimiter);
+app.use("/api/categories", generalApiRateLimiter);
+app.use("/api/products", generalApiRateLimiter);
 
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);

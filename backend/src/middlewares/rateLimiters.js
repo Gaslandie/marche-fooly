@@ -57,7 +57,37 @@ const generalApiRateLimiter = rateLimit({
   },
 });
 
+/**
+ * Rate limiter strict pour les formulaires PUBLICS sans authentification
+ * (POST /api/contact, POST /api/newsletter). Ces routes sont des cibles
+ * classiques de bots/spam car elles ne demandent ni JWT ni CAPTCHA au MVP.
+ *
+ * - windowMs: 15 minutes
+ * - limit: 10 requetes par IP par fenetre
+ * - Objectif: limiter une vague de spam sans bloquer un utilisateur reel
+ *   qui pourrait soumettre 2-3 messages legitimes par session.
+ *
+ * Note: a empiler avec generalApiRateLimiter si on monte les routes sous
+ * un prefixe deja couvert. En pratique on monte /api/contact et
+ * /api/newsletter SEULEMENT avec ce limiter dedie, pour ne pas doubler.
+ */
+const publicFormRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message:
+        "Trop de soumissions. Veuillez reessayer dans quelques minutes.",
+      data: null,
+    });
+  },
+});
+
 module.exports = {
   authRateLimiter,
   generalApiRateLimiter,
+  publicFormRateLimiter,
 };

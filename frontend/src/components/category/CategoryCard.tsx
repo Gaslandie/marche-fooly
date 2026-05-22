@@ -21,7 +21,11 @@ export default function CategoryCard({ category, variant = "row" }: CategoryCard
         <div className={styles.categoryFeaturedFooter}>
           <span className={styles.categoryMeta}>
             <i className="bi bi-box" aria-hidden="true"></i>
-            {category.productCount} produits
+            {/* productCount n'est pas fourni par l'API : on affiche un libellé
+                neutre plutôt qu'un faux chiffre (décision Jour 21). */}
+            {category.productCount > 0
+              ? `${category.productCount} produits`
+              : "Voir les produits"}
           </span>
           <i className={`bi bi-arrow-right ${styles.categoryArrow}`} aria-hidden="true"></i>
         </div>
@@ -40,7 +44,15 @@ export default function CategoryCard({ category, variant = "row" }: CategoryCard
           <p className={styles.categoryCardText}>{category.shortDescription}</p>
         </div>
       </div>
-      <span className={styles.categoryCount}>{category.productCount}</span>
+      {/* productCount absent de l'API -> on remplace le badge chiffré par une
+          flèche neutre plutôt que d'afficher « 0 » (décision Jour 21). */}
+      <span className={styles.categoryCount}>
+        {category.productCount > 0 ? (
+          category.productCount
+        ) : (
+          <i className="bi bi-chevron-right" aria-hidden="true"></i>
+        )}
+      </span>
     </Link>
   );
 }

@@ -12,12 +12,17 @@ import {
   minCatalogPrice,
   shopCategoryFilters,
 } from "@/data/products";
+import { getProducts } from "@/lib/api";
 import styles from "@/styles/catalog.module.css";
 import type { ProductSortKey, ProductViewMode } from "@/types/catalog";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
+
+// Cette page dépend d'une API live (GET /api/products) : on force le rendu
+// dynamique (à la requête). Le build Next.js ne contacte donc plus le backend.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Boutique",
@@ -54,16 +59,25 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
   const sort = normalizeSort(readParam(params.sort));
   const view = normalizeView(readParam(params.view));
 
-  const filteredProducts = getFilteredProducts({
-    category,
-    query,
-    maxPrice,
-    stockOnly,
-    promoOnly,
-    localOnly,
-    minRating,
-    sort,
-  });
+  // Produits réels : API backend (GET /api/products). Seuls les query params
+  // supportés par l'API (category, q, limit) sont envoyés côté serveur. Les
+  // autres filtres (prix, stock, promo, local, note) et le tri restent
+  // appliqués côté frontend par getFilteredProducts (décision Jour 21).
+  const apiProducts = await getProducts({ category, q: query, limit: 100 });
+
+  const filteredProducts = getFilteredProducts(
+    {
+      category,
+      query,
+      maxPrice,
+      stockOnly,
+      promoOnly,
+      localOnly,
+      minRating,
+      sort,
+    },
+    apiProducts,
+  );
 
   const filterCategories = categories.filter((item) => shopCategoryFilters.includes(item.slug));
   const categoryLabel = getCategoryLabel(category);

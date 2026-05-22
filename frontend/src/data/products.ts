@@ -176,19 +176,25 @@ export const shopCategoryFilters = [
   "bebe-maternite",
 ];
 
-export function getFilteredProducts({
-  category,
-  query,
-  maxPrice = maxCatalogPrice,
-  stockOnly,
-  promoOnly,
-  localOnly,
-  minRating,
-  sort = "recommended",
-}: ProductFilterParams) {
+// `source` permet de filtrer une liste fournie par l'appelant (ex : produits
+// renvoyés par l'API). Par défaut, on retombe sur le tableau statique local
+// pour rester rétrocompatible avec les anciens appels.
+export function getFilteredProducts(
+  {
+    category,
+    query,
+    maxPrice = maxCatalogPrice,
+    stockOnly,
+    promoOnly,
+    localOnly,
+    minRating,
+    sort = "recommended",
+  }: ProductFilterParams,
+  source: ProductItem[] = products,
+) {
   const normalizedQuery = query?.trim().toLowerCase() ?? "";
 
-  const filtered = products.filter((product) => {
+  const filtered = source.filter((product) => {
     const matchesCategory = category ? product.categorySlug === category : true;
     const matchesQuery = normalizedQuery
       ? [product.name, product.vendor, product.slug]

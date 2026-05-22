@@ -1,4 +1,27 @@
+/**
+ * Composant: AccountSidebar (Server Component)
+ *
+ * Rôle du fichier :
+ *   Colonne latérale de la page /mon-compte : profil de l'utilisateur
+ *   connecté, navigation du compte et bouton de déconnexion.
+ *
+ * Où il est utilisé :
+ *   - app/mon-compte/page.tsx (rendu uniquement quand un utilisateur
+ *     est connecté ; reçoit `user` en prop).
+ *
+ * Prérequis / infos utiles :
+ *   - Reste un Server Component : il affiche des données déjà
+ *     récupérées côté serveur. Seul le bouton de déconnexion est
+ *     interactif et délégué au Client Component <LogoutButton/>.
+ *
+ * Note pour GitHub Copilot :
+ *   - `user` est garanti non-null : la page n'affiche cette sidebar
+ *     que pour un utilisateur authentifié.
+ */
+
 import Link from "next/link";
+import LogoutButton from "@/components/account/LogoutButton";
+import type { AuthUser } from "@/types/auth";
 import styles from "@/styles/account.module.css";
 
 const NAV_LINKS = [
@@ -9,14 +32,21 @@ const NAV_LINKS = [
   { icon: "bi bi-shield-check", label: "Sécurité", href: "/mon-compte", active: false },
 ];
 
-export default function AccountSidebar() {
+type AccountSidebarProps = {
+  user: AuthUser;
+};
+
+export default function AccountSidebar({ user }: AccountSidebarProps) {
+  const fullName = `${user.firstName} ${user.lastName}`.trim();
+  const initial = (user.firstName || user.email).charAt(0).toUpperCase();
+
   return (
     <div className={styles.sidebar}>
       {/* Profile header */}
       <div className={styles.sidebarProfile}>
-        <div className={styles.avatarCircle}>M</div>
-        <p className={styles.sidebarName}>Mamadou Diallo</p>
-        <p className={styles.sidebarEmail}>mamadou@exemple.com</p>
+        <div className={styles.avatarCircle}>{initial}</div>
+        <p className={styles.sidebarName}>{fullName}</p>
+        <p className={styles.sidebarEmail}>{user.email}</p>
       </div>
 
       {/* Nav */}
@@ -34,10 +64,7 @@ export default function AccountSidebar() {
 
         <div className={styles.sidebarDivider} />
 
-        <button type="button" className={styles.sidebarLogout}>
-          <i className="bi bi-box-arrow-right" aria-hidden="true"></i>
-          Déconnexion
-        </button>
+        <LogoutButton />
       </nav>
     </div>
   );

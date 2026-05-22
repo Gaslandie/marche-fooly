@@ -1,9 +1,32 @@
+/**
+ * Route: app/commandes/page
+ *
+ * Rôle du fichier :
+ *   Page « Mes commandes ». Protégée côté serveur : un visiteur non
+ *   connecté est redirigé vers /mon-compte.
+ *
+ * Sécurité :
+ *   - L'état de connexion est vérifié côté serveur via getCurrentUser()
+ *     (cookie httpOnly + validation backend). On ne fait jamais
+ *     confiance au navigateur.
+ *   - redirect() est appelé HORS de tout try/catch (il lève
+ *     volontairement une exception NEXT_REDIRECT).
+ *   - `dynamic = "force-dynamic"` : la page dépend du cookie de session.
+ *
+ * Limite connue :
+ *   Les commandes affichées proviennent encore de données statiques
+ *   (src/data/orders.ts). La connexion à l'API commandes backend est
+ *   prévue pour un bloc ultérieur.
+ */
+
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import OrderCard from "@/components/orders/OrderCard";
 import OrdersToolbar from "@/components/orders/OrdersToolbar";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { orders, statusLabel, statusClass } from "@/data/orders";
+import { getCurrentUser } from "@/lib/auth";
 import { formatPrice } from "@/utils/formatPrice";
 import styles from "@/styles/orders.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
@@ -14,7 +37,16 @@ export const metadata: Metadata = {
     "Suivez l'état de vos commandes sur Marché Fooly et retrouvez l'historique de vos achats locaux à Sangarédi.",
 };
 
-export default function CommandesPage() {
+// La page dépend du cookie de session : rendu dynamique obligatoire.
+export const dynamic = "force-dynamic";
+
+export default async function CommandesPage() {
+  // Protection serveur : les visiteurs non connectés sont redirigés.
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/mon-compte");
+  }
+
   const totalSpent = orders.reduce((sum, o) => sum + o.total, 0);
   const doneCount = orders.filter((o) => o.status === "done").length;
   const pendingCount = orders.filter(

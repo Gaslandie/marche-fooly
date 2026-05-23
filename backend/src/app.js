@@ -19,6 +19,16 @@ const newsletterRoutes = require("./routes/newsletterRoutes");
 
 const app = express();
 
+// Confiance proxy: en production (Render, etc.), le service tourne DERRIERE
+// un load-balancer qui ajoute l'en-tete X-Forwarded-For. Sans ce reglage,
+// Express ignore cet en-tete: express-rate-limit voit alors une seule IP
+// (celle du proxy) pour tous les clients et leve l'erreur
+// ERR_ERL_UNEXPECTED_X_FORWARDED_FOR.
+// On utilise la valeur numerique 1 ("faire confiance au 1er proxy") et NON
+// `true`: `true` accepte l'IP la plus a gauche de X-Forwarded-For, qui peut
+// etre usurpee par un client malveillant pour contourner le rate-limit.
+app.set("trust proxy", 1);
+
 // Securite: en-tetes HTTP par defaut recommandes par helmet.
 app.use(helmet());
 

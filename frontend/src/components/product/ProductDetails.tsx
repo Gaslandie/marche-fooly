@@ -1,5 +1,5 @@
 import Link from "next/link";
-import QuantitySelector from "@/components/product/QuantitySelector";
+import ProductBuyBox from "@/components/product/ProductBuyBox";
 import { getCategoryLabel } from "@/data/products";
 import type { ProductItem } from "@/types/catalog";
 import { formatPrice } from "@/utils/formatPrice";
@@ -252,30 +252,10 @@ export default function ProductDetails({ product }: Props) {
               </div>
             )}
 
-            {/* Quantity + Add to cart */}
-            <div className="d-flex flex-wrap align-items-center gap-3 mb-4">
-              <div>
-                <label className="form-label fw-bold d-block">Quantité</label>
-                <QuantitySelector />
-              </div>
-              <div className="pt-sm-4 flex-grow-1">
-                <Link href="/panier" className="btn btn-warning fw-bold w-100">
-                  <i className="bi bi-cart-plus me-1" aria-hidden="true"></i>
-                  Ajouter au panier
-                </Link>
-              </div>
-            </div>
-
-            {/* Secondary CTAs */}
-            <div className="d-grid gap-2 d-sm-flex mb-4">
-              <Link href="/panier" className="btn btn-dark fw-bold flex-fill">
-                Acheter maintenant
-              </Link>
-              <Link href="/favoris" className="btn btn-outline-dark flex-fill">
-                <i className="bi bi-heart me-1" aria-hidden="true"></i>
-                Ajouter aux favoris
-              </Link>
-            </div>
+            {/* Quantité + ajout panier + acheter maintenant + favoris.
+                Isolé dans un Client Component (ProductBuyBox) pour garder
+                le reste de ProductDetails en Server Component. */}
+            <ProductBuyBox product={product} />
 
             {/* Trust row */}
             <div className={styles.trustRow}>

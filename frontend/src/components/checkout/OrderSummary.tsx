@@ -1,33 +1,69 @@
-import type { CartItemData } from "@/components/cart/CartItem";
+/**
+ * Composant: OrderSummary (Client Component)
+ *
+ * Rôle du fichier :
+ *   Récapitulatif des articles du panier dans la colonne droite de la
+ *   page /checkout. Lit directement le panier via `useCart()` (plus de
+ *   prop `items` — la source unique est le Provider).
+ *
+ * Où il est utilisé :
+ *   - app/checkout/page.tsx
+ *
+ * Règles métier / sécurité :
+ *   - Le sous-total est PUREMENT INDICATIF. Le backend recalculera tout
+ *     lors du POST /api/orders (cf. CheckoutForm).
+ *
+ * Note pour GitHub Copilot :
+ *   - Au premier rendu (SSR + hydratation), le panier est vide (snapshot
+ *     serveur de CartProvider) ; les vraies lignes apparaissent juste
+ *     après l'hydratation. Si le panier est réellement vide, on
+ *     affiche un état neutre + un lien vers /panier.
+ */
+
+"use client";
+
+import Link from "next/link";
+import { useCart } from "@/components/cart/CartProvider";
 import { formatPrice } from "@/utils/formatPrice";
 import styles from "@/styles/checkout.module.css";
 
-type Props = {
-  items: CartItemData[];
-};
+export default function OrderSummary() {
+  const { lines, subtotalDisplay } = useCart();
+  const currency = lines[0]?.currency ?? "GNF";
 
-export default function OrderSummary({ items }: Props) {
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const currency = "GNF";
+  if (lines.length === 0) {
+    return (
+      <aside className={styles.summaryCard}>
+        <h2 className="h5 fw-bold mb-3">Résumé de commande</h2>
+        <p className="text-secondary small mb-3">
+          Votre panier est vide. Ajoutez des produits pour pouvoir commander.
+        </p>
+        <Link href="/panier" className="btn btn-outline-dark w-100">
+          <i className="bi bi-arrow-left me-1" aria-hidden="true"></i>
+          Retour au panier
+        </Link>
+      </aside>
+    );
+  }
 
   return (
     <aside className={styles.summaryCard}>
       <h2 className="h5 fw-bold mb-3">Résumé de commande</h2>
 
       <div className="mb-3">
-        {items.map((item) => (
-          <div key={item.slug} className={styles.summaryItem}>
+        {lines.map((line) => (
+          <div key={line.productId} className={styles.summaryItem}>
             <div className={styles.summaryItemIcon}>
-              <i className={item.icon} aria-hidden="true"></i>
+              <i className={line.icon} aria-hidden="true"></i>
             </div>
             <div className="flex-grow-1">
-              <div className={styles.summaryItemName}>{item.name}</div>
+              <div className={styles.summaryItemName}>{line.name}</div>
               <div className="text-secondary" style={{ fontSize: "0.78rem" }}>
-                {item.vendor} · Qté {item.quantity}
+                {line.vendor} · Qté {line.quantity}
               </div>
             </div>
             <div className={styles.summaryItemPrice}>
-              {formatPrice(item.price * item.quantity, item.currency)}
+              {formatPrice(line.price * line.quantity, line.currency)}
             </div>
           </div>
         ))}
@@ -35,7 +71,7 @@ export default function OrderSummary({ items }: Props) {
 
       <div className={styles.summaryLine}>
         <span>Sous-total</span>
-        <strong>{formatPrice(subtotal, currency)}</strong>
+        <strong>{formatPrice(subtotalDisplay, currency)}</strong>
       </div>
       <div className={styles.summaryLine}>
         <span>Livraison</span>
@@ -47,26 +83,16 @@ export default function OrderSummary({ items }: Props) {
       </div>
 
       <div className={styles.summaryTotal}>
-        <span className={styles.summaryTotalLabel}>Total</span>
+        <span className={styles.summaryTotalLabel}>Total estimé</span>
         <strong className={styles.summaryTotalValue}>
-          {formatPrice(subtotal, currency)}
+          {formatPrice(subtotalDisplay, currency)}
         </strong>
       </div>
 
-      <div className="mt-4 pt-3 border-top">
-        <div className={styles.securityRow}>
-          <i className="bi bi-shield-check text-success" aria-hidden="true"></i>
-          <span className="small text-secondary fw-semibold">Vendeurs locaux vérifiés</span>
-        </div>
-        <div className={styles.securityRow}>
-          <i className="bi bi-lock text-primary" aria-hidden="true"></i>
-          <span className="small text-secondary fw-semibold">Informations protégées</span>
-        </div>
-        <div className={styles.securityRow}>
-          <i className="bi bi-geo-alt" style={{ color: "var(--mf-orange)" }} aria-hidden="true"></i>
-          <span className="small text-secondary fw-semibold">Livraison locale à Sangarédi</span>
-        </div>
-      </div>
+      <p className="small text-secondary mt-3 mb-0">
+        Le total final (incluant les frais de livraison éventuels) est calculé
+        par le vendeur lors de la confirmation.
+      </p>
     </aside>
   );
 }

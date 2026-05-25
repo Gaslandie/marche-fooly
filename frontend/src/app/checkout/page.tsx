@@ -1,9 +1,28 @@
+/**
+ * Route: app/checkout/page
+ *
+ * Rôle du fichier :
+ *   Page de finalisation de commande. Protégée côté serveur :
+ *     - utilisateur non connecté -> redirect("/mon-compte")
+ *   Pré-charge l'utilisateur et le passe au `CheckoutForm` (Client) qui
+ *   se charge de la logique métier (panier via useCart, soumission via
+ *   /api/orders).
+ *
+ * Sécurité :
+ *   - `getCurrentUser()` valide la session côté serveur.
+ *   - `dynamic = "force-dynamic"` : la page dépend du cookie de session.
+ *   - L'état du panier (panier vide -> notice + retour /panier) est géré
+ *     côté client par CheckoutForm/OrderSummary (le panier vit en
+ *     localStorage, invisible côté serveur).
+ */
+
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
-import type { CartItemData } from "@/components/cart/CartItem";
+import { getCurrentUser } from "@/lib/auth";
 import styles from "@/styles/checkout.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
@@ -13,30 +32,14 @@ export const metadata: Metadata = {
     "Complétez vos informations et choisissez votre mode de paiement pour finaliser votre achat sur Marché Fooly à Sangarédi.",
 };
 
-const CHECKOUT_ITEMS: CartItemData[] = [
-  {
-    slug: "samsung-a12",
-    name: "Téléphone Samsung A12",
-    icon: "bi bi-phone",
-    vendor: "Boutique Diallo",
-    meta: "Couleur : Noir · Stockage : 64 Go",
-    price: 1200000,
-    currency: "GNF",
-    quantity: 1,
-  },
-  {
-    slug: "huile-de-soin-naturelle",
-    name: "Huile de peau naturelle",
-    icon: "bi bi-droplet-half",
-    vendor: "Beauté Locale",
-    meta: "Format : 250 ml",
-    price: 120000,
-    currency: "GNF",
-    quantity: 2,
-  },
-];
+export const dynamic = "force-dynamic";
 
-export default function CheckoutPage() {
+export default async function CheckoutPage() {
+  const user = await getCurrentUser();
+  if (!user) {
+    redirect("/mon-compte");
+  }
+
   return (
     <>
       {/* ── Hero ──────────────────────────────────────────────────── */}
@@ -90,14 +93,11 @@ export default function CheckoutPage() {
       <section className={styles.checkoutPage}>
         <div className="container">
           <div className="row g-4 align-items-start">
-            {/* Form column */}
             <div className="col-lg-8">
-              <CheckoutForm />
+              <CheckoutForm user={user} />
             </div>
-
-            {/* Summary column */}
             <div className="col-lg-4">
-              <OrderSummary items={CHECKOUT_ITEMS} />
+              <OrderSummary />
             </div>
           </div>
         </div>

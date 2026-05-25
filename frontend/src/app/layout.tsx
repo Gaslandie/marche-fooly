@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./globals.css";
+import CartProvider from "@/components/cart/CartProvider";
 import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import TopBar from "@/components/layout/TopBar";
@@ -26,10 +27,16 @@ export default function RootLayout({
   return (
     <html lang="fr" className={inter.className}>
       <body>
-        <TopBar />
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        {/* CartProvider : Context panier disponible partout (Header, pages,
+            checkout). Le Provider est un Client Component ; le layout reste
+            un Server Component. Pas d'impact sur le rendu statique des pages
+            qui ne consomment pas useCart(). */}
+        <CartProvider>
+          <TopBar />
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

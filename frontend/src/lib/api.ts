@@ -125,6 +125,12 @@ function refSellerName(seller: ApiProduct["seller"]): string {
   return "Vendeur Marché Fooly";
 }
 
+/** Extrait le slug du vendeur d'une référence (objet peuplé ou string/null). */
+function refSellerSlug(seller: ApiProduct["seller"]): string {
+  if (seller && typeof seller === "object") return seller.slug;
+  return "";
+}
+
 /**
  * Convertit un produit API en `ProductItem` attendu par les composants.
  * Les champs absents de l'API reçoivent des placeholders neutres
@@ -150,6 +156,9 @@ export function toProductItem(api: ApiProduct): ProductItem {
     isLocal: false,
     sortRank: 0,
     newestRank: 0,
+    // Identifiants utiles au panier / commande (Jour 23).
+    productId: api.id,
+    sellerSlug: refSellerSlug(api.seller),
   };
 }
 

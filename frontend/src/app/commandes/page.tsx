@@ -2,31 +2,34 @@
  * Route: app/commandes/page
  *
  * Rôle du fichier :
- *   Page « Mes commandes ». Protégée côté serveur : un visiteur non
- *   connecté est redirigé vers /mon-compte.
+ *   Page « Mes commandes ». Protégée côté serveur (redirect si non
+ *   connecté). Récupère les commandes réelles du client via getMyOrders()
+ *   (cookie httpOnly + backend) et les confie à <OrdersHistory> (Client)
+ *   pour la recherche/le filtre. Stats calculées côté serveur sur les
+ *   commandes récupérées.
  *
  * Sécurité :
- *   - L'état de connexion est vérifié côté serveur via getCurrentUser()
- *     (cookie httpOnly + validation backend). On ne fait jamais
- *     confiance au navigateur.
- *   - redirect() est appelé HORS de tout try/catch (il lève
- *     volontairement une exception NEXT_REDIRECT).
- *   - `dynamic = "force-dynamic"` : la page dépend du cookie de session.
+ *   - `getCurrentUser()` valide la session ; `redirect("/mon-compte")`
+ *     hors try/catch si non connecté.
+ *   - `getMyOrders()` renvoie uniquement les commandes du client
+ *     (ownership backend). Le JWT n'est jamais exposé au navigateur.
+ *   - `dynamic = "force-dynamic"` : dépend du cookie de session.
  *
- * Limite connue :
- *   Les commandes affichées proviennent encore de données statiques
- *   (src/data/orders.ts). La connexion à l'API commandes backend est
- *   prévue pour un bloc ultérieur.
+ * Note pour GitHub Copilot :
+ *   - `getMyOrders` -> null = échec backend/réseau : on affiche un état
+ *     d'erreur léger (loading.tsx/error.tsx complètent au bloc suivant).
+ *   - Limite de fetch volontairement large (50) pour le MVP ; la
+ *     pagination UI n'est pas encore branchée.
  */
 
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import OrderCard from "@/components/orders/OrderCard";
-import OrdersToolbar from "@/components/orders/OrdersToolbar";
+import OrdersHistory from "@/components/orders/OrdersHistory";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
-import { orders, statusLabel, statusClass } from "@/data/orders";
 import { getCurrentUser } from "@/lib/auth";
+import { getMyOrders } from "@/lib/orders";
+import { ORDER_STATUS_CLASS, ORDER_STATUS_LABEL } from "@/lib/orderStatus";
 import { formatPrice } from "@/utils/formatPrice";
 import styles from "@/styles/orders.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
@@ -40,6 +43,8 @@ export const metadata: Metadata = {
 // La page dépend du cookie de session : rendu dynamique obligatoire.
 export const dynamic = "force-dynamic";
 
+const IN_PROGRESS_STATUSES = ["pending", "confirmed", "preparing", "shipped"];
+
 export default async function CommandesPage() {
   // Protection serveur : les visiteurs non connectés sont redirigés.
   const user = await getCurrentUser();
@@ -47,10 +52,17 @@ export default async function CommandesPage() {
     redirect("/mon-compte");
   }
 
-  const totalSpent = orders.reduce((sum, o) => sum + o.total, 0);
-  const doneCount = orders.filter((o) => o.status === "done").length;
-  const pendingCount = orders.filter(
-    (o) => o.status === "pending" || o.status === "processing"
+  const result = await getMyOrders({ limit: 50 });
+  const loadError = result === null;
+  const orders = result?.items ?? [];
+
+  // Stats calculées sur les commandes récupérées.
+  const totalSpent = orders
+    .filter((o) => o.status !== "cancelled")
+    .reduce((sum, o) => sum + o.totalAmount, 0);
+  const deliveredCount = orders.filter((o) => o.status === "delivered").length;
+  const inProgressCount = orders.filter((o) =>
+    IN_PROGRESS_STATUSES.includes(o.status),
   ).length;
 
   return (
@@ -106,11 +118,28 @@ export default async function CommandesPage() {
           <div className="row g-4 align-items-start">
             {/* Left column – order list */}
             <div className="col-lg-9">
-              <OrdersToolbar count={orders.length} />
-
-              {orders.map((order) => (
-                <OrderCard key={order.id} order={order} />
-              ))}
+              {loadError ? (
+                <div className="bg-white rounded-3 shadow-sm p-5 text-center">
+                  <i
+                    className="bi bi-wifi-off d-block mb-3 text-warning"
+                    style={{ fontSize: "2.5rem" }}
+                    aria-hidden="true"
+                  ></i>
+                  <h2 className="h5 fw-bold">
+                    Impossible de charger vos commandes
+                  </h2>
+                  <p className="text-secondary mb-4">
+                    Une erreur est survenue. Vérifiez votre connexion, puis
+                    réessayez.
+                  </p>
+                  <Link href="/commandes" className="btn btn-dark">
+                    <i className="bi bi-arrow-clockwise me-1" aria-hidden="true"></i>
+                    Réessayer
+                  </Link>
+                </div>
+              ) : (
+                <OrdersHistory orders={orders} />
+              )}
             </div>
 
             {/* Right column – stats */}
@@ -121,12 +150,12 @@ export default async function CommandesPage() {
               </div>
 
               <div className={styles.statCard}>
-                <span className={styles.statValue}>{doneCount}</span>
+                <span className={styles.statValue}>{deliveredCount}</span>
                 <span className={styles.statLabel}>Livrées</span>
               </div>
 
               <div className={styles.statCard}>
-                <span className={styles.statValue}>{pendingCount}</span>
+                <span className={styles.statValue}>{inProgressCount}</span>
                 <span className={styles.statLabel}>En cours</span>
               </div>
 
@@ -137,14 +166,17 @@ export default async function CommandesPage() {
                 <span className={styles.statLabel}>Total dépensé</span>
               </div>
 
-              {/* Status legend */}
+              {/* Légende des statuts */}
               <div className="bg-white rounded-3 shadow-sm p-3 mt-2">
                 <p className="fw-bold mb-2" style={{ fontSize: "0.875rem" }}>
                   Légende des statuts
                 </p>
-                {Object.entries(statusLabel).map(([key, label]) => (
+                {Object.entries(ORDER_STATUS_LABEL).map(([key, label]) => (
                   <div key={key} className="d-flex align-items-center gap-2 mb-1">
-                    <span className={`badge bg-${statusClass[key]} rounded-pill`} style={{ fontSize: "0.7rem" }}>
+                    <span
+                      className={`badge bg-${ORDER_STATUS_CLASS[key]} rounded-pill`}
+                      style={{ fontSize: "0.7rem" }}
+                    >
                       {label}
                     </span>
                   </div>

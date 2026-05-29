@@ -39,6 +39,53 @@ export const ORDER_STATUS_FLOW = [
   "delivered",
 ] as const;
 
+/**
+ * Transition de statut proposable à un VENDEUR depuis l'UI.
+ * `intent` sert seulement à la présentation (couleur du bouton).
+ */
+export type SellerStatusTransition = {
+  target: string;
+  label: string;
+  intent: "advance" | "cancel";
+};
+
+/**
+ * Miroir FRONTEND de la machine d'état backend (acteur = seller).
+ * Source de vérité = backend (STATUS_TRANSITIONS dans orderController).
+ * Ce miroir sert UNIQUEMENT à n'afficher que les boutons autorisés ;
+ * le backend revérifie et reste juge final (422 si transition interdite,
+ * 403 si l'acteur n'est pas autorisé).
+ */
+const SELLER_TRANSITIONS: Record<string, SellerStatusTransition[]> = {
+  pending: [
+    { target: "confirmed", label: "Confirmer", intent: "advance" },
+    { target: "cancelled", label: "Annuler", intent: "cancel" },
+  ],
+  confirmed: [
+    { target: "preparing", label: "Mettre en préparation", intent: "advance" },
+    { target: "cancelled", label: "Annuler", intent: "cancel" },
+  ],
+  preparing: [
+    { target: "shipped", label: "Expédier", intent: "advance" },
+    { target: "cancelled", label: "Annuler", intent: "cancel" },
+  ],
+  shipped: [
+    { target: "delivered", label: "Marquer comme livrée", intent: "advance" },
+  ],
+  delivered: [],
+  cancelled: [],
+};
+
+/**
+ * Transitions de statut autorisées à un vendeur depuis un statut donné.
+ * PURE. Renvoie `[]` pour les états terminaux ou inconnus.
+ */
+export function getSellerStatusTransitions(
+  status: string,
+): SellerStatusTransition[] {
+  return SELLER_TRANSITIONS[status] ?? [];
+}
+
 /** Libellés français des 6 statuts backend. */
 export const ORDER_STATUS_LABEL: Record<string, string> = {
   pending: "En attente",

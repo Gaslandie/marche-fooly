@@ -202,10 +202,16 @@ export default async function VendeurPage() {
           </span>
           <h1 className="h3 fw-bold mb-0">Espace vendeur</h1>
         </div>
-        <Link href="/vendeur/produits/nouveau" className="btn btn-warning fw-bold">
-          <i className="bi bi-plus-lg me-1" aria-hidden="true"></i>
-          Ajouter un produit
-        </Link>
+        <div className="d-flex flex-wrap gap-2">
+          <Link href="/vendeur/commandes" className="btn btn-outline-dark">
+            <i className="bi bi-receipt me-1" aria-hidden="true"></i>
+            Voir mes commandes
+          </Link>
+          <Link href="/vendeur/produits/nouveau" className="btn btn-warning fw-bold">
+            <i className="bi bi-plus-lg me-1" aria-hidden="true"></i>
+            Ajouter un produit
+          </Link>
+        </div>
       </div>
 
       {/* Statistiques */}

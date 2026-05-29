@@ -62,6 +62,19 @@ export default function AccountSidebar({ user }: AccountSidebarProps) {
           </Link>
         ))}
 
+        {/* Lien espace vendeur : visible seulement pour les comptes vendeur.
+            (L'accès réel est de toute façon revalidé côté serveur sur le
+            statut du profil vendeur dans /vendeur.) */}
+        {user.role === "seller" && (
+          <Link
+            href="/vendeur"
+            className={styles.sidebarLink}
+          >
+            <i className="bi bi-shop" aria-hidden="true"></i>
+            Espace vendeur
+          </Link>
+        )}
+
         <div className={styles.sidebarDivider} />
 
         <LogoutButton />

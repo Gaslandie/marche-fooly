@@ -223,3 +223,21 @@ export async function getCategories(): Promise<CategoryItem[]> {
   const body = await request<ApiListData<ApiCategory>>("/api/categories");
   return body.data.items.map(toCategoryItem);
 }
+
+/** Option de catégorie pour un <select> (conserve l'`id` ObjectId). */
+export type CategoryOption = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+/**
+ * Récupère les catégories sous forme d'options { id, name, slug }.
+ * Contrairement à getCategories() (qui mappe vers CategoryItem et perd
+ * l'id), on conserve ici l'`id` ObjectId — indispensable au formulaire
+ * produit vendeur, car POST/PATCH /api/products attend `category` = ObjectId.
+ */
+export async function getCategoryOptions(): Promise<CategoryOption[]> {
+  const body = await request<ApiListData<ApiCategory>>("/api/categories");
+  return body.data.items.map((c) => ({ id: c.id, name: c.name, slug: c.slug }));
+}

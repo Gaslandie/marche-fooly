@@ -75,6 +75,15 @@ export default function AccountSidebar({ user }: AccountSidebarProps) {
           </Link>
         )}
 
+        {/* Lien espace admin : visible seulement pour les comptes admin.
+            (L'accès réel est revalidé serveur + backend requireRole.) */}
+        {user.role === "admin" && (
+          <Link href="/admin" className={styles.sidebarLink}>
+            <i className="bi bi-shield-lock" aria-hidden="true"></i>
+            Espace admin
+          </Link>
+        )}
+
         <div className={styles.sidebarDivider} />
 
         <LogoutButton />

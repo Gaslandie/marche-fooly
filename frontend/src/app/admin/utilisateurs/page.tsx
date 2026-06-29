@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Admin — Utilisateurs" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminUsersPage() {
-  await requireAdmin();
+  const currentUser = await requireAdmin();
 
   const result = await getAdminUsers({ limit: 50 });
   const loadError = result === null;
@@ -46,7 +46,7 @@ export default async function AdminUsersPage() {
           </Link>
         </div>
       ) : (
-        <AdminUsersTable users={users} />
+        <AdminUsersTable users={users} currentUser={currentUser} />
       )}
     </section>
   );

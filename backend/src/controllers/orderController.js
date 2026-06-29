@@ -75,6 +75,7 @@
 const Product = require("../models/Product");
 const SellerProfile = require("../models/SellerProfile");
 const Order = require("../models/Order");
+const { BACKOFFICE_ROLES } = require("../models/shared/constants");
 
 const {
   CREATE_ORDER_ALLOWED_FIELDS,
@@ -165,7 +166,7 @@ const computeDeliveryFee = (fulfillmentMethod, productsData) => {
 // Retourne l'acteur metier ("customer" | "seller" | "admin" | null)
 // pour un order donne et un req.
 const determineActor = async (order, req) => {
-  if (req.user.role === "admin") return "admin";
+  if (BACKOFFICE_ROLES.includes(req.user.role)) return "admin";
   if (order.customer.equals(req.user._id)) return "customer";
   // Sinon, verifier s'il est le vendeur owner via son sellerProfile.
   const sp = await SellerProfile.findOne({

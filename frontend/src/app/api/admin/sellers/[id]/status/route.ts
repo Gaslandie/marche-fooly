@@ -12,7 +12,7 @@
  * Règles de sécurité (IMPORTANT) :
  *   - JWT jamais exposé (cookie httpOnly -> Bearer côté serveur).
  *   - Whitelist stricte : seul `{ status }` est relayé.
- *   - Le backend impose `requireRole("admin")` ET la logique métier
+ *   - Le backend impose les rôles owner/admin ET la logique métier
  *     (promotion de rôle à l'approbation). Il reste la SOURCE DE VÉRITÉ ;
  *     on relaie ses codes (401/403/404/422).
  *

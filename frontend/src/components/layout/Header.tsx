@@ -3,6 +3,7 @@ import Link from "next/link";
 import SearchBar from "@/components/common/SearchBar";
 import { siteConfig } from "@/config/site";
 import { getCurrentUser } from "@/lib/auth";
+import { hasBackOfficeAccess } from "@/lib/admin";
 
 const navLinks = [
   { href: "/", label: "Accueil" },
@@ -14,7 +15,7 @@ const navLinks = [
 
 export default async function Header() {
   const user = await getCurrentUser();
-  const isAdmin = user?.role === "admin";
+  const hasAdminAccess = user ? hasBackOfficeAccess(user.role) : false;
 
   return (
     <header className="mf-header">
@@ -67,7 +68,7 @@ export default async function Header() {
                 </Link>
               </li>
             ))}
-            {isAdmin && (
+            {hasAdminAccess && (
               <li>
                 <Link href="/admin">
                   Administration

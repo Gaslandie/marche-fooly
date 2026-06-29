@@ -54,6 +54,7 @@
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 const SellerProfile = require("../models/SellerProfile");
+const { ADMIN_OPERATION_ROLES } = require("../models/shared/constants");
 
 const {
   CREATE_PRODUCT_ALLOWED_FIELDS,
@@ -361,7 +362,7 @@ const update = async (req, res, next) => {
     const product = await Product.findById(req.params.id);
     if (!product) return reject404(res);
 
-    const isAdmin = req.user.role === "admin";
+    const isAdmin = ADMIN_OPERATION_ROLES.includes(req.user.role);
 
     // Ownership pour non-admins.
     if (!isAdmin) {
@@ -433,7 +434,7 @@ const softDelete = async (req, res, next) => {
     const product = await Product.findById(req.params.id);
     if (!product) return reject404(res);
 
-    const isAdmin = req.user.role === "admin";
+    const isAdmin = ADMIN_OPERATION_ROLES.includes(req.user.role);
     if (!isAdmin) {
       const sellerProfile = await loadOwnSellerProfile(req.user);
       if (!sellerProfile) return reject403(res);

@@ -10,6 +10,7 @@
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "check:db": "node src/utils/checkDatabaseConnection.js",
+    "owner:promote": "node src/scripts/promoteOwner.js",
     "test": "echo \"No tests configured\""
   },
   "keywords": [],

@@ -8,13 +8,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AdminProductsTable from "@/components/admin/AdminProductsTable";
-import { getAdminProducts, requireAdmin } from "@/lib/admin";
+import { getAdminProducts, requireBackOffice } from "@/lib/admin";
 
 export const metadata: Metadata = { title: "Admin — Produits" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
-  await requireAdmin();
+  await requireBackOffice();
 
   const result = await getAdminProducts({ limit: 50 });
   const loadError = result === null;

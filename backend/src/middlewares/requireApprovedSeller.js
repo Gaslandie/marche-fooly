@@ -66,7 +66,7 @@ const requireApprovedSeller = async (req, res, next) => {
       });
     }
 
-    if (!["seller", "admin"].includes(user.role)) {
+    if (!["seller", "admin", "owner"].includes(user.role)) {
       return res.status(403).json({
         success: false,
         message: "Acces vendeur requis",
@@ -77,7 +77,7 @@ const requireApprovedSeller = async (req, res, next) => {
     // Les admins ont acces sans avoir de SellerProfile.
     // req.sellerProfile reste donc undefined: les controleurs en aval
     // doivent en tenir compte (cf. commentaire d'en-tete).
-    if (user.role === "admin") {
+    if (user.role === "admin" || user.role === "owner") {
       return next();
     }
 
@@ -104,4 +104,3 @@ const requireApprovedSeller = async (req, res, next) => {
 module.exports = {
   requireApprovedSeller,
 };
-

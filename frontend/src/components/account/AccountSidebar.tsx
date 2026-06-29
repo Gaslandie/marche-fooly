@@ -21,6 +21,7 @@
 
 import Link from "next/link";
 import LogoutButton from "@/components/account/LogoutButton";
+import { hasBackOfficeAccess } from "@/lib/admin";
 import type { AuthUser } from "@/types/auth";
 import styles from "@/styles/account.module.css";
 
@@ -77,7 +78,7 @@ export default function AccountSidebar({ user }: AccountSidebarProps) {
 
         {/* Lien espace admin : visible seulement pour les comptes admin.
             (L'accès réel est revalidé serveur + backend requireRole.) */}
-        {user.role === "admin" && (
+        {hasBackOfficeAccess(user.role) && (
           <Link href="/admin" className={styles.sidebarLink}>
             <i className="bi bi-shield-lock" aria-hidden="true"></i>
             Espace admin

@@ -238,6 +238,48 @@ const updateSellerStatus = async (req, res, next) => {
   }
 };
 
+const updateUserRole = async (req, res, next) => {
+  try {
+    const targetUser = await User.findById(req.params.id);
+    if (!targetUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Utilisateur introuvable",
+        data: null,
+      });
+    }
+
+    if (targetUser.role === "owner") {
+      return res.status(403).json({
+        success: false,
+        message: "Le compte proprietaire ne peut pas etre modifie",
+        data: null,
+      });
+    }
+
+    if (targetUser._id.equals(req.user._id)) {
+      return res.status(403).json({
+        success: false,
+        message: "Vous ne pouvez pas modifier votre propre role",
+        data: null,
+      });
+    }
+
+    const targetRole = req.body.role;
+    targetUser.role = targetRole;
+    targetUser.status = "active";
+    await targetUser.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Role utilisateur mis a jour",
+      data: { user: toAdminUser(targetUser) },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const listProducts = async (req, res, next) => {
   try {
     const { page, limit, skip } = parsePagination(req);
@@ -299,6 +341,7 @@ module.exports = {
   listUsers,
   listSellers,
   updateSellerStatus,
+  updateUserRole,
   listProducts,
   listOrders,
 };

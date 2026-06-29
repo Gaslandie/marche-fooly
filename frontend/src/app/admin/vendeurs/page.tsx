@@ -9,13 +9,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import AdminSellersTable from "@/components/admin/AdminSellersTable";
-import { getAdminSellers, requireAdmin } from "@/lib/admin";
+import { canManageOperations, getAdminSellers, requireBackOffice } from "@/lib/admin";
 
 export const metadata: Metadata = { title: "Admin — Vendeurs" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminSellersPage() {
-  await requireAdmin();
+  const currentUser = await requireBackOffice();
 
   const result = await getAdminSellers({ limit: 50 });
   const loadError = result === null;
@@ -44,7 +44,10 @@ export default async function AdminSellersPage() {
           </Link>
         </div>
       ) : (
-        <AdminSellersTable sellers={sellers} />
+        <AdminSellersTable
+          sellers={sellers}
+          canManageSellers={canManageOperations(currentUser.role)}
+        />
       )}
     </section>
   );

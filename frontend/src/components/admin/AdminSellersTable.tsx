@@ -26,7 +26,13 @@ function userLabel(user: AdminUserRef): { name: string; email: string } {
   return { name: "—", email: "" };
 }
 
-export default function AdminSellersTable({ sellers }: { sellers: AdminSeller[] }) {
+export default function AdminSellersTable({
+  sellers,
+  canManageSellers,
+}: {
+  sellers: AdminSeller[];
+  canManageSellers: boolean;
+}) {
   if (sellers.length === 0) {
     return (
       <div className="bg-white rounded-3 shadow-sm p-5 text-center text-secondary">
@@ -80,11 +86,15 @@ export default function AdminSellersTable({ sellers }: { sellers: AdminSeller[] 
                       : "—"}
                   </td>
                   <td className="text-end">
-                    <AdminSellerActions
-                      sellerId={s.id}
-                      status={s.status}
-                      storeName={s.storeName}
-                    />
+                    {canManageSellers ? (
+                      <AdminSellerActions
+                        sellerId={s.id}
+                        status={s.status}
+                        storeName={s.storeName}
+                      />
+                    ) : (
+                      <span className="text-secondary small">Lecture seule</span>
+                    )}
                   </td>
                 </tr>
               );

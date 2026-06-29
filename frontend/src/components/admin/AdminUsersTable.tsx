@@ -1,17 +1,23 @@
 /**
  * Composant: AdminUsersTable (Server Component)
  *
- * Rôle : tableau des utilisateurs pour l'admin (lecture seule).
+ * Rôle : tableau des utilisateurs pour le back office.
  * Usage : app/admin/utilisateurs/page.tsx.
  * Sécurité : reçoit des `AdminUser` déjà whitelistés (jamais passwordHash).
+ * Les actions de rôle sont affichées uniquement au `owner`.
  */
 
 import type { AdminUser } from "@/lib/admin";
+import { canManageTeam } from "@/lib/admin";
+import type { AuthUser } from "@/types/auth";
+import AdminUserRoleActions from "@/components/admin/AdminUserRoleActions";
 
 const ROLE_BADGE: Record<string, string> = {
   customer: "bg-secondary",
   seller: "bg-info text-dark",
+  staff: "bg-primary",
   admin: "bg-dark",
+  owner: "bg-warning text-dark",
 };
 
 const STATUS_BADGE: Record<string, string> = {
@@ -20,7 +26,25 @@ const STATUS_BADGE: Record<string, string> = {
   suspended: "bg-danger",
 };
 
-export default function AdminUsersTable({ users }: { users: AdminUser[] }) {
+const ROLE_LABEL: Record<string, string> = {
+  customer: "Client",
+  seller: "Vendeur",
+  staff: "Staff",
+  admin: "Admin",
+  owner: "Owner",
+};
+
+const EDITABLE_ROLES = ["customer", "staff", "admin"];
+
+export default function AdminUsersTable({
+  users,
+  currentUser,
+}: {
+  users: AdminUser[];
+  currentUser: AuthUser;
+}) {
+  const showRoleActions = canManageTeam(currentUser.role);
+
   if (users.length === 0) {
     return (
       <div className="bg-white rounded-3 shadow-sm p-5 text-center text-secondary">
@@ -41,6 +65,11 @@ export default function AdminUsersTable({ users }: { users: AdminUser[] }) {
               <th scope="col">Rôle</th>
               <th scope="col">Statut</th>
               <th scope="col">Inscrit le</th>
+              {showRoleActions && (
+                <th scope="col" className="text-end">
+                  Gestion rôle
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -55,7 +84,7 @@ export default function AdminUsersTable({ users }: { users: AdminUser[] }) {
                   <span
                     className={`badge rounded-pill ${ROLE_BADGE[u.role] ?? "bg-secondary"}`}
                   >
-                    {u.role}
+                    {ROLE_LABEL[u.role] ?? u.role}
                   </span>
                 </td>
                 <td>
@@ -70,6 +99,18 @@ export default function AdminUsersTable({ users }: { users: AdminUser[] }) {
                     ? new Date(u.createdAt).toLocaleDateString("fr-FR")
                     : "—"}
                 </td>
+                {showRoleActions && (
+                  <td className="text-end">
+                    {u.role === "owner" || u.id === currentUser.id || !EDITABLE_ROLES.includes(u.role) ? (
+                      <span className="text-secondary small">Protégé</span>
+                    ) : (
+                      <AdminUserRoleActions
+                        userId={u.id}
+                        currentRole={u.role as "customer" | "staff" | "admin"}
+                      />
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

@@ -32,6 +32,7 @@ const mongoose = require("mongoose");
 const {
   USER_ROLES,
   ACCOUNT_STATUSES,
+  TEAM_TARGET_ROLES,
   SELLER_STATUSES,
   PRODUCT_STATUSES,
   ORDER_STATUSES,
@@ -105,6 +106,15 @@ const updateSellerStatusValidators = [
     ),
 ];
 
+const updateUserRoleValidators = [
+  body("role")
+    .isString()
+    .withMessage("role requis")
+    .bail()
+    .isIn(TEAM_TARGET_ROLES)
+    .withMessage(`role: doit valoir ${TEAM_TARGET_ROLES.join(", ")}`),
+];
+
 module.exports = {
   listUsersValidators,
   listSellersValidators,
@@ -112,5 +122,6 @@ module.exports = {
   listOrdersValidators,
   paramIdValidator,
   updateSellerStatusValidators,
+  updateUserRoleValidators,
   ADMIN_SELLER_TARGET_STATUSES,
 };

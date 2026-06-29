@@ -69,6 +69,7 @@ const {
 const { authenticate } = require("../middlewares/authenticate");
 const { requireRole } = require("../middlewares/requireRole");
 const { runValidators } = require("../middlewares/validate");
+const { ADMIN_OPERATION_ROLES } = require("../models/shared/constants");
 const {
   createCategoryValidators,
   updateCategoryValidators,
@@ -84,7 +85,7 @@ const router = express.Router();
 router.post(
   "/",
   authenticate,
-  requireRole("admin"),
+  requireRole(...ADMIN_OPERATION_ROLES),
   runValidators(createCategoryValidators),
   create,
 );
@@ -92,7 +93,7 @@ router.post(
 router.patch(
   "/:id",
   authenticate,
-  requireRole("admin"),
+  requireRole(...ADMIN_OPERATION_ROLES),
   runValidators(paramIdValidator),
   runValidators(updateCategoryValidators),
   update,
@@ -101,7 +102,7 @@ router.patch(
 router.delete(
   "/:id",
   authenticate,
-  requireRole("admin"),
+  requireRole(...ADMIN_OPERATION_ROLES),
   runValidators(paramIdValidator),
   softDelete,
 );

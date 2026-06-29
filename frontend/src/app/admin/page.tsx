@@ -21,14 +21,14 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import {
+  canManageOperations,
   getAdminOrders,
   getAdminProducts,
   getAdminSellers,
   getAdminUsers,
+  requireBackOffice,
 } from "@/lib/admin";
-import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Administration",
@@ -38,12 +38,11 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect("/mon-compte");
-  if (user.role !== "admin") redirect("/");
+  const user = await requireBackOffice();
+  const canManageSensitiveData = canManageOperations(user.role);
 
   const [users, sellers, pendingSellers, products, orders] = await Promise.all([
-    getAdminUsers({ limit: 1 }),
+    canManageSensitiveData ? getAdminUsers({ limit: 1 }) : Promise.resolve(null),
     getAdminSellers({ limit: 1 }),
     getAdminSellers({ status: "pending", limit: 1 }),
     getAdminProducts({ limit: 1 }),
@@ -57,12 +56,16 @@ export default async function AdminPage() {
   const pendingCount = total(pendingSellers);
 
   const sections = [
-    {
-      href: "/admin/utilisateurs",
-      icon: "bi bi-people",
-      label: "Utilisateurs",
-      value: fmt(total(users)),
-    },
+    ...(canManageSensitiveData
+      ? [
+          {
+            href: "/admin/utilisateurs",
+            icon: "bi bi-people",
+            label: "Utilisateurs",
+            value: fmt(total(users)),
+          },
+        ]
+      : []),
     {
       href: "/admin/vendeurs",
       icon: "bi bi-shop",
@@ -109,6 +112,9 @@ export default async function AdminPage() {
           Supervision
         </span>
         <h1 className="h3 fw-bold mb-0">Administration</h1>
+        <p className="text-secondary mb-0">
+          Accès {user.role === "owner" ? "propriétaire" : user.role === "admin" ? "administrateur" : "collaborateur"}.
+        </p>
       </div>
 
       <div className="row g-3">

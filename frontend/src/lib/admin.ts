@@ -2,7 +2,7 @@
  * Lib: admin (MODULE SERVEUR UNIQUEMENT)
  *
  * Rôle du fichier :
- *   Fetchers serveur de supervision admin (lecture) :
+ *   Fetchers serveur de supervision back office (lecture) :
  *     - getAdminUsers(params)
  *     - getAdminSellers(params)
  *     - getAdminProducts(params)
@@ -16,8 +16,8 @@
  * Règles de sécurité (IMPORTANT) :
  *   - SERVEUR UNIQUEMENT (importe lib/auth -> next/headers) : exclu du
  *     bundle navigateur. JWT jamais exposé ni journalisé.
- *   - Le backend impose `requireRole("admin")` : un non-admin reçoit 403
- *     -> ici on renvoie `null` (la page redirige de toute façon en amont).
+ *   - Le backend impose les rôles back office : un utilisateur non autorisé
+ *     reçoit 403 -> ici on renvoie `null`.
  *   - Les types reflètent les whitelists backend (toAdminUser/Seller/...):
  *     jamais de `passwordHash` ni de secret.
  *
@@ -28,20 +28,41 @@
 
 import { redirect } from "next/navigation";
 import { backendJson, getCurrentUser, readAuthToken } from "@/lib/auth";
-import type { AuthUser } from "@/types/auth";
+import type { AuthRole, AuthUser } from "@/types/auth";
+
+export const BACKOFFICE_ROLES: AuthRole[] = ["owner", "admin", "staff"];
+export const ADMIN_OPERATION_ROLES: AuthRole[] = ["owner", "admin"];
+
+export function hasBackOfficeAccess(role: AuthRole) {
+  return BACKOFFICE_ROLES.includes(role);
+}
+
+export function canManageOperations(role: AuthRole) {
+  return ADMIN_OPERATION_ROLES.includes(role);
+}
+
+export function canManageTeam(role: AuthRole) {
+  return role === "owner";
+}
 
 /**
- * Garde admin pour les pages /admin/* (Server Components).
+ * Garde back office pour les pages /admin/* (Server Components).
  * - non connecté          -> redirect("/mon-compte")
- * - user.role !== "admin"  -> redirect("/")
- * Le backend impose AUSSI requireRole("admin") (défense en profondeur).
+ * - rôle non autorisé     -> redirect("/")
+ * Le backend impose AUSSI les rôles côté API (défense en profondeur).
  * À appeler en tout début de page (redirect() lève une exception).
  */
-export async function requireAdmin(): Promise<AuthUser> {
+export async function requireBackOffice(
+  allowedRoles: AuthRole[] = BACKOFFICE_ROLES,
+): Promise<AuthUser> {
   const user = await getCurrentUser();
   if (!user) redirect("/mon-compte");
-  if (user.role !== "admin") redirect("/");
+  if (!allowedRoles.includes(user.role)) redirect("/");
   return user;
+}
+
+export async function requireAdmin(): Promise<AuthUser> {
+  return requireBackOffice(ADMIN_OPERATION_ROLES);
 }
 
 export type AdminPagination = {

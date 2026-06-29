@@ -34,7 +34,7 @@ export type AuthAddress = {
 };
 
 /** Rôles applicatifs (forcés côté serveur ; l'inscription publique = customer). */
-export type AuthRole = "customer" | "seller" | "admin";
+export type AuthRole = "customer" | "seller" | "staff" | "admin" | "owner";
 
 /** Utilisateur public, tel que renvoyé par le backend (jamais le token). */
 export type AuthUser = {

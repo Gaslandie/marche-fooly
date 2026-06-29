@@ -13,9 +13,7 @@
  *   - `dynamic = "force-dynamic"` : la page dépend du cookie de session,
  *     elle ne doit pas être pré-rendue / mise en cache.
  *
- * Limites connues (à connecter dans un bloc ultérieur) :
- *   - Statistiques (commandes/favoris/total) : encore basées sur des
- *     données statiques (src/data/orders.ts) — /commandes non connectée.
+ * Limites connues :
  *   - Boutons « Modifier mes informations » / « Changer le mot de passe »
  *     et les préférences de notification : non fonctionnels pour l'instant.
  */
@@ -25,8 +23,9 @@ import Link from "next/link";
 import AuthTabs from "@/components/account/AuthTabs";
 import AccountSidebar from "@/components/account/AccountSidebar";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
-import { orders } from "@/data/orders";
 import { getCurrentUser } from "@/lib/auth";
+import { getMyFavoriteCount } from "@/lib/favorites";
+import { getMyOrderStats } from "@/lib/orders";
 import { formatPrice } from "@/utils/formatPrice";
 import styles from "@/styles/account.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
@@ -49,6 +48,14 @@ const NOTIF_SETTINGS = [
 export default async function MonComptePage() {
   // Vérification de session côté serveur (cookie httpOnly + backend).
   const user = await getCurrentUser();
+  let orderStats: Awaited<ReturnType<typeof getMyOrderStats>> = null;
+  let favoriteCount = 0;
+  if (user) {
+    [orderStats, favoriteCount] = await Promise.all([
+      getMyOrderStats(),
+      getMyFavoriteCount(),
+    ]);
+  }
 
   return (
     <>
@@ -134,15 +141,25 @@ export default async function MonComptePage() {
                   </div>
                 </div>
 
-                {/* Quick stats (encore basées sur des données statiques) */}
+                {/* Quick stats réelles liées au compte connecté */}
                 <div className="row g-3 mb-4">
                   {[
-                    { icon: "bi bi-bag-check", value: orders.length, label: "Commandes", color: "var(--mf-orange)" },
-                    { icon: "bi bi-heart", value: 6, label: "Favoris", color: "var(--mf-green)" },
+                    {
+                      icon: "bi bi-bag-check",
+                      value: orderStats?.totalOrders ?? 0,
+                      label: "Commandes",
+                      color: "var(--mf-orange)",
+                    },
+                    {
+                      icon: "bi bi-heart",
+                      value: favoriteCount,
+                      label: "Favoris",
+                      color: "var(--mf-green)",
+                    },
                     {
                       icon: "bi bi-cash-stack",
                       value: formatPrice(
-                        orders.reduce((sum, o) => sum + o.total, 0),
+                        orderStats?.totalSpent ?? 0,
                         "GNF",
                       ),
                       label: "Total dépensé",

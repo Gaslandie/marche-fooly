@@ -1,4 +1,6 @@
 import Link from "next/link";
+import AddToCartButton from "@/components/cart/AddToCartButton";
+import RemoveFavoriteButton from "@/components/wishlist/RemoveFavoriteButton";
 import type { ProductItem } from "@/types/catalog";
 import { formatPrice } from "@/utils/formatPrice";
 import styles from "@/styles/wishlist.module.css";
@@ -25,13 +27,10 @@ export default function WishlistItem({ product }: Props) {
         {product.badge && (
           <span className={styles.wishlistBadge}>{product.badge}</span>
         )}
-        <Link
-          href="/favoris"
+        <RemoveFavoriteButton
+          productId={product.productId}
           className={styles.wishlistRemove}
-          aria-label="Retirer des favoris"
-        >
-          <i className="bi bi-x-lg" aria-hidden="true"></i>
-        </Link>
+        />
         <i className={product.icon} aria-hidden="true"></i>
       </div>
 
@@ -55,9 +54,10 @@ export default function WishlistItem({ product }: Props) {
       </div>
 
       <div className={styles.wishlistActions}>
-        <Link href="/panier" className="btn btn-warning btn-sm fw-bold">
-          Ajouter au panier
-        </Link>
+        <AddToCartButton
+          product={product}
+          className="btn btn-warning btn-sm fw-bold w-100"
+        />
         <Link href={`/produit/${product.slug}`} className="btn btn-light btn-sm">
           Voir
         </Link>

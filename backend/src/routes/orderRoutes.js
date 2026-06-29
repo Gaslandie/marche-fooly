@@ -2,13 +2,14 @@
  * Routes: orderRoutes
  *
  * Role exact du fichier:
- *   Declare les 5 endpoints commandes sous /api/orders. AUCUNE route
+ *   Declare les 6 endpoints commandes sous /api/orders. AUCUNE route
  *   publique: une commande contient de la donnee transactionnelle et
  *   personnelle (adresse, telephone, montants). Toutes les routes
  *   exigent authenticate au minimum.
  *
  *     POST   /                       creer une commande (tout user authentifie)
  *     GET    /mine                   liste des commandes du CLIENT connecte
+ *     GET    /mine/stats             statistiques du CLIENT connecte
  *     GET    /seller                 liste des commandes du VENDEUR connecte (approved)
  *     PATCH  /:reference/status      transition statut (machine d'etat + RBAC)
  *     GET    /:reference             detail (visible: customer | seller | admin)
@@ -20,10 +21,11 @@
  *
  * ORDRE DES ROUTES IMPORTANT (Express 5 matche dans l'ordre de declaration):
  *   1. POST     /                       (sans collision)
- *   2. GET      /mine                   (segment statique)
- *   3. GET      /seller                 (segment statique)
- *   4. PATCH    /:reference/status      (methode differente des GET, pas de conflit)
- *   5. GET      /:reference             (paramétrée, doit etre DERNIERE des GET
+ *   2. GET      /mine/stats             (segment statique)
+ *   3. GET      /mine                   (segment statique)
+ *   4. GET      /seller                 (segment statique)
+ *   5. PATCH    /:reference/status      (methode differente des GET, pas de conflit)
+ *   6. GET      /:reference             (paramétrée, doit etre DERNIERE des GET
  *                                        pour ne pas absorber /mine et /seller)
  *
  * Chaines de middlewares (ordre IMPORTANT, principe defense en profondeur):
@@ -40,6 +42,11 @@
  *       -> runValidators(listOrdersQueryValidators)
  *       -> controller.listMine
  *     Le controleur filtre strictement customer === req.user._id.
+ *
+ *   - GET /mine/stats:
+ *       authenticate
+ *       -> controller.statsMine
+ *     Le controleur agrege strictement customer === req.user._id.
  *
  *   - GET /seller:
  *       authenticate
@@ -87,6 +94,7 @@ const express = require("express");
 const {
   create,
   listMine,
+  statsMine,
   listSeller,
   getByReference,
   updateStatus,
@@ -112,6 +120,12 @@ router.post(
   authenticate,
   runValidators(createOrderValidators),
   create,
+);
+
+router.get(
+  "/mine/stats",
+  authenticate,
+  statsMine,
 );
 
 router.get(

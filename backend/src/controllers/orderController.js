@@ -2,9 +2,10 @@
  * Controller: orderController
  *
  * Role exact du fichier:
- *   Implemente les 5 endpoints commandes:
+ *   Implemente les 6 endpoints commandes:
  *     - create           POST   /api/orders                       (authenticate)
  *     - listMine         GET    /api/orders/mine                  (authenticate)
+ *     - statsMine        GET    /api/orders/mine/stats            (authenticate)
  *     - listSeller       GET    /api/orders/seller                (authenticate + requireApprovedSeller)
  *     - getByReference   GET    /api/orders/:reference            (authenticate)
  *     - updateStatus     PATCH  /api/orders/:reference/status     (authenticate)
@@ -373,6 +374,62 @@ const listMine = async (req, res, next) => {
   }
 };
 
+// --- GET /api/orders/mine/stats -------------------------------------------
+
+const statsMine = async (req, res, next) => {
+  try {
+    const [stats] = await Order.aggregate([
+      { $match: { customer: req.user._id } },
+      {
+        $group: {
+          _id: null,
+          totalOrders: { $sum: 1 },
+          totalSpent: {
+            $sum: {
+              $cond: [{ $ne: ["$status", "cancelled"] }, "$totalAmount", 0],
+            },
+          },
+          deliveredCount: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "delivered"] }, 1, 0],
+            },
+          },
+          inProgressCount: {
+            $sum: {
+              $cond: [
+                {
+                  $in: [
+                    "$status",
+                    ["pending", "confirmed", "preparing", "shipped"],
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Statistiques commandes",
+      data: {
+        stats: {
+          totalOrders: stats?.totalOrders || 0,
+          totalSpent: stats?.totalSpent || 0,
+          deliveredCount: stats?.deliveredCount || 0,
+          inProgressCount: stats?.inProgressCount || 0,
+          currency: "GNF",
+        },
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 // --- GET /api/orders/seller ------------------------------------------------
 
 const listSeller = async (req, res, next) => {
@@ -542,6 +599,7 @@ const updateStatus = async (req, res, next) => {
 module.exports = {
   create,
   listMine,
+  statsMine,
   listSeller,
   getByReference,
   updateStatus,

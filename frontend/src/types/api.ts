@@ -120,3 +120,13 @@ export type ApiProduct = {
   createdAt: string;
   updatedAt: string;
 };
+
+/* --- Favoris -------------------------------------------------------------- */
+
+/** Un favori tel que renvoye par GET /api/favorites. */
+export type ApiFavorite = {
+  id: string;
+  product: ApiProduct;
+  createdAt: string;
+  updatedAt: string;
+};

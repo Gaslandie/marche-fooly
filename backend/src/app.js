@@ -14,6 +14,7 @@ const sellerRoutes = require("./routes/sellerRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const favoriteRoutes = require("./routes/favoriteRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const newsletterRoutes = require("./routes/newsletterRoutes");
@@ -52,6 +53,7 @@ app.use("/api/sellers", generalApiRateLimiter);
 app.use("/api/categories", generalApiRateLimiter);
 app.use("/api/products", generalApiRateLimiter);
 app.use("/api/orders", generalApiRateLimiter);
+app.use("/api/favorites", generalApiRateLimiter);
 app.use("/api/admin", generalApiRateLimiter);
 
 app.use("/api/health", healthRoutes);
@@ -60,6 +62,7 @@ app.use("/api/sellers", sellerRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/favorites", favoriteRoutes);
 app.use("/api/admin", adminRoutes);
 
 // Routes publiques de formulaires (anti-spam plus strict que generalApi).

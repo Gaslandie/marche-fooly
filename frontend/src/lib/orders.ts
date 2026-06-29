@@ -126,6 +126,14 @@ export type MyOrdersResult = {
   pagination: OrderPagination;
 };
 
+export type MyOrderStats = {
+  totalOrders: number;
+  totalSpent: number;
+  deliveredCount: number;
+  inProgressCount: number;
+  currency: "GNF";
+};
+
 export type GetMyOrdersParams = {
   status?: string;
   page?: number;
@@ -158,6 +166,27 @@ export async function getMyOrders(
     const body = result.body as { data?: MyOrdersResult } | null;
     if (!body?.data || !Array.isArray(body.data.items)) return null;
     return body.data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Récupère les statistiques exactes des commandes du client connecté.
+ * Le calcul est fait côté backend sur customer === utilisateur du JWT.
+ */
+export async function getMyOrderStats(): Promise<MyOrderStats | null> {
+  const token = await readAuthToken();
+  if (!token) return null;
+
+  try {
+    const result = await backendJson("/api/orders/mine/stats", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!result.ok) return null;
+    const body = result.body as { data?: { stats?: MyOrderStats } } | null;
+    return body?.data?.stats ?? null;
   } catch {
     return null;
   }

@@ -11,7 +11,7 @@
  *     - Quantité (label + QuantitySelector contrôlé)
  *     - « Ajouter au panier »      → <AddToCartButton variant="default">
  *     - « Acheter maintenant »     → <AddToCartButton variant="buy-now">
- *     - « Ajouter aux favoris »    → Link (logique favoris hors scope Jour 23)
+ *     - « Ajouter aux favoris »    → API favoris user-owned
  *
  * Où il est utilisé :
  *   - components/product/ProductDetails.tsx
@@ -32,9 +32,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import AddToCartButton from "@/components/cart/AddToCartButton";
 import QuantitySelector from "@/components/product/QuantitySelector";
+import FavoriteToggleButton from "@/components/wishlist/FavoriteToggleButton";
 import type { ProductItem } from "@/types/catalog";
 
 type Props = {
@@ -66,10 +66,10 @@ export default function ProductBuyBox({ product }: Props) {
             variant="buy-now"
           />
         </div>
-        <Link href="/favoris" className="btn btn-outline-dark flex-fill">
-          <i className="bi bi-heart me-1" aria-hidden="true"></i>
-          Ajouter aux favoris
-        </Link>
+        <FavoriteToggleButton
+          productId={product.productId}
+          className="btn btn-outline-dark flex-fill"
+        />
       </div>
     </>
   );

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import ProductCard from "@/components/product/ProductCard";
 import WishlistItem from "@/components/wishlist/WishlistItem";
 import WishlistToolbar from "@/components/wishlist/WishlistToolbar";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
-import { products } from "@/data/products";
+import { getProducts } from "@/lib/api";
+import { getCurrentUser } from "@/lib/auth";
+import { getMyFavorites } from "@/lib/favorites";
 import styles from "@/styles/wishlist.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
@@ -14,15 +17,6 @@ export const metadata: Metadata = {
     "Retrouvez vos produits favoris sur Marché Fooly et ajoutez-les rapidement au panier pour acheter localement à Sangarédi.",
 };
 
-const WISHLIST_SLUGS = [
-  "iphone-12-occasion",
-  "samsung-a12",
-  "television-ecran-plat",
-  "sac-tendance-femme",
-  "huile-de-soin-naturelle",
-  "location-maison-sangaredi",
-];
-
 const CATEGORY_CHIPS = [
   { label: "Tous", icon: "bi bi-grid", href: "/favoris", active: true },
   { label: "Téléphones", icon: "bi bi-phone", href: "/boutique?category=telephones-accessoires", active: false },
@@ -31,15 +25,27 @@ const CATEGORY_CHIPS = [
   { label: "Électro", icon: "bi bi-tv", href: "/boutique?category=electromenagers", active: false },
 ];
 
-export default function FavorisPage() {
-  const wishlistProducts = products.filter((p) => WISHLIST_SLUGS.includes(p.slug));
-  const suggested = products
-    .filter((p) => !WISHLIST_SLUGS.includes(p.slug))
+export const dynamic = "force-dynamic";
+
+export default async function FavorisPage() {
+  const user = await getCurrentUser();
+  if (!user) redirect("/mon-compte");
+
+  const [favoritesResult, productSuggestions] = await Promise.all([
+    getMyFavorites({ limit: 50 }),
+    getProducts({ limit: 8 }),
+  ]);
+
+  const wishlistProducts = favoritesResult?.items.map((item) => item.product) ?? [];
+  const favoriteSlugs = new Set(wishlistProducts.map((product) => product.slug));
+  const suggested = productSuggestions
+    .filter((p) => !favoriteSlugs.has(p.slug))
     .slice(0, 4);
 
   const inStockCount = wishlistProducts.filter((p) => p.inStock).length;
-  const promoCount = wishlistProducts.filter((p) => p.isPromo).length;
-  const localCount = wishlistProducts.filter((p) => p.isLocal).length;
+  const unavailableCount = wishlistProducts.length - inStockCount;
+  const vendorCount = new Set(wishlistProducts.map((p) => p.vendor)).size;
+  const loadError = favoritesResult === null;
 
   return (
     <>
@@ -106,28 +112,32 @@ export default function FavorisPage() {
                 ))}
               </div>
 
-              {/* Wishlist grid */}
-              <div className="row g-4">
-                {wishlistProducts.map((product) => (
-                  <div key={product.slug} className="col-sm-6 col-xl-4">
-                    <WishlistItem product={product} />
-                  </div>
-                ))}
-              </div>
-
-              {/* Empty state */}
-              <div className={`${styles.emptyWishlist} mt-4`}>
-                <div className={styles.emptyWishlistIcon}>
-                  <i className="bi bi-search-heart" aria-hidden="true"></i>
+              {loadError ? (
+                <div className="alert alert-warning" role="alert">
+                  Impossible de charger vos favoris pour le moment.
                 </div>
-                <h2 className="h4 fw-bold">Continuez à sauvegarder vos coups de cœur</h2>
-                <p className="text-secondary mb-3">
-                  Parcourez la boutique et gardez les meilleurs produits pour les retrouver plus tard.
-                </p>
-                <Link href="/boutique" className="btn btn-outline-dark">
-                  Explorer la boutique
-                </Link>
-              </div>
+              ) : wishlistProducts.length > 0 ? (
+                <div className="row g-4">
+                  {wishlistProducts.map((product) => (
+                    <div key={product.slug} className="col-sm-6 col-xl-4">
+                      <WishlistItem product={product} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className={`${styles.emptyWishlist} mt-4`}>
+                  <div className={styles.emptyWishlistIcon}>
+                    <i className="bi bi-search-heart" aria-hidden="true"></i>
+                  </div>
+                  <h2 className="h4 fw-bold">Aucun favori pour le moment</h2>
+                  <p className="text-secondary mb-3">
+                    Parcourez la boutique et sauvegardez les produits que vous voulez retrouver plus tard.
+                  </p>
+                  <Link href="/boutique" className="btn btn-outline-dark">
+                    Explorer la boutique
+                  </Link>
+                </div>
+              )}
             </div>
 
             {/* Right column – summary + tip */}
@@ -144,12 +154,12 @@ export default function FavorisPage() {
                   <strong>{inStockCount}</strong>
                 </div>
                 <div className={styles.summaryStat}>
-                  <span>Promos</span>
-                  <strong>{promoCount}</strong>
+                  <span>Indisponibles</span>
+                  <strong>{unavailableCount}</strong>
                 </div>
                 <div className={styles.summaryStat}>
-                  <span>Vendeurs locaux</span>
-                  <strong>{localCount}</strong>
+                  <span>Vendeurs</span>
+                  <strong>{vendorCount}</strong>
                 </div>
 
                 <Link href="/panier" className="btn btn-warning fw-bold w-100 mt-4">

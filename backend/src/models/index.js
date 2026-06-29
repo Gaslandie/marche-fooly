@@ -7,6 +7,7 @@ const SellerProfile = require("./SellerProfile");
 const Category = require("./Category");
 const Product = require("./Product");
 const Order = require("./Order");
+const Favorite = require("./Favorite");
 const ContactMessage = require("./ContactMessage");
 const NewsletterSubscriber = require("./NewsletterSubscriber");
 
@@ -16,6 +17,7 @@ module.exports = {
   Category,
   Product,
   Order,
+  Favorite,
   ContactMessage,
   NewsletterSubscriber,
 };

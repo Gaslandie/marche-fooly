@@ -8,6 +8,7 @@ import type { CategoryItem } from "@/types/catalog";
 
 type ProductFiltersProps = {
   categories: CategoryItem[];
+  totalProducts: number;
   selectedCategory?: string;
   query?: string;
   maxPrice: number;
@@ -23,6 +24,7 @@ type ProductFiltersProps = {
 
 export default function ProductFilters({
   categories,
+  totalProducts,
   selectedCategory,
   query,
   maxPrice,
@@ -97,7 +99,7 @@ export default function ProductFilters({
                   .join(" ")}
               >
                 <span>Tout voir</span>
-                <span className={styles.filterCount}>120</span>
+                <span className={styles.filterCount}>{totalProducts}</span>
               </Link>
 
               {categories.map((category) => (

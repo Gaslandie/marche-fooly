@@ -46,19 +46,24 @@
  */
 
 const Category = require("../models/Category");
+const Product = require("../models/Product");
+const {
+  PUBLIC_PRODUCT_STATUSES,
+} = require("../validators/productValidators");
 const {
   UPDATE_CATEGORY_ALLOWED_FIELDS,
 } = require("../validators/categoryValidators");
 
 const MAX_PARENT_DEPTH = 50;
 
-const toPublicCategory = (doc) => ({
+const toPublicCategory = (doc, productCount = 0) => ({
   id: doc._id.toString(),
   name: doc.name,
   slug: doc.slug,
   description: doc.description || "",
   imageUrl: doc.imageUrl || "",
   parentCategory: doc.parentCategory ? doc.parentCategory.toString() : null,
+  productCount,
   isActive: doc.isActive,
   sortOrder: doc.sortOrder,
   createdAt: doc.createdAt,
@@ -182,11 +187,32 @@ const listPublic = async (req, res, next) => {
       Category.countDocuments(filter),
     ]);
 
+    const categoryIds = items.map((item) => item._id);
+    const productCounts = categoryIds.length
+      ? await Product.aggregate([
+          {
+            $match: {
+              category: { $in: categoryIds },
+              status: { $in: PUBLIC_PRODUCT_STATUSES },
+            },
+          },
+          { $group: { _id: "$category", productCount: { $sum: 1 } } },
+        ])
+      : [];
+    const productCountByCategory = new Map(
+      productCounts.map((item) => [item._id.toString(), item.productCount]),
+    );
+
     return res.status(200).json({
       success: true,
       message: "Liste des categories",
       data: {
-        items: items.map(toPublicCategory),
+        items: items.map((item) =>
+          toPublicCategory(
+            item,
+            productCountByCategory.get(item._id.toString()) || 0,
+          ),
+        ),
         pagination: {
           page,
           limit,
@@ -215,10 +241,15 @@ const getPublicBySlug = async (req, res, next) => {
       });
     }
 
+    const productCount = await Product.countDocuments({
+      category: category._id,
+      status: { $in: PUBLIC_PRODUCT_STATUSES },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Categorie",
-      data: { category: toPublicCategory(category) },
+      data: { category: toPublicCategory(category, productCount) },
     });
   } catch (error) {
     return next(error);

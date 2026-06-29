@@ -30,8 +30,7 @@
  *       isPromo / isLocal      -> false      (placeholders neutres)
  *       sortRank / newestRank  -> 0          (placeholders neutres)
  *       icon (produit/catégorie) -> icône Bootstrap générique
- *       productCount (catégorie) -> 0        (NE PAS inventer un chiffre ;
- *                                  l'affichage neutre est géré au Bloc 3)
+ *       productCount (catégorie) -> compteur renvoyé par l'API
  *   - Détail produit : l'API expose /api/products/:sellerSlug/:productSlug
  *     (route composite). Le frontend n'a que /produit/[slug]. SOLUTION
  *     TEMPORAIRE validée (option B Jour 21) : on cherche le produit via
@@ -164,8 +163,7 @@ export function toProductItem(api: ApiProduct): ProductItem {
 
 /**
  * Convertit une catégorie API en `CategoryItem` attendu par les composants.
- * `productCount` est mis à 0 (on n'invente pas de chiffre) : l'affichage
- * neutre côté `CategoryCard` sera traité au Bloc 3.
+ * `productCount` vient du backend et ne doit pas être inventé côté frontend.
  */
 export function toCategoryItem(api: ApiCategory): CategoryItem {
   return {
@@ -174,7 +172,7 @@ export function toCategoryItem(api: ApiCategory): CategoryItem {
     shortDescription: api.description,
     description: api.description,
     icon: "bi bi-grid-3x3-gap",
-    productCount: 0,
+    productCount: api.productCount ?? 0,
     featured: false,
   };
 }

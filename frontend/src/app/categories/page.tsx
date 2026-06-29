@@ -26,6 +26,10 @@ export default async function CategoriesPage() {
   const featuredCategories = categories.slice(0, 4);
   const popularCategoryChips = featuredCategories;
   const hasCategories = categories.length > 0;
+  const totalPublicProducts = categories.reduce(
+    (total, category) => total + category.productCount,
+    0,
+  );
 
   return (
     <>
@@ -92,13 +96,13 @@ export default async function CategoriesPage() {
           <div className="row g-3 mt-4">
             <div className="col-6 col-lg-3">
               <div className={styles.statsCard}>
-                <strong>14+</strong>
+                <strong>{categories.length}</strong>
                 <span className="text-secondary fw-semibold">Catégories principales</span>
               </div>
             </div>
             <div className="col-6 col-lg-3">
               <div className={styles.statsCard}>
-                <strong>120+</strong>
+                <strong>{totalPublicProducts}</strong>
                 <span className="text-secondary fw-semibold">Produits listés</span>
               </div>
             </div>

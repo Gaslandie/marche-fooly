@@ -57,6 +57,7 @@ export type ApiCategory = {
   description: string;
   imageUrl: string;
   parentCategory: string | null;
+  productCount: number;
   isActive: boolean;
   sortOrder: number;
   createdAt: string;

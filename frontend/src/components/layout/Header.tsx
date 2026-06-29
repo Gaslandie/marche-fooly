@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import SearchBar from "@/components/common/SearchBar";
 import { siteConfig } from "@/config/site";
+import { getCurrentUser } from "@/lib/auth";
 
 const navLinks = [
   { href: "/", label: "Accueil" },
@@ -11,7 +12,10 @@ const navLinks = [
   { href: "/contact", label: "Contact" },
 ] as const;
 
-export default function Header() {
+export default async function Header() {
+  const user = await getCurrentUser();
+  const isAdmin = user?.role === "admin";
+
   return (
     <header className="mf-header">
       <div className="container py-3">
@@ -63,6 +67,13 @@ export default function Header() {
                 </Link>
               </li>
             ))}
+            {isAdmin && (
+              <li>
+                <Link href="/admin">
+                  Administration
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
       </div>

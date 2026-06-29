@@ -4,7 +4,6 @@ import ProductCard from "@/components/product/ProductCard";
 import ProductFilters from "@/components/product/ProductFilters";
 import ProductSort from "@/components/product/ProductSort";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
-import { categories } from "@/data/categories";
 import {
   getCategoryLabel,
   getFilteredProducts,
@@ -12,7 +11,7 @@ import {
   minCatalogPrice,
   shopCategoryFilters,
 } from "@/data/products";
-import { getProducts } from "@/lib/api";
+import { getCategories, getProducts } from "@/lib/api";
 import styles from "@/styles/catalog.module.css";
 import type { ProductSortKey, ProductViewMode } from "@/types/catalog";
 
@@ -63,7 +62,10 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
   // supportés par l'API (category, q, limit) sont envoyés côté serveur. Les
   // autres filtres (prix, stock, promo, local, note) et le tri restent
   // appliqués côté frontend par getFilteredProducts (décision Jour 21).
-  const apiProducts = await getProducts({ category, q: query, limit: 100 });
+  const [apiProducts, apiCategories] = await Promise.all([
+    getProducts({ category, q: query, limit: 100 }),
+    getCategories(),
+  ]);
 
   const filteredProducts = getFilteredProducts(
     {
@@ -79,8 +81,14 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
     apiProducts,
   );
 
-  const filterCategories = categories.filter((item) => shopCategoryFilters.includes(item.slug));
-  const categoryLabel = getCategoryLabel(category);
+  const filterCategories = apiCategories.filter((item) => shopCategoryFilters.includes(item.slug));
+  const totalPublicProducts = apiCategories.reduce(
+    (total, item) => total + item.productCount,
+    0,
+  );
+  const categoryLabel =
+    apiCategories.find((item) => item.slug === category)?.name ??
+    getCategoryLabel(category);
   const summary = categoryLabel
     ? `Résultats pour ${categoryLabel}`
     : query
@@ -121,13 +129,13 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
               <div className="row g-3">
                 <div className="col-4">
                   <div className={styles.shopStatCard}>
-                    <strong>120+</strong>
+                    <strong>{totalPublicProducts}</strong>
                     <span className="text-secondary small">Produits</span>
                   </div>
                 </div>
                 <div className="col-4">
                   <div className={styles.shopStatCard}>
-                    <strong>{categories.length}</strong>
+                    <strong>{apiCategories.length}</strong>
                     <span className="text-secondary small">Catégories</span>
                   </div>
                 </div>
@@ -166,6 +174,7 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
             <div className="col-lg-3">
               <ProductFilters
                 categories={filterCategories}
+                totalProducts={totalPublicProducts}
                 selectedCategory={category}
                 query={query}
                 maxPrice={maxPrice}

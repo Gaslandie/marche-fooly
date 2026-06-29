@@ -3,6 +3,8 @@ import Link from "next/link";
 import CategoryCard from "@/components/category/CategoryCard";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { getCategories } from "@/lib/api";
+import { getSellerCta } from "@/lib/sellerCta";
+import { getSellerNavigationState } from "@/lib/sellerNavigation";
 import styles from "@/styles/catalog.module.css";
 
 // Cette page dépend d'une API live (GET /api/categories) : on force le rendu
@@ -19,7 +21,13 @@ export default async function CategoriesPage() {
   // Données réelles : API backend (GET /api/categories), déjà triées côté
   // serveur par sortOrder. Pendant le chargement -> app/categories/loading.tsx.
   // En cas d'échec réseau/serveur -> app/categories/error.tsx.
-  const categories = await getCategories();
+  const [categories, sellerNavigation] = await Promise.all([
+    getCategories(),
+    getSellerNavigationState(),
+  ]);
+  const sellerCta = getSellerCta(sellerNavigation.sellerStatus, {
+    defaultLabel: "Créer ma boutique",
+  });
 
   // L'API n'expose pas de drapeau « featured ». Décision Jour 21 : on retient
   // les 4 premières catégories selon sortOrder comme catégories populaires.
@@ -184,9 +192,11 @@ export default async function CategoriesPage() {
                     </p>
                   </div>
                   <div className="col-lg-4 text-lg-end">
-                    <Link href="/devenir-vendeur" className="btn btn-light fw-bold me-2 mb-2">
-                      Créer ma boutique
-                    </Link>
+                    {sellerNavigation.showSellerEntry && (
+                      <Link href={sellerCta.href} className="btn btn-light fw-bold me-2 mb-2">
+                        {sellerCta.label}
+                      </Link>
+                    )}
                     <Link href="/contact" className="btn btn-outline-light fw-bold mb-2">
                       Nous contacter
                     </Link>

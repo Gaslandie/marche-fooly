@@ -12,9 +12,18 @@ const SUBJECTS = [
   "Autre demande",
 ];
 
-export default function ContactForm() {
+type ContactFormProps = {
+  hasSellerStatus?: boolean;
+};
+
+export default function ContactForm({ hasSellerStatus = false }: ContactFormProps) {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const subjects = hasSellerStatus
+    ? SUBJECTS.map((subject) =>
+        subject === "Devenir vendeur" ? "Support vendeur" : subject,
+      )
+    : SUBJECTS;
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -119,7 +128,7 @@ export default function ContactForm() {
             <option value="" disabled>
               Choisir un sujet
             </option>
-            {SUBJECTS.map((s) => (
+            {subjects.map((s) => (
               <option key={s}>{s}</option>
             ))}
           </select>

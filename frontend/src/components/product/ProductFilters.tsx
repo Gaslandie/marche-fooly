@@ -3,8 +3,10 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import styles from "@/styles/catalog.module.css";
+import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
 import { formatPrice } from "@/utils/formatPrice";
 import type { CategoryItem } from "@/types/catalog";
+import type { SellerCtaStatus } from "@/lib/sellerCta";
 
 type ProductFiltersProps = {
   categories: CategoryItem[];
@@ -20,6 +22,8 @@ type ProductFiltersProps = {
   minRating?: number;
   sort?: string;
   view?: string;
+  sellerStatus: SellerCtaStatus;
+  showSellerEntry: boolean;
 };
 
 export default function ProductFilters({
@@ -36,9 +40,13 @@ export default function ProductFilters({
   minRating,
   sort,
   view,
+  sellerStatus,
+  showSellerEntry,
 }: ProductFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [rangeValue, setRangeValue] = useState(String(maxPrice));
+  const sellerCta = getSellerCta(sellerStatus);
+  const hasSellerStatus = hasSellerProfileStatus(sellerStatus);
 
   const baseParams = useMemo(() => {
     const params = new URLSearchParams();
@@ -198,14 +206,20 @@ export default function ProductFilters({
             </div>
           </form>
 
-          <div className={styles.sellerMiniCard}>
-            <i className="bi bi-shop" aria-hidden="true"></i>
-            <h3>Vous vendez aussi ?</h3>
-            <p className={styles.filtersMeta}>Créez votre boutique et touchez les clients de Sangarédi.</p>
-            <Link href="/devenir-vendeur" className="btn btn-warning btn-sm w-100 fw-semibold">
-              Devenir vendeur
-            </Link>
-          </div>
+          {showSellerEntry && (
+            <div className={styles.sellerMiniCard}>
+              <i className={sellerCta.icon} aria-hidden="true"></i>
+              <h3>{hasSellerStatus ? "Votre espace vendeur" : "Vous vendez aussi ?"}</h3>
+              <p className={styles.filtersMeta}>
+                {hasSellerStatus
+                  ? "Suivez votre boutique, votre demande ou vos commandes."
+                  : "Créez votre boutique et touchez les clients de Sangarédi."}
+              </p>
+              <Link href={sellerCta.href} className="btn btn-warning btn-sm w-100 fw-semibold">
+                {sellerCta.label}
+              </Link>
+            </div>
+          )}
         </aside>
       </div>
     </>

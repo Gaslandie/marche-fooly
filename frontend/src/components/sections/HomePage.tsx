@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
+import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
+import type { SellerCtaStatus } from "@/lib/sellerCta";
 import styles from "@/app/page.module.css";
 
 type SectionHeadingProps = {
@@ -285,7 +287,21 @@ function Rating({ rating, reviews }: { rating: number; reviews: number }) {
   );
 }
 
-export default function HomePage() {
+type HomePageProps = {
+  sellerStatus: SellerCtaStatus;
+  showSellerEntry: boolean;
+};
+
+export default function HomePage({
+  sellerStatus,
+  showSellerEntry,
+}: HomePageProps) {
+  const heroSellerCta = getSellerCta(sellerStatus);
+  const panelSellerCta = getSellerCta(sellerStatus, {
+    defaultLabel: "Créer ma boutique",
+  });
+  const hasSellerStatus = hasSellerProfileStatus(sellerStatus);
+
   return (
     <div className={styles.page}>
       <section className={styles.heroSection}>
@@ -307,9 +323,11 @@ export default function HomePage() {
                 <Link href="/boutique" className="btn btn-warning btn-lg">
                   Acheter maintenant <i className="bi bi-arrow-right ms-1" aria-hidden="true"></i>
                 </Link>
-                <Link href="/devenir-vendeur" className="btn btn-outline-dark btn-lg">
-                  Devenir vendeur
-                </Link>
+                {showSellerEntry && (
+                  <Link href={heroSellerCta.href} className="btn btn-outline-dark btn-lg">
+                    {heroSellerCta.label}
+                  </Link>
+                )}
               </div>
 
               <div className="row g-3 mt-4">
@@ -428,14 +446,21 @@ export default function HomePage() {
             <div className="row align-items-center g-5">
               <div className="col-lg-6">
                 <span className={styles.eyebrow}>Vendeurs locaux</span>
-                <h2 className={styles.sectionTitle}>Vendez en ligne facilement avec FOOLY</h2>
+                <h2 className={styles.sectionTitle}>
+                  {hasSellerStatus
+                    ? "Suivez votre boutique FOOLY"
+                    : "Vendez en ligne facilement avec FOOLY"}
+                </h2>
                 <p className={styles.sectionSubtitle}>
-                  Créez votre boutique et commencez à vendre partout à Sangarédi avec une
-                  présence digitale crédible et simple à gérer.
+                  {hasSellerStatus
+                    ? "Retrouvez l'état de votre demande, vos produits et vos commandes dans votre espace vendeur."
+                    : "Créez votre boutique et commencez à vendre partout à Sangarédi avec une présence digitale crédible et simple à gérer."}
                 </p>
-                <Link href="/devenir-vendeur" className="btn btn-warning btn-lg mt-2">
-                  Créer ma boutique
-                </Link>
+                {showSellerEntry && (
+                  <Link href={panelSellerCta.href} className="btn btn-warning btn-lg mt-2">
+                    {panelSellerCta.label}
+                  </Link>
+                )}
               </div>
 
               <div className="col-lg-6">

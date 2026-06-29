@@ -3,6 +3,8 @@ import Link from "next/link";
 import AccordionFaq from "@/components/common/AccordionFaq";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { siteConfig } from "@/config/site";
+import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
+import { getSellerNavigationState } from "@/lib/sellerNavigation";
 import styles from "@/styles/aide.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
@@ -11,6 +13,8 @@ export const metadata: Metadata = {
   description:
     "Centre d'aide Marché Fooly : réponses aux questions sur les achats, commandes, vendeurs, livraison, paiement, compte client et support à Sangarédi.",
 };
+
+export const dynamic = "force-dynamic";
 
 const CATEGORIES = [
   {
@@ -126,7 +130,68 @@ const QUICK_ACCESS = [
   { icon: "bi bi-heart", title: "Favoris", text: "Retrouver vos produits sauvegardés.", href: "/favoris" },
 ];
 
-export default function AidePage() {
+export default async function AidePage() {
+  const { sellerStatus, showSellerEntry } = await getSellerNavigationState();
+  const sellerCta = getSellerCta(sellerStatus, {
+    defaultLabel: "Créer ma boutique",
+  });
+  const hasSellerStatus = hasSellerProfileStatus(sellerStatus);
+  const helpCategories = CATEGORIES.map((category) => {
+    if (category.title !== "Devenir vendeur") return category;
+    return {
+      ...category,
+      title: hasSellerStatus ? "Espace vendeur" : category.title,
+      text: hasSellerStatus
+        ? "Suivre votre boutique, vos produits et vos commandes."
+        : category.text,
+      linkLabel: showSellerEntry ? sellerCta.label : "Nous écrire",
+      href: showSellerEntry ? sellerCta.href : "/contact",
+    };
+  });
+  const popularLinks = POPULAR_LINKS.map((link) =>
+    link.href === "/devenir-vendeur"
+      ? {
+          label: hasSellerStatus
+            ? "Gérer mon espace vendeur"
+            : link.label,
+          href: showSellerEntry ? sellerCta.href : "/contact",
+        }
+      : link,
+  );
+  const sellGuideTitle = hasSellerStatus
+    ? "Votre activité vendeur sur Marché Fooly"
+    : "Vendre sur Marché Fooly";
+  const sellGuideSteps = hasSellerStatus
+    ? [
+        {
+          n: "1",
+          title: "Consultez votre statut",
+          text: "Suivez l'état de votre demande ou de votre boutique.",
+        },
+        {
+          n: "2",
+          title: "Gérez vos produits",
+          text: "Ajoutez ou mettez à jour vos articles quand votre boutique est validée.",
+        },
+        {
+          n: "3",
+          title: "Traitez vos commandes",
+          text: "Suivez les demandes clients depuis votre espace vendeur.",
+        },
+      ]
+    : SELL_STEPS;
+  const faqItems = hasSellerStatus
+    ? FAQ_ITEMS.map((item) =>
+        item.question === "Comment devenir vendeur ?"
+          ? {
+              question: "Comment gérer mon espace vendeur ?",
+              answer:
+                "Ouvrez votre espace vendeur pour consulter votre statut, vos produits et vos commandes selon les droits de votre boutique.",
+            }
+          : item,
+      )
+    : FAQ_ITEMS;
+
   return (
     <>
       {/* ── Hero ──────────────────────────────────────────────────── */}
@@ -195,7 +260,7 @@ export default function AidePage() {
           </div>
 
           <div className="row g-4">
-            {CATEGORIES.map(({ icon, title, text, linkLabel, href }) => (
+            {helpCategories.map(({ icon, title, text, linkLabel, href }) => (
               <div key={title} className="col-md-6 col-lg-3">
                 <Link href={href} className={styles.categoryCard}>
                   <div className={styles.categoryIcon}>
@@ -250,8 +315,8 @@ export default function AidePage() {
                 <div className={styles.guideIcon}>
                   <i className="bi bi-shop" aria-hidden="true"></i>
                 </div>
-                <h3 className="h4 fw-bold mb-3">Vendre sur Marché Fooly</h3>
-                {SELL_STEPS.map(({ n, title, text }) => (
+                <h3 className="h4 fw-bold mb-3">{sellGuideTitle}</h3>
+                {sellGuideSteps.map(({ n, title, text }) => (
                   <div key={n} className={styles.guideStep}>
                     <div className={styles.stepNumber}>{n}</div>
                     <div>
@@ -260,9 +325,11 @@ export default function AidePage() {
                     </div>
                   </div>
                 ))}
-                <Link href="/devenir-vendeur" className="btn btn-warning fw-bold mt-4">
-                  Devenir vendeur
-                </Link>
+                {showSellerEntry && (
+                  <Link href={sellerCta.href} className="btn btn-warning fw-bold mt-4">
+                    {sellerCta.label}
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -278,7 +345,7 @@ export default function AidePage() {
               <div className={styles.faqPanel}>
                 <span className={catalogStyles.eyebrow}>FAQ</span>
                 <h2 className={catalogStyles.sectionTitle}>Questions fréquentes</h2>
-                <AccordionFaq items={FAQ_ITEMS} />
+                <AccordionFaq items={faqItems} />
               </div>
             </div>
 
@@ -289,7 +356,7 @@ export default function AidePage() {
                   <i className="bi bi-lightning-charge" aria-hidden="true"></i>
                 </div>
                 <h2 className="h4 fw-bold mb-3">Questions populaires</h2>
-                {POPULAR_LINKS.map(({ label, href }) => (
+                {popularLinks.map(({ label, href }) => (
                   <Link key={label} href={href} className={styles.popularQuestion}>
                     <span>{label}</span>
                     <i className="bi bi-arrow-right" aria-hidden="true"></i>

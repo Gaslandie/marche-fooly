@@ -12,6 +12,7 @@ import {
   shopCategoryFilters,
 } from "@/data/products";
 import { getCategories, getProducts } from "@/lib/api";
+import { getSellerNavigationState } from "@/lib/sellerNavigation";
 import styles from "@/styles/catalog.module.css";
 import type { ProductSortKey, ProductViewMode } from "@/types/catalog";
 
@@ -62,9 +63,10 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
   // supportés par l'API (category, q, limit) sont envoyés côté serveur. Les
   // autres filtres (prix, stock, promo, local, note) et le tri restent
   // appliqués côté frontend par getFilteredProducts (décision Jour 21).
-  const [apiProducts, apiCategories] = await Promise.all([
+  const [apiProducts, apiCategories, sellerNavigation] = await Promise.all([
     getProducts({ category, q: query, limit: 100 }),
     getCategories(),
+    getSellerNavigationState(),
   ]);
 
   const filteredProducts = getFilteredProducts(
@@ -186,6 +188,8 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
                 minRating={minRating}
                 sort={sort}
                 view={view}
+                sellerStatus={sellerNavigation.sellerStatus}
+                showSellerEntry={sellerNavigation.showSellerEntry}
               />
             </div>
 

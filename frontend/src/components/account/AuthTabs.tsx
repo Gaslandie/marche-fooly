@@ -22,7 +22,8 @@
  * Notes UX :
  *   - États gérés par formulaire : idle / loading / error / success.
  *   - Boutons désactivés pendant l'envoi.
- *   - Après succès : redirection vers /mon-compte + router.refresh()
+ *   - Après succès : redirection vers /mon-compte ou vers le retour local
+ *     demandé en query string + router.refresh()
  *     pour que les Server Components relisent la session (cookie).
  *
  * Note pour GitHub Copilot :
@@ -34,7 +35,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "@/styles/account.module.css";
 
 type Status = "idle" | "loading" | "error" | "success";
@@ -50,6 +51,7 @@ const EMPTY_REGISTER = {
 
 export default function AuthTabs() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [tab, setTab] = useState<"login" | "register">("login");
 
   // --- État du formulaire de connexion ---
@@ -64,10 +66,15 @@ export default function AuthTabs() {
 
   const loginLoading = loginStatus === "loading";
   const registerLoading = registerStatus === "loading";
+  const requestedReturn = searchParams.get("retour");
+  const returnPath =
+    requestedReturn?.startsWith("/") && !requestedReturn.startsWith("//")
+      ? requestedReturn
+      : "/mon-compte";
 
-  /** Redirige vers le compte et force la relecture serveur de la session. */
+  /** Redirige vers la destination locale et force la relecture serveur. */
   function goToAccount() {
-    router.push("/mon-compte");
+    router.push(returnPath);
     router.refresh();
   }
 

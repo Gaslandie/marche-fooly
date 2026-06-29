@@ -1,7 +1,19 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
+import { getSellerCta } from "@/lib/sellerCta";
+import type { SellerCtaStatus } from "@/lib/sellerCta";
 
-export default function TopBar() {
+type TopBarProps = {
+  sellerStatus: SellerCtaStatus;
+  showSellerEntry: boolean;
+};
+
+export default function TopBar({
+  sellerStatus,
+  showSellerEntry,
+}: TopBarProps) {
+  const sellerCta = getSellerCta(sellerStatus);
+
   return (
     <div className="mf-topbar">
       <div className="container d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 small">
@@ -20,7 +32,9 @@ export default function TopBar() {
           </a>
         </div>
         <div className="d-flex flex-wrap gap-3">
-          <Link href="/devenir-vendeur">Devenir vendeur</Link>
+          {showSellerEntry && (
+            <Link href={sellerCta.href}>{sellerCta.label}</Link>
+          )}
           <Link href="/contact">Contact</Link>
         </div>
       </div>

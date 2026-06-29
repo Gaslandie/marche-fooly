@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import TopBar from "@/components/layout/TopBar";
 import { siteConfig } from "@/config/site";
+import { getSellerNavigationState } from "@/lib/sellerNavigation";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -19,11 +20,14 @@ export const metadata: Metadata = {
   description: `${siteConfig.name} — ${siteConfig.slogan}. Marketplace locale à ${siteConfig.location}.`,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { user, sellerStatus, showSellerEntry } =
+    await getSellerNavigationState();
+
   return (
     <html lang="fr" className={inter.className}>
       <body>
@@ -32,10 +36,14 @@ export default function RootLayout({
             un Server Component. Pas d'impact sur le rendu statique des pages
             qui ne consomment pas useCart(). */}
         <CartProvider>
-          <TopBar />
-          <Header />
+          <TopBar sellerStatus={sellerStatus} showSellerEntry={showSellerEntry} />
+          <Header
+            user={user}
+            sellerStatus={sellerStatus}
+            showSellerEntry={showSellerEntry}
+          />
           <main>{children}</main>
-          <Footer />
+          <Footer sellerStatus={sellerStatus} showSellerEntry={showSellerEntry} />
         </CartProvider>
       </body>
     </html>

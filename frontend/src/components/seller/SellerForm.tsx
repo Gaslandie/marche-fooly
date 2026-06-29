@@ -71,7 +71,9 @@ export default function SellerForm() {
       } | null;
 
       if (res.status === 401) {
-        router.push("/mon-compte");
+        setError(
+          "Votre session a expiré. Connectez-vous puis revenez finaliser votre demande vendeur.",
+        );
         return;
       }
 

@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Newsletter from "@/components/common/Newsletter";
 import { siteConfig } from "@/config/site";
+import { getSellerCta } from "@/lib/sellerCta";
+import type { SellerCtaStatus } from "@/lib/sellerCta";
 
 const shopLinks = [
   { href: "/boutique", label: "Boutique" },
   { href: "/categories", label: "Catégories" },
   { href: "/panier", label: "Mon panier" },
   { href: "/favoris", label: "Mes favoris" },
-  { href: "/devenir-vendeur", label: "Devenir vendeur" },
 ] as const;
 
 const accountLinks = [
@@ -17,7 +18,17 @@ const accountLinks = [
   { href: "/contact", label: "Contact" },
 ] as const;
 
-export default function Footer() {
+type FooterProps = {
+  sellerStatus: SellerCtaStatus;
+  showSellerEntry: boolean;
+};
+
+export default function Footer({
+  sellerStatus,
+  showSellerEntry,
+}: FooterProps) {
+  const sellerCta = getSellerCta(sellerStatus);
+
   return (
     <footer className="mf-footer mt-auto">
       <div className="container py-5">
@@ -36,6 +47,11 @@ export default function Footer() {
                   <Link href={item.href}>{item.label}</Link>
                 </li>
               ))}
+              {showSellerEntry && (
+                <li>
+                  <Link href={sellerCta.href}>{sellerCta.label}</Link>
+                </li>
+              )}
             </ul>
           </div>
 

@@ -2,20 +2,31 @@ import Image from "next/image";
 import Link from "next/link";
 import SearchBar from "@/components/common/SearchBar";
 import { siteConfig } from "@/config/site";
-import { getCurrentUser } from "@/lib/auth";
 import { hasBackOfficeAccess } from "@/lib/admin";
+import { getSellerCta } from "@/lib/sellerCta";
+import type { SellerCtaStatus } from "@/lib/sellerCta";
+import type { AuthUser } from "@/types/auth";
 
 const navLinks = [
   { href: "/", label: "Accueil" },
   { href: "/boutique", label: "Boutique" },
   { href: "/categories", label: "Catégories" },
-  { href: "/devenir-vendeur", label: "Devenir vendeur" },
   { href: "/contact", label: "Contact" },
 ] as const;
 
-export default async function Header() {
-  const user = await getCurrentUser();
+type HeaderProps = {
+  user: AuthUser | null;
+  sellerStatus: SellerCtaStatus;
+  showSellerEntry: boolean;
+};
+
+export default function Header({
+  user,
+  sellerStatus,
+  showSellerEntry,
+}: HeaderProps) {
   const hasAdminAccess = user ? hasBackOfficeAccess(user.role) : false;
+  const sellerCta = getSellerCta(sellerStatus);
 
   return (
     <header className="mf-header">
@@ -68,6 +79,13 @@ export default async function Header() {
                 </Link>
               </li>
             ))}
+            {showSellerEntry && (
+              <li>
+                <Link href={sellerCta.href}>
+                  {sellerCta.label}
+                </Link>
+              </li>
+            )}
             {hasAdminAccess && (
               <li>
                 <Link href="/admin">

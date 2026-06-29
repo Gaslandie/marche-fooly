@@ -4,6 +4,9 @@ import Link from "next/link";
 import SellerForm from "@/components/seller/SellerForm";
 import AccordionFaq from "@/components/common/AccordionFaq";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
+import { getCurrentUser } from "@/lib/auth";
+import { getMySellerProfile } from "@/lib/seller";
+import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
 import styles from "@/styles/seller.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
@@ -12,6 +15,8 @@ export const metadata: Metadata = {
   description:
     "Créez votre boutique sur Marché Fooly et commencez à vendre vos produits en ligne à Sangarédi. Marketplace locale pour commerçants et vendeurs indépendants.",
 };
+
+export const dynamic = "force-dynamic";
 
 const BENEFITS = [
   {
@@ -39,8 +44,8 @@ const BENEFITS = [
 const HOW_STEPS = [
   {
     n: "1",
-    title: "Remplissez le formulaire",
-    text: "Donnez les informations de votre boutique, vos produits et votre contact.",
+    title: "Connectez-vous et remplissez le formulaire",
+    text: "Votre demande est rattachée à votre compte Marché Fooly.",
   },
   {
     n: "2",
@@ -117,7 +122,7 @@ const FAQ_ITEMS = [
   {
     question: "Est-ce que la création de boutique est déjà fonctionnelle ?",
     answer:
-      "Oui. Soumettez votre demande via ce formulaire et l'équipe FOOLY vous recontactera pour finaliser votre inscription et activer votre boutique.",
+      "Oui. Connectez-vous, soumettez votre demande via ce formulaire et l'équipe FOOLY validera votre boutique depuis le back office.",
   },
   {
     question: "Quels vendeurs peuvent rejoindre Marché Fooly ?",
@@ -142,7 +147,23 @@ const MINI_PRODUCTS = [
   { icon: "bi bi-tv", name: "Télévision", price: "500 000 GNF", badge: "Nouveau", badgeCls: "bg-primary" },
 ];
 
-export default function DevenirVendeurPage() {
+export default async function DevenirVendeurPage() {
+  const [user, sellerProfile] = await Promise.all([
+    getCurrentUser(),
+    getMySellerProfile(),
+  ]);
+  const sellerStatus = sellerProfile?.status ?? null;
+  const sellerCta = getSellerCta(sellerStatus, {
+    defaultLabel: "Créer ma boutique",
+  });
+  const hasSellerStatus = hasSellerProfileStatus(sellerStatus);
+  const sellerStatusColor =
+    sellerStatus === "approved"
+      ? "var(--mf-green)"
+      : sellerStatus === "pending"
+        ? "var(--mf-orange)"
+        : "#dc3545";
+
   return (
     <>
       {/* ── Hero ──────────────────────────────────────────────────── */}
@@ -154,7 +175,7 @@ export default function DevenirVendeurPage() {
                 <Link href="/" className={styles.breadcrumbLink}>Accueil</Link>
               </li>
               <li className={`breadcrumb-item active ${styles.breadcrumbCurrent}`} aria-current="page">
-                Devenir vendeur
+                {hasSellerStatus ? "Statut vendeur" : "Devenir vendeur"}
               </li>
             </ol>
           </nav>
@@ -166,15 +187,22 @@ export default function DevenirVendeurPage() {
                 Espace vendeurs Marché Fooly
               </span>
               <h1 className={`${styles.sellerTitle} mb-4`}>
-                Vendez en ligne facilement avec FOOLY
+                {hasSellerStatus
+                  ? "Suivez votre activité vendeur avec FOOLY"
+                  : "Vendez en ligne facilement avec FOOLY"}
               </h1>
               <p className="fs-5 text-secondary mb-4">
-                Créez votre boutique gratuitement et commencez à vendre partout à Sangarédi.
-                Marché Fooly aide les commerçants locaux à gagner en visibilité et à recevoir plus de commandes.
+                {hasSellerStatus
+                  ? "Votre compte possède déjà une boutique ou une demande vendeur. Consultez votre espace pour suivre son statut."
+                  : "Créez votre boutique gratuitement et commencez à vendre partout à Sangarédi. Marché Fooly aide les commerçants locaux à gagner en visibilité et à recevoir plus de commandes."}
               </p>
               <div className="d-flex flex-wrap gap-3">
-                <Link href="#formulaire-vendeur" className="btn btn-warning fw-bold">
-                  Créer ma boutique <i className="bi bi-arrow-right ms-1" aria-hidden="true"></i>
+                <Link
+                  href={hasSellerStatus ? sellerCta.href : "#formulaire-vendeur"}
+                  className="btn btn-warning fw-bold"
+                >
+                  {hasSellerStatus ? sellerCta.label : "Créer ma boutique"}{" "}
+                  <i className="bi bi-arrow-right ms-1" aria-hidden="true"></i>
                 </Link>
                 <Link href="/boutique" className="btn btn-outline-dark fw-bold">
                   Voir la marketplace
@@ -355,6 +383,8 @@ export default function DevenirVendeurPage() {
                   </ul>
                   {plan.href ? (
                     <Link href={plan.href} className={plan.ctaCls}>{plan.cta}</Link>
+                  ) : hasSellerStatus ? (
+                    <Link href={sellerCta.href} className={plan.ctaCls}>{sellerCta.label}</Link>
                   ) : (
                     <Link href="#formulaire-vendeur" className={plan.ctaCls}>{plan.cta}</Link>
                   )}
@@ -371,10 +401,15 @@ export default function DevenirVendeurPage() {
           <div className="row g-5 align-items-start">
             <div className="col-lg-5">
               <span className={catalogStyles.eyebrow}>Demande vendeur</span>
-              <h2 className={catalogStyles.sectionTitle}>Créer votre boutique FOOLY</h2>
+              <h2 className={catalogStyles.sectionTitle}>
+                {hasSellerStatus ? "Votre statut vendeur FOOLY" : "Créer votre boutique FOOLY"}
+              </h2>
               <p className={catalogStyles.sectionDescription}>
-                Remplissez ce formulaire pour créer votre boutique sur Marché Fooly.
-                Votre demande sera traitée par l&apos;équipe FOOLY.
+                {hasSellerStatus
+                  ? "Votre compte possède déjà un statut vendeur. Vous pouvez suivre votre demande ou accéder à votre espace vendeur."
+                  : user
+                  ? "Remplissez ce formulaire pour créer votre boutique sur Marché Fooly. Votre demande sera traitée par l'équipe FOOLY."
+                  : "Connectez-vous ou créez un compte avant d'envoyer votre demande vendeur. Cela permet de rattacher la boutique au bon propriétaire."}
               </p>
 
               <div className={styles.helpCard}>
@@ -390,7 +425,74 @@ export default function DevenirVendeurPage() {
             </div>
 
             <div className="col-lg-7">
-              <SellerForm />
+              {sellerProfile ? (
+                <div
+                  id="formulaire-vendeur"
+                  className={styles.formCard}
+                  style={{ textAlign: "center", padding: "3rem" }}
+                >
+                  <div
+                    style={{
+                      width: 72,
+                      height: 72,
+                      borderRadius: "50%",
+                      background: sellerStatusColor,
+                      display: "grid",
+                      placeItems: "center",
+                      margin: "0 auto 1.25rem",
+                      fontSize: "2rem",
+                      color: "#ffffff",
+                    }}
+                  >
+                    <i className={sellerCta.icon} aria-hidden="true"></i>
+                  </div>
+                  <h3 className="h4 fw-bold mb-2">{sellerCta.label}</h3>
+                  <p className="text-secondary mb-4">
+                    La boutique <strong>{sellerProfile.storeName}</strong> est déjà
+                    enregistrée sur votre compte. Consultez votre espace vendeur pour
+                    suivre son statut.
+                  </p>
+                  <Link href={sellerCta.href} className="btn btn-warning fw-bold">
+                    {sellerCta.label}
+                  </Link>
+                </div>
+              ) : user ? (
+                <SellerForm />
+              ) : (
+                <div
+                  id="formulaire-vendeur"
+                  className={styles.formCard}
+                  style={{ textAlign: "center", padding: "3rem" }}
+                >
+                  <div
+                    style={{
+                      width: 72,
+                      height: 72,
+                      borderRadius: "50%",
+                      background: "var(--mf-orange)",
+                      display: "grid",
+                      placeItems: "center",
+                      margin: "0 auto 1.25rem",
+                      fontSize: "2rem",
+                      color: "#ffffff",
+                    }}
+                  >
+                    <i className="bi bi-person-lock" aria-hidden="true"></i>
+                  </div>
+                  <h3 className="h4 fw-bold mb-2">Connexion requise</h3>
+                  <p className="text-secondary mb-4">
+                    Créez un compte ou connectez-vous pour envoyer une demande vendeur.
+                    Après connexion, vous reviendrez sur cette page pour finaliser la boutique.
+                  </p>
+                  <Link
+                    href="/mon-compte?retour=/devenir-vendeur"
+                    className="btn btn-warning fw-bold"
+                  >
+                    <i className="bi bi-box-arrow-in-right me-1" aria-hidden="true"></i>
+                    Se connecter / créer un compte
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>

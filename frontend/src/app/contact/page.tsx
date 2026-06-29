@@ -4,6 +4,8 @@ import ContactForm from "@/components/contact/ContactForm";
 import AccordionFaq from "@/components/common/AccordionFaq";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { siteConfig } from "@/config/site";
+import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
+import { getSellerNavigationState } from "@/lib/sellerNavigation";
 import styles from "@/styles/contact.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
@@ -12,6 +14,8 @@ export const metadata: Metadata = {
   description:
     "Contactez Marché Fooly à Sangarédi, Guinée. Assistance clients, vendeurs, commandes, partenariats et informations sur la marketplace locale.",
 };
+
+export const dynamic = "force-dynamic";
 
 const HERO_CARDS = [
   { icon: "bi bi-clock", title: "Réponse rapide", text: "Support client et vendeur prévu pour accompagner les utilisateurs." },
@@ -74,7 +78,33 @@ const FAQ_ITEMS = [
   },
 ];
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const { sellerStatus, showSellerEntry } = await getSellerNavigationState();
+  const sellerCta = getSellerCta(sellerStatus);
+  const hasSellerStatus = hasSellerProfileStatus(sellerStatus);
+  const supportCards = SUPPORT_CARDS.map((card) => {
+    if (card.title !== "Vendeurs") return card;
+    return {
+      ...card,
+      text: hasSellerStatus
+        ? "Suivi de boutique, produits, commandes et accompagnement vendeur."
+        : card.text,
+      linkLabel: showSellerEntry ? sellerCta.label : "Nous écrire",
+      href: showSellerEntry ? sellerCta.href : "/contact",
+    };
+  });
+  const faqItems = hasSellerStatus
+    ? FAQ_ITEMS.map((item) =>
+        item.question === "Comment devenir vendeur ?"
+          ? {
+              question: "Comment suivre mon espace vendeur ?",
+              answer:
+                "Ouvrez votre espace vendeur pour consulter l'état de votre demande, vos produits ou vos commandes selon votre statut.",
+            }
+          : item,
+      )
+    : FAQ_ITEMS;
+
   return (
     <>
       {/* ── Hero ──────────────────────────────────────────────────── */}
@@ -190,9 +220,11 @@ export default function ContactPage() {
                     <a className="btn btn-light fw-bold" href={siteConfig.whatsappHref}>
                       WhatsApp
                     </a>
-                    <Link href="/devenir-vendeur" className="btn btn-outline-light fw-bold">
-                      Devenir vendeur
-                    </Link>
+                    {showSellerEntry && (
+                      <Link href={sellerCta.href} className="btn btn-outline-light fw-bold">
+                        {sellerCta.label}
+                      </Link>
+                    )}
                   </div>
                 </div>
               </aside>
@@ -200,7 +232,7 @@ export default function ContactPage() {
 
             {/* Contact form */}
             <div className="col-lg-8 order-lg-2">
-              <ContactForm />
+              <ContactForm hasSellerStatus={hasSellerStatus} />
 
               {/* WhatsApp banner */}
               <div className={`${styles.whatsappBanner} mt-4`}>
@@ -238,7 +270,7 @@ export default function ContactPage() {
           </div>
 
           <div className="row g-4">
-            {SUPPORT_CARDS.map(({ icon, title, text, linkLabel, href }) => (
+            {supportCards.map(({ icon, title, text, linkLabel, href }) => (
               <div key={title} className="col-md-6 col-lg-3">
                 <div className={styles.supportCard}>
                   <div className={styles.supportIcon}>
@@ -282,7 +314,7 @@ export default function ContactPage() {
               <div className={`${styles.faqCard} h-100`}>
                 <span className={catalogStyles.eyebrow}>FAQ rapide</span>
                 <h2 className="h3 fw-bold mb-4">Questions fréquentes</h2>
-                <AccordionFaq items={FAQ_ITEMS} />
+            <AccordionFaq items={faqItems} />
                 <Link href="/aide" className="btn btn-warning fw-bold mt-4">
                   Voir le centre d&apos;aide
                 </Link>

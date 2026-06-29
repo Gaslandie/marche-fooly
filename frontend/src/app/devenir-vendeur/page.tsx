@@ -60,62 +60,10 @@ const HOW_STEPS = [
 ];
 
 const PROOF_STATS = [
-  { value: "14+", label: "Catégories" },
-  { value: "120+", label: "Produits prévus" },
   { value: "Local", label: "Sangarédi" },
-  { value: "24/7", label: "Vitrine digitale" },
-];
-
-const PLANS = [
-  {
-    badge: "Découverte",
-    badgeBg: "bg-success",
-    title: "Boutique Starter",
-    price: "Gratuit",
-    desc: "Idéal pour tester la vente en ligne avec quelques produits.",
-    features: [
-      "Création de boutique",
-      "Produits limités",
-      "Présence dans la marketplace",
-      "Contact client simple",
-    ],
-    cta: "Commencer",
-    ctaCls: "btn btn-outline-dark w-100",
-    featured: false,
-  },
-  {
-    badge: "Recommandé",
-    badgeBg: "",
-    title: "Boutique Pro",
-    price: "À définir",
-    desc: "Pour vendeurs réguliers qui veulent plus de visibilité.",
-    features: [
-      "Plus de produits",
-      "Mise en avant boutique",
-      "Support vendeur prioritaire",
-      "Suivi des ventes",
-    ],
-    cta: "Demander l'accès",
-    ctaCls: "btn btn-warning fw-bold w-100",
-    featured: true,
-  },
-  {
-    badge: "Entreprise",
-    badgeBg: "bg-dark",
-    title: "Boutique Premium",
-    price: "Sur mesure",
-    desc: "Pour grandes boutiques, grossistes ou marques locales.",
-    features: [
-      "Accompagnement personnalisé",
-      "Catalogue avancé",
-      "Mise en avant premium",
-      "Options de visibilité",
-    ],
-    cta: "Nous contacter",
-    ctaCls: "btn btn-outline-dark w-100",
-    featured: false,
-    href: "/contact",
-  },
+  { value: "Compte", label: "Rattaché" },
+  { value: "Validation", label: "Back office" },
+  { value: "Suivi", label: "Espace vendeur" },
 ];
 
 const FAQ_ITEMS = [
@@ -139,12 +87,6 @@ const FAQ_ITEMS = [
     answer:
       "Marché Fooly propose le paiement à la livraison et le retrait en boutique. Le paiement en ligne peut être proposé selon les options disponibles.",
   },
-];
-
-const MINI_PRODUCTS = [
-  { icon: "bi bi-phone", name: "Samsung A12", price: "1 200 000 GNF", badge: "Top", badgeCls: "bg-warning text-dark" },
-  { icon: "bi bi-bag-heart", name: "Sac tendance", price: "85 000 GNF", badge: "Stock", badgeCls: "bg-success" },
-  { icon: "bi bi-tv", name: "Télévision", price: "500 000 GNF", badge: "Nouveau", badgeCls: "bg-primary" },
 ];
 
 export default async function DevenirVendeurPage() {
@@ -229,40 +171,31 @@ export default async function DevenirVendeurPage() {
                         <i className="bi bi-shop" aria-hidden="true"></i>
                       </div>
                       <div>
-                        <strong className="d-block">Boutique locale</strong>
-                        <span className="text-secondary small">Vendeur FOOLY</span>
+                        <strong className="d-block">Demande vendeur</strong>
+                        <span className="text-secondary small">Validation par l&apos;équipe FOOLY</span>
                       </div>
                     </div>
-                    <span className="badge rounded-pill bg-success">Actif</span>
+                    <span className="badge rounded-pill bg-warning text-dark">Suivi</span>
                   </div>
 
-                  <div className="row g-3 mb-2">
-                    {[
-                      { value: "36", label: "Produits" },
-                      { value: "18", label: "Commandes" },
-                      { value: "4.8", label: "Note" },
-                    ].map(({ value, label }) => (
-                      <div key={label} className="col-4">
-                        <div className={styles.dashStat}>
-                          <span className={styles.dashStatValue}>{value}</span>
-                          <span className="text-secondary small">{label}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {MINI_PRODUCTS.map(({ icon, name, price, badge, badgeCls }) => (
-                    <div key={name} className={styles.miniProductRow}>
-                      <div className={styles.miniProductIcon}>
-                        <i className={icon} aria-hidden="true"></i>
-                      </div>
-                      <div className="flex-grow-1">
-                        <strong className="d-block">{name}</strong>
-                        <span className="text-secondary small">{price}</span>
-                      </div>
-                      <span className={`badge ${badgeCls}`}>{badge}</span>
+                  <div className={styles.miniProductRow}>
+                    <div className={styles.miniProductIcon}>
+                      <i className="bi bi-person-check" aria-hidden="true"></i>
                     </div>
-                  ))}
+                    <div className="flex-grow-1">
+                      <strong className="d-block">Compte vendeur identifié</strong>
+                      <span className="text-secondary small">Chaque boutique est rattachée à un utilisateur connecté.</span>
+                    </div>
+                  </div>
+                  <div className={styles.miniProductRow}>
+                    <div className={styles.miniProductIcon}>
+                      <i className="bi bi-shield-check" aria-hidden="true"></i>
+                    </div>
+                    <div className="flex-grow-1">
+                      <strong className="d-block">Validation admin</strong>
+                      <span className="text-secondary small">L&apos;équipe FOOLY approuve la boutique avant publication.</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -350,47 +283,6 @@ export default async function DevenirVendeurPage() {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Plans ─────────────────────────────────────────────────── */}
-      <section className={styles.plansSection}>
-        <div className="container">
-          <div className="text-center mb-5">
-            <span className={catalogStyles.eyebrow}>Offres vendeurs</span>
-            <h2 className={catalogStyles.sectionTitle}>Plans de lancement</h2>
-            <p className={catalogStyles.sectionDescription}>
-              Rejoignez Marché Fooly et commencez à vendre dès aujourd&apos;hui auprès des acheteurs de Sangarédi.
-            </p>
-          </div>
-
-          <div className="row g-4 align-items-stretch">
-            {PLANS.map((plan) => (
-              <div key={plan.title} className="col-md-4">
-                <div className={`${styles.planCard} ${plan.featured ? styles.planCardFeatured : ""}`}>
-                  <span className={`${styles.planBadge} ${plan.badgeBg}`}>{plan.badge}</span>
-                  <h3 className="h4 fw-bold">{plan.title}</h3>
-                  <div className={styles.planPrice}>{plan.price}</div>
-                  <p className="text-secondary">{plan.desc}</p>
-                  <ul className={styles.planList}>
-                    {plan.features.map((f) => (
-                      <li key={f} className={styles.planListItem}>
-                        <i className={`bi bi-check-circle-fill ${styles.planListIcon}`} aria-hidden="true"></i>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  {plan.href ? (
-                    <Link href={plan.href} className={plan.ctaCls}>{plan.cta}</Link>
-                  ) : hasSellerStatus ? (
-                    <Link href={sellerCta.href} className={plan.ctaCls}>{sellerCta.label}</Link>
-                  ) : (
-                    <Link href="#formulaire-vendeur" className={plan.ctaCls}>{plan.cta}</Link>
-                  )}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

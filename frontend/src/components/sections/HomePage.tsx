@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import ProductCard from "@/components/product/ProductCard";
 import { siteConfig } from "@/config/site";
 import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
 import type { SellerCtaStatus } from "@/lib/sellerCta";
+import type { CategoryItem, ProductItem } from "@/types/catalog";
 import styles from "@/app/page.module.css";
 
 type SectionHeadingProps = {
@@ -14,22 +16,6 @@ type SectionHeadingProps = {
     href: string;
     label: string;
   };
-};
-
-type Category = {
-  icon: string;
-  title: string;
-  description: string;
-};
-
-type Product = {
-  badge?: string;
-  icon: string;
-  title: string;
-  price: string;
-  rating: number;
-  reviews: number;
-  href: string;
 };
 
 type Feature = {
@@ -50,84 +36,6 @@ type Reason = {
   description: string;
   accentClass: string;
 };
-
-type Testimonial = {
-  quote: string;
-  author: string;
-  role: string;
-  rating: number;
-};
-
-const categories: Category[] = [
-  { icon: "bi bi-basket2", title: "Alimentation", description: "Produits du quotidien" },
-  { icon: "bi bi-car-front", title: "Automobile", description: "Accessoires et pièces" },
-  { icon: "bi bi-balloon-heart", title: "Bébé & maternité", description: "Soins et accessoires" },
-  { icon: "bi bi-tv", title: "Électroménagers", description: "Équipements maison" },
-  { icon: "bi bi-pencil-square", title: "Fournitures scolaires", description: "Bureau et école" },
-  { icon: "bi bi-music-note-beamed", title: "Instruments de musique", description: "Son et création" },
-  { icon: "bi bi-controller", title: "Livres & jeux", description: "Loisirs pour tous" },
-  { icon: "bi bi-house-heart", title: "Maison & cuisine", description: "Confort quotidien" },
-  { icon: "bi bi-lamp", title: "Meubles", description: "Décoration et mobilier" },
-  { icon: "bi bi-gem", title: "Sacs & bijoux", description: "Accessoires mode" },
-  { icon: "bi bi-phone", title: "Téléphones", description: "Mobiles et accessoires" },
-  { icon: "bi bi-person-standing-dress", title: "Vêtements", description: "Femme, homme, enfant" },
-];
-
-const popularProducts: Product[] = [
-  {
-    badge: "Populaire",
-    icon: "bi bi-phone",
-    title: "Téléphone Samsung A12",
-    price: "1 200 000 GNF",
-    rating: 4.5,
-    reviews: 24,
-    href: "/produit/samsung-a12",
-  },
-  {
-    badge: "Promo",
-    icon: "bi bi-router",
-    title: "Routeur Wi-Fi",
-    price: "350 000 GNF",
-    rating: 4,
-    reviews: 18,
-    href: "/boutique",
-  },
-  {
-    icon: "bi bi-droplet-half",
-    title: "Huile de soin",
-    price: "120 000 GNF",
-    rating: 5,
-    reviews: 32,
-    href: "/boutique",
-  },
-  {
-    badge: "Nouveau",
-    icon: "bi bi-house-door",
-    title: "Location maison",
-    price: "12 000 000 GNF",
-    rating: 4,
-    reviews: 9,
-    href: "/boutique",
-  },
-  {
-    badge: "Top",
-    icon: "bi bi-display",
-    title: "Télévision HD",
-    price: "2 500 000 GNF",
-    rating: 4.5,
-    reviews: 14,
-    href: "/boutique",
-  },
-  {
-    badge: "Local",
-    icon: "bi bi-bag-heart",
-    title: "Sac tendance femme",
-    price: "85 000 GNF",
-    rating: 4,
-    reviews: 21,
-    href: "/boutique",
-  },
-];
 
 const sellerFeatures: Feature[] = [
   {
@@ -209,27 +117,6 @@ const reasons: Reason[] = [
   },
 ];
 
-const testimonials: Testimonial[] = [
-  {
-    quote: "Une marketplace comme celle-ci aide vraiment les commerçants de Sangarédi à vendre plus facilement.",
-    author: "Mamadou B.",
-    role: "Vendeur local",
-    rating: 5,
-  },
-  {
-    quote: "Le site est simple, clair et donne envie d'acheter. Les catégories sont faciles à parcourir.",
-    author: "Aïssatou D.",
-    role: "Cliente",
-    rating: 4.5,
-  },
-  {
-    quote: "FOOLY peut devenir une vraie vitrine digitale pour les boutiques locales et les indépendants.",
-    author: "Ibrahima S.",
-    role: "Commerçant",
-    rating: 5,
-  },
-];
-
 function SectionHeading({
   eyebrow,
   title,
@@ -262,45 +149,30 @@ function SectionHeading({
   );
 }
 
-function Rating({ rating, reviews }: { rating: number; reviews: number }) {
-  const stars = Array.from({ length: 5 }, (_, index) => {
-    const starValue = index + 1;
-
-    if (rating >= starValue) {
-      return "bi bi-star-fill";
-    }
-
-    if (rating >= starValue - 0.5) {
-      return "bi bi-star-half";
-    }
-
-    return "bi bi-star";
-  });
-
-  return (
-    <div className={styles.rating} aria-label={`Note ${rating} sur 5`}>
-      {stars.map((iconClass, index) => (
-        <i key={`${iconClass}-${index}`} className={iconClass} aria-hidden="true"></i>
-      ))}
-      {reviews > 0 ? <span className={styles.reviewCount}>({reviews})</span> : null}
-    </div>
-  );
-}
-
 type HomePageProps = {
   sellerStatus: SellerCtaStatus;
   showSellerEntry: boolean;
+  categories: CategoryItem[];
+  products: ProductItem[];
 };
 
 export default function HomePage({
   sellerStatus,
   showSellerEntry,
+  categories,
+  products,
 }: HomePageProps) {
   const heroSellerCta = getSellerCta(sellerStatus);
   const panelSellerCta = getSellerCta(sellerStatus, {
     defaultLabel: "Créer ma boutique",
   });
   const hasSellerStatus = hasSellerProfileStatus(sellerStatus);
+  const visibleCategories = categories.slice(0, 12);
+  const visibleProducts = products.slice(0, 6);
+  const totalProducts = categories.reduce(
+    (total, category) => total + category.productCount,
+    0,
+  );
 
   return (
     <div className={styles.page}>
@@ -333,7 +205,7 @@ export default function HomePage({
               <div className="row g-3 mt-4">
                 <div className="col-4">
                   <div className={styles.heroStat}>
-                    <strong>+14</strong>
+                    <strong>{categories.length}</strong>
                     <span>Catégories</span>
                   </div>
                 </div>
@@ -345,8 +217,8 @@ export default function HomePage({
                 </div>
                 <div className="col-4">
                   <div className={styles.heroStat}>
-                    <strong>24/7</strong>
-                    <span>Boutique en ligne</span>
+                    <strong>{totalProducts}</strong>
+                    <span>Produits</span>
                   </div>
                 </div>
               </div>
@@ -387,58 +259,44 @@ export default function HomePage({
             action={{ href: "/categories", label: "Voir toutes les catégories" }}
           />
 
-          <div className="row g-3">
-            {categories.map((category) => (
-              <div key={category.title} className="col-6 col-md-4 col-lg-3">
-                <Link href="/categories" className={styles.categoryCard}>
-                  <span className={styles.categoryIcon}>
-                    <i className={category.icon} aria-hidden="true"></i>
-                  </span>
-                  <h3>{category.title}</h3>
-                  <p>{category.description}</p>
-                </Link>
-              </div>
-            ))}
-          </div>
+          {visibleCategories.length > 0 ? (
+            <div className="row g-3">
+              {visibleCategories.map((category) => (
+                <div key={category.slug} className="col-6 col-md-4 col-lg-3">
+                  <Link href={`/boutique?category=${category.slug}`} className={styles.categoryCard}>
+                    <span className={styles.categoryIcon}>
+                      <i className={category.icon} aria-hidden="true"></i>
+                    </span>
+                    <h3>{category.name}</h3>
+                    <p>{category.shortDescription || category.description}</p>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </div>
       </section>
 
-      <section className={`${styles.sectionBlock} ${styles.softSection}`}>
-        <div className="container">
-          <SectionHeading
-            eyebrow="Produits populaires"
-            title="Les bonnes affaires du moment"
-            description="Des sélections temporaires pour présenter les produits les plus consultés de la marketplace."
-            action={{ href: "/boutique", label: "Explorer la boutique" }}
-          />
+      {visibleProducts.length > 0 && (
+        <section className={`${styles.sectionBlock} ${styles.softSection}`}>
+          <div className="container">
+            <SectionHeading
+              eyebrow="Produits disponibles"
+              title="À découvrir sur Marché Fooly"
+              description="Des produits publiés par les vendeurs validés de la marketplace."
+              action={{ href: "/boutique", label: "Explorer la boutique" }}
+            />
 
-          <div className="row g-4">
-            {popularProducts.map((product) => (
-              <div key={product.title} className="col-sm-6 col-xl-4">
-                <article className={styles.productCard}>
-                  <div className={styles.productMedia}>
-                    {product.badge ? <span className={styles.productBadge}>{product.badge}</span> : null}
-                    <i className={product.icon} aria-hidden="true"></i>
-                  </div>
-                  <div className={styles.productBody}>
-                    <h3>{product.title}</h3>
-                    <Rating rating={product.rating} reviews={product.reviews} />
-                    <div className={styles.productPrice}>{product.price}</div>
-                    <div className={styles.productActions}>
-                      <Link href="/panier" className="btn btn-warning btn-sm">
-                        Ajouter
-                      </Link>
-                      <Link href={product.href} className="btn btn-outline-dark btn-sm">
-                        Voir
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              </div>
-            ))}
+            <div className="row g-4">
+              {visibleProducts.map((product) => (
+                <div key={product.productId} className="col-sm-6 col-xl-4">
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <section className={styles.sectionBlock}>
         <div className="container">
@@ -575,30 +433,6 @@ export default function HomePage({
                   <i className={`${reason.icon} ${reason.accentClass}`} aria-hidden="true"></i>
                   <h3>{reason.title}</h3>
                   <p>{reason.description}</p>
-                </article>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.sectionBlock}>
-        <div className="container">
-          <SectionHeading
-            eyebrow="Témoignages"
-            title="Ils font confiance à FOOLY"
-            description="Des retours qui renforcent la crédibilité de la marketplace locale."
-            centered
-          />
-
-          <div className="row g-4">
-            {testimonials.map((testimonial) => (
-              <div key={testimonial.author} className="col-md-4">
-                <article className={styles.testimonialCard}>
-                  <Rating rating={testimonial.rating} reviews={0} />
-                  <p>{`“${testimonial.quote}”`}</p>
-                  <strong>{testimonial.author}</strong>
-                  <span>{testimonial.role}</span>
                 </article>
               </div>
             ))}

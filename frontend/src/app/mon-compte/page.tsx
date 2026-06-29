@@ -41,7 +41,7 @@ export const dynamic = "force-dynamic";
 
 const NOTIF_SETTINGS = [
   { label: "Nouvelles commandes", desc: "Recevez une alerte à chaque commande passée." },
-  { label: "Promotions locales", desc: "Offres exclusives des vendeurs de Sangarédi." },
+  { label: "Informations Marché Fooly", desc: "Actualités utiles sur votre compte et la marketplace." },
   { label: "Mises à jour de livraison", desc: "Notifications dès que votre colis évolue." },
 ];
 

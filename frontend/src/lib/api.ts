@@ -26,9 +26,6 @@
  *
  * Notes pour GitHub Copilot / autocompletion :
  *   - Limites connues des mappers (champs absents de l'API) :
- *       rating / reviewCount   -> 0          (l'API ne les fournit pas)
- *       isPromo / isLocal      -> false      (placeholders neutres)
- *       sortRank / newestRank  -> 0          (placeholders neutres)
  *       icon (produit/catégorie) -> icône Bootstrap générique
  *       productCount (catégorie) -> compteur renvoyé par l'API
  *   - Détail produit : l'API expose /api/products/:sellerSlug/:productSlug
@@ -118,6 +115,12 @@ function refCategorySlug(category: ApiProduct["category"]): string {
   return "";
 }
 
+/** Extrait le nom d'une référence catégorie (objet peuplé ou string/null). */
+function refCategoryName(category: ApiProduct["category"]): string {
+  if (category && typeof category === "object") return category.name;
+  return "";
+}
+
 /** Extrait le nom du vendeur d'une référence (objet peuplé ou string/null). */
 function refSellerName(seller: ApiProduct["seller"]): string {
   if (seller && typeof seller === "object") return seller.storeName;
@@ -141,20 +144,23 @@ export function toProductItem(api: ApiProduct): ProductItem {
   return {
     slug: api.slug,
     name: api.name,
+    shortDescription: api.shortDescription,
+    description: api.description,
     vendor: refSellerName(api.seller),
     price: api.price,
     currency: toCurrency(api.currency),
-    rating: 0,
-    reviewCount: 0,
     icon: "bi bi-box-seam",
     categorySlug: refCategorySlug(api.category),
+    categoryName: refCategoryName(api.category),
     badge: api.isFeatured ? "Populaire" : undefined,
     stockLabel: inStock ? "En stock" : "Rupture de stock",
+    stockQuantity: api.stockQuantity,
     inStock,
-    isPromo: false,
-    isLocal: false,
-    sortRank: 0,
-    newestRank: 0,
+    sku: api.sku,
+    coverImageUrl: api.coverImageUrl,
+    deliveryFee: api.deliveryFee,
+    isFreeDelivery: api.isFreeDelivery,
+    pickupAddress: api.pickupAddress ?? null,
     // Identifiants utiles au panier / commande (Jour 23).
     productId: api.id,
     sellerSlug: refSellerSlug(api.seller),

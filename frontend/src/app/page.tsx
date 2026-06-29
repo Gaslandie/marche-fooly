@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomePage from "@/components/sections/HomePage";
+import { getCategories, getProducts } from "@/lib/api";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
 
 export const metadata: Metadata = {
@@ -11,12 +12,18 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function Page() {
-  const { sellerStatus, showSellerEntry } = await getSellerNavigationState();
+  const [sellerNavigation, categories, products] = await Promise.all([
+    getSellerNavigationState(),
+    getCategories(),
+    getProducts({ limit: 6 }),
+  ]);
 
   return (
     <HomePage
-      sellerStatus={sellerStatus}
-      showSellerEntry={showSellerEntry}
+      sellerStatus={sellerNavigation.sellerStatus}
+      showSellerEntry={sellerNavigation.showSellerEntry}
+      categories={categories}
+      products={products}
     />
   );
 }

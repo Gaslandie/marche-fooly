@@ -15,8 +15,6 @@ const sortOptions: Array<{ value: ProductSortKey; label: string }> = [
   { value: "recommended", label: "Tri recommandé" },
   { value: "price-asc", label: "Prix croissant" },
   { value: "price-desc", label: "Prix décroissant" },
-  { value: "rating", label: "Meilleures notes" },
-  { value: "newest", label: "Nouveautés" },
 ];
 
 export default function ProductSort({ total, summary, sort, view }: ProductSortProps) {

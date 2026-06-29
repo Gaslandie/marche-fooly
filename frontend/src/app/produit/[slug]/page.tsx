@@ -31,7 +31,6 @@ import { notFound } from "next/navigation";
 import ProductCard from "@/components/product/ProductCard";
 import ProductDetails from "@/components/product/ProductDetails";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
-import { getCategoryLabel } from "@/data/products";
 import { getProductBySlug, getProducts } from "@/lib/api";
 import styles from "@/styles/product.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
@@ -60,7 +59,7 @@ export default async function ProduitPage({ params }: PageProps) {
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const categoryLabel = getCategoryLabel(product.categorySlug);
+  const categoryLabel = product.categoryName || product.categorySlug;
 
   // Produits similaires : même catégorie via l'API, produit courant exclu.
   const similarPool = product.categorySlug

@@ -4,17 +4,10 @@ import ProductCard from "@/components/product/ProductCard";
 import ProductFilters from "@/components/product/ProductFilters";
 import ProductSort from "@/components/product/ProductSort";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
-import {
-  getCategoryLabel,
-  getFilteredProducts,
-  maxCatalogPrice,
-  minCatalogPrice,
-  shopCategoryFilters,
-} from "@/data/products";
 import { getCategories, getProducts } from "@/lib/api";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
 import styles from "@/styles/catalog.module.css";
-import type { ProductSortKey, ProductViewMode } from "@/types/catalog";
+import type { ProductItem, ProductSortKey, ProductViewMode } from "@/types/catalog";
 
 type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -35,7 +28,7 @@ function readParam(value?: string | string[]) {
 }
 
 function normalizeSort(value?: string): ProductSortKey {
-  const allowed: ProductSortKey[] = ["recommended", "price-asc", "price-desc", "rating", "newest"];
+  const allowed: ProductSortKey[] = ["recommended", "price-asc", "price-desc"];
   return allowed.includes(value as ProductSortKey) ? (value as ProductSortKey) : "recommended";
 }
 
@@ -43,54 +36,83 @@ function normalizeView(value?: string): ProductViewMode {
   return value === "list" ? "list" : "grid";
 }
 
+function getPriceLimits(products: ProductItem[]) {
+  const prices = products
+    .map((product) => product.price)
+    .filter((price) => Number.isFinite(price));
+
+  if (prices.length === 0) {
+    return { min: 0, max: 0 };
+  }
+
+  return {
+    min: Math.min(...prices),
+    max: Math.max(...prices),
+  };
+}
+
+function filterProducts(
+  products: ProductItem[],
+  {
+    maxPrice,
+    stockOnly,
+    sort,
+  }: {
+    maxPrice: number;
+    stockOnly: boolean;
+    sort: ProductSortKey;
+  },
+) {
+  const filtered = products.filter((product) => {
+    const matchesPrice = maxPrice > 0 ? product.price <= maxPrice : true;
+    const matchesStock = stockOnly ? product.inStock : true;
+    return matchesPrice && matchesStock;
+  });
+
+  return [...filtered].sort((left, right) => {
+    if (sort === "price-asc") return left.price - right.price;
+    if (sort === "price-desc") return right.price - left.price;
+    return 0;
+  });
+}
+
 export default async function BoutiquePage({ searchParams }: PageProps) {
   const params = (await searchParams) ?? {};
   const category = readParam(params.category);
   const query = readParam(params.q)?.trim() ?? "";
-  const rawMaxPrice = Number(readParam(params.maxPrice) ?? maxCatalogPrice);
-  const maxPrice = Number.isFinite(rawMaxPrice)
-    ? Math.min(Math.max(rawMaxPrice, minCatalogPrice), maxCatalogPrice)
-    : maxCatalogPrice;
   const stockOnly = readParam(params.stock) === "1";
-  const promoOnly = readParam(params.promo) === "1";
-  const localOnly = readParam(params.local) === "1";
-  const rawRating = Number(readParam(params.rating));
-  const minRating = rawRating === 4 || rawRating === 3 ? rawRating : undefined;
   const sort = normalizeSort(readParam(params.sort));
   const view = normalizeView(readParam(params.view));
 
-  // Produits réels : API backend (GET /api/products). Seuls les query params
-  // supportés par l'API (category, q, limit) sont envoyés côté serveur. Les
-  // autres filtres (prix, stock, promo, local, note) et le tri restent
-  // appliqués côté frontend par getFilteredProducts (décision Jour 21).
+  // Produits réels : API backend (GET /api/products). Seuls les filtres
+  // réellement supportés par l'API sont envoyés côté serveur.
   const [apiProducts, apiCategories, sellerNavigation] = await Promise.all([
     getProducts({ category, q: query, limit: 100 }),
     getCategories(),
     getSellerNavigationState(),
   ]);
 
-  const filteredProducts = getFilteredProducts(
-    {
-      category,
-      query,
-      maxPrice,
-      stockOnly,
-      promoOnly,
-      localOnly,
-      minRating,
-      sort,
-    },
-    apiProducts,
-  );
+  const priceLimits = getPriceLimits(apiProducts);
+  const rawMaxPrice = Number(readParam(params.maxPrice));
+  const maxPrice =
+    priceLimits.max > 0 && Number.isFinite(rawMaxPrice)
+      ? Math.min(Math.max(rawMaxPrice, priceLimits.min), priceLimits.max)
+      : priceLimits.max;
 
-  const filterCategories = apiCategories.filter((item) => shopCategoryFilters.includes(item.slug));
+  const filteredProducts = filterProducts(apiProducts, {
+    maxPrice,
+    stockOnly,
+    sort,
+  });
+
+  const filterCategories = apiCategories;
   const totalPublicProducts = apiCategories.reduce(
     (total, item) => total + item.productCount,
     0,
   );
   const categoryLabel =
     apiCategories.find((item) => item.slug === category)?.name ??
-    getCategoryLabel(category);
+    "";
   const summary = categoryLabel
     ? `Résultats pour ${categoryLabel}`
     : query
@@ -154,15 +176,15 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
           <div className={styles.dealStrip}>
             <div className="row align-items-center g-3 position-relative">
               <div className="col-lg-8">
-                <span className="badge rounded-pill bg-warning text-dark mb-2">Offres flash</span>
-                <h2 className="h3 fw-bold mb-1">Prix spéciaux sur les téléphones et accessoires</h2>
+                <span className="badge rounded-pill bg-warning text-dark mb-2">Catalogue local</span>
+                <h2 className="h3 fw-bold mb-1">Découvrez les produits disponibles</h2>
                 <p className={styles.bannerText}>
-                  Profitez des bonnes affaires locales avant la fin des promos.
+                  Parcourez les offres publiées par les vendeurs validés sur Marché Fooly.
                 </p>
               </div>
               <div className="col-lg-4 text-lg-end">
-                <Link href="/boutique?promo=1" className="btn btn-light fw-bold">
-                  Voir les promos
+                <Link href="/categories" className="btn btn-light fw-bold">
+                  Explorer les catégories
                 </Link>
               </div>
             </div>
@@ -180,12 +202,9 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
                 selectedCategory={category}
                 query={query}
                 maxPrice={maxPrice}
-                maxPriceLimit={maxCatalogPrice}
-                minPriceLimit={minCatalogPrice}
+                maxPriceLimit={priceLimits.max}
+                minPriceLimit={priceLimits.min}
                 stockOnly={stockOnly}
-                promoOnly={promoOnly}
-                localOnly={localOnly}
-                minRating={minRating}
                 sort={sort}
                 view={view}
                 sellerStatus={sellerNavigation.sellerStatus}
@@ -221,33 +240,6 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
                 )}
               </div>
 
-              {filteredProducts.length > 0 ? (
-                <nav className={styles.paginationNav} aria-label="Pagination boutique">
-                  <ul className={styles.paginationList}>
-                    <li>
-                      <span className={styles.paginationDisabled}>Précédent</span>
-                    </li>
-                    <li>
-                      <span className={styles.paginationActive}>1</span>
-                    </li>
-                    <li>
-                      <Link href="/boutique" className={styles.paginationLink}>
-                        2
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/boutique" className={styles.paginationLink}>
-                        3
-                      </Link>
-                    </li>
-                    <li>
-                      <Link href="/boutique" className={styles.paginationLink}>
-                        Suivant
-                      </Link>
-                    </li>
-                  </ul>
-                </nav>
-              ) : null}
             </div>
           </div>
         </div>

@@ -13,30 +13,35 @@ export type CategoryItem = {
 export type ProductItem = {
   slug: string;
   name: string;
+  shortDescription: string;
+  description: string;
   vendor: string;
   price: number;
   currency: CurrencyCode;
-  rating: number;
-  reviewCount: number;
   icon: string;
   categorySlug: string;
+  categoryName: string;
   badge?: string;
   stockLabel: string;
+  stockQuantity: number;
   inStock: boolean;
-  isPromo: boolean;
-  isLocal: boolean;
-  sortRank: number;
-  newestRank: number;
+  sku: string;
+  coverImageUrl: string;
+  deliveryFee: number;
+  isFreeDelivery: boolean;
+  pickupAddress: {
+    city: string;
+    region: string;
+    country: string;
+  } | null;
   // Champs renseignés par les mappers API (toProductItem) :
   // - productId : ObjectId Mongo, requis pour POST /api/orders
   // - sellerSlug : utilisé pour la règle mono-vendeur côté panier
-  // Optionnels pour rester rétrocompatibles avec les produits statiques
-  // de src/data/products.ts (fallback dev qui ne fournit pas ces champs).
-  productId?: string;
-  sellerSlug?: string;
+  productId: string;
+  sellerSlug: string;
 };
 
-export type ProductSortKey = "recommended" | "price-asc" | "price-desc" | "rating" | "newest";
+export type ProductSortKey = "recommended" | "price-asc" | "price-desc";
 export type ProductViewMode = "grid" | "list";
 
 export type ProductFilterParams = {
@@ -44,8 +49,5 @@ export type ProductFilterParams = {
   query?: string;
   maxPrice?: number;
   stockOnly?: boolean;
-  promoOnly?: boolean;
-  localOnly?: boolean;
-  minRating?: number;
   sort?: ProductSortKey;
 };

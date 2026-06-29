@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "@/styles/seller.module.css";
 
 const CATEGORIES = [
@@ -22,16 +23,70 @@ const PRODUCT_COUNTS = [
 ];
 
 export default function SellerForm() {
+  const router = useRouter();
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setError(null);
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+
+    const form = new FormData(e.currentTarget);
+    const sellerName = String(form.get("sellerName") || "").trim();
+    const sellerPhone = String(form.get("sellerPhone") || "").trim();
+    const storeName = String(form.get("storeName") || "").trim();
+    const shopCategory = String(form.get("shopCategory") || "").trim();
+    const sellerLocation = String(form.get("sellerLocation") || "").trim();
+    const productCount = String(form.get("productCount") || "").trim();
+    const sellerMessage = String(form.get("sellerMessage") || "").trim();
+
+    const description = [
+      sellerName ? `Responsable : ${sellerName}` : "",
+      shopCategory ? `Catégorie principale : ${shopCategory}` : "",
+      productCount ? `Nombre de produits : ${productCount}` : "",
+      sellerMessage,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    try {
+      const res = await fetch("/api/sellers/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          storeName,
+          description,
+          contactDetails: { phone: sellerPhone },
+          address: {
+            city: sellerLocation,
+            country: "Guinée",
+          },
+        }),
+      });
+
+      const body = (await res.json().catch(() => null)) as {
+        message?: string;
+      } | null;
+
+      if (res.status === 401) {
+        router.push("/mon-compte");
+        return;
+      }
+
+      if (!res.ok) {
+        setError(body?.message ?? "Création de boutique impossible.");
+        return;
+      }
+
       setSent(true);
-    }, 800);
+      router.refresh();
+    } catch {
+      setError("Service vendeur indisponible. Réessayez plus tard.");
+    } finally {
+      setSending(false);
+    }
   }
 
   if (sent) {
@@ -72,6 +127,7 @@ export default function SellerForm() {
           </label>
           <input
             id="sellerName"
+            name="sellerName"
             className={styles.inputField}
             type="text"
             placeholder="Ex : Mamadou Diallo"
@@ -85,6 +141,7 @@ export default function SellerForm() {
           </label>
           <input
             id="sellerPhone"
+            name="sellerPhone"
             className={styles.inputField}
             type="tel"
             placeholder="+224 6XX XX XX XX"
@@ -98,6 +155,7 @@ export default function SellerForm() {
           </label>
           <input
             id="shopName"
+            name="storeName"
             className={styles.inputField}
             type="text"
             placeholder="Ex : Boutique Diallo"
@@ -111,6 +169,7 @@ export default function SellerForm() {
           </label>
           <select
             id="shopCategory"
+            name="shopCategory"
             className={styles.inputField}
             defaultValue=""
             required
@@ -131,6 +190,7 @@ export default function SellerForm() {
           </label>
           <input
             id="sellerLocation"
+            name="sellerLocation"
             className={styles.inputField}
             type="text"
             placeholder="Ex : Sangarédi centre"
@@ -143,6 +203,7 @@ export default function SellerForm() {
           </label>
           <select
             id="productCount"
+            name="productCount"
             className={styles.inputField}
             defaultValue={PRODUCT_COUNTS[0]}
             style={{ appearance: "auto" }}
@@ -159,6 +220,7 @@ export default function SellerForm() {
           </label>
           <textarea
             id="sellerMessage"
+            name="sellerMessage"
             className={styles.inputField}
             placeholder="Présentez rapidement vos produits ou votre boutique..."
             rows={4}
@@ -180,6 +242,11 @@ export default function SellerForm() {
         </div>
 
         <div className="col-12">
+          {error && (
+            <div className="alert alert-warning mb-3" role="alert">
+              {error}
+            </div>
+          )}
           <button
             className="btn btn-warning fw-bold w-100"
             type="submit"

@@ -140,12 +140,19 @@ const apply = async (req, res, next) => {
       data: { sellerProfile: toPublicSellerProfile(created) },
     });
   } catch (error) {
-    // Course condition sur l'index unique { user } -> 409 lisible.
     if (error && error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      if (field === "slug") {
+        return res.status(409).json({
+          success: false,
+          message: "Ce nom de boutique est deja utilise",
+          data: { field: "storeName" },
+        });
+      }
       return res.status(409).json({
         success: false,
         message: "Une candidature vendeur existe deja pour ce compte",
-        data: null,
+        data: { field: "user" },
       });
     }
     return next(error);

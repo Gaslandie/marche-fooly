@@ -18,6 +18,11 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: `${siteConfig.name} — ${siteConfig.slogan}. Marketplace locale à ${siteConfig.location}.`,
+  icons: {
+    icon: [{ url: "/images/logo/favicon_fooly.png", type: "image/png" }],
+    shortcut: "/images/logo/favicon_fooly.png",
+    apple: "/images/logo/favicon_fooly.png",
+  },
 };
 
 export default async function RootLayout({

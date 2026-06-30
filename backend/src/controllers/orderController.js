@@ -82,6 +82,10 @@ const {
   CREATE_ORDER_ALLOWED_FIELDS,
 } = require("../validators/orderValidators");
 const { generateOrderReference } = require("../utils/orderReference");
+const {
+  notifyOrderCreated,
+  notifyOrderStatusChanged,
+} = require("../services/notificationEvents");
 
 const MAX_REFERENCE_RETRIES = 3;
 
@@ -326,6 +330,10 @@ const create = async (req, res, next) => {
       }
     }
 
+    await notifyOrderCreated({ order: created }).catch((error) => {
+      console.warn("Notifications creation commande:", error?.message || error);
+    });
+
     return res.status(201).json({
       success: true,
       message: "Commande creee",
@@ -539,6 +547,7 @@ const updateStatus = async (req, res, next) => {
     }
 
     const target = req.body.status;
+    const previousStatus = order.status;
     const allowedActors = STATUS_TRANSITIONS[order.status]?.[target];
 
     // Pas de transition definie -> transition interdite (etat terminal,
@@ -575,6 +584,14 @@ const updateStatus = async (req, res, next) => {
 
     order.status = target;
     await order.save();
+
+    await notifyOrderStatusChanged({
+      order,
+      previousStatus,
+      actor,
+    }).catch((error) => {
+      console.warn("Notifications statut commande:", error?.message || error);
+    });
 
     // Repopulate seller pour le retour.
     await order.populate("seller", "storeName slug");

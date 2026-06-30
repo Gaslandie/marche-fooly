@@ -42,6 +42,9 @@ const {
 const {
   UPDATE_SELLER_ME_ALLOWED_FIELDS,
 } = require("../validators/sellerValidators");
+const {
+  notifySellerApplicationCreated,
+} = require("../services/notificationEvents");
 
 // Shape pour les routes PUBLIQUES (GET /api/sellers, GET /api/sellers/:slug).
 // Volontairement plus restreint que toPublicSellerProfile:
@@ -145,6 +148,11 @@ const apply = async (req, res, next) => {
       address: address || {},
       status: "pending",
     });
+
+    await notifySellerApplicationCreated({ profile: created, applicant: user })
+      .catch((error) => {
+        console.warn("Notifications candidature vendeur:", error?.message || error);
+      });
 
     return res.status(201).json({
       success: true,

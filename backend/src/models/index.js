@@ -8,6 +8,7 @@ const Category = require("./Category");
 const Product = require("./Product");
 const Order = require("./Order");
 const Favorite = require("./Favorite");
+const Notification = require("./Notification");
 const ContactMessage = require("./ContactMessage");
 const NewsletterSubscriber = require("./NewsletterSubscriber");
 
@@ -18,6 +19,7 @@ module.exports = {
   Product,
   Order,
   Favorite,
+  Notification,
   ContactMessage,
   NewsletterSubscriber,
 };

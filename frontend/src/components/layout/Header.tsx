@@ -18,12 +18,14 @@ type HeaderProps = {
   user: AuthUser | null;
   sellerStatus: SellerCtaStatus;
   showSellerEntry: boolean;
+  unreadNotifications: number;
 };
 
 export default function Header({
   user,
   sellerStatus,
   showSellerEntry,
+  unreadNotifications,
 }: HeaderProps) {
   const hasAdminAccess = user ? hasBackOfficeAccess(user.role) : false;
   const sellerCta = getSellerCta(sellerStatus);
@@ -58,6 +60,24 @@ export default function Header({
           </div>
 
           <div className="d-flex align-items-center gap-3">
+            {user && (
+              <Link
+                href="/notifications"
+                className="mf-icon-link"
+                aria-label={
+                  unreadNotifications > 0
+                    ? `${unreadNotifications} notifications non lues`
+                    : "Notifications"
+                }
+              >
+                <i className="bi bi-bell" aria-hidden="true"></i>
+                {unreadNotifications > 0 && (
+                  <span className="mf-icon-badge">
+                    {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                  </span>
+                )}
+              </Link>
+            )}
             <Link href="/favoris" className="mf-icon-link" aria-label="Mes favoris">
               <i className="bi bi-heart" aria-hidden="true"></i>
             </Link>

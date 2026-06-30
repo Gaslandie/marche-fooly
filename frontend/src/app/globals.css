@@ -140,6 +140,7 @@ a:hover {
 
 /* ── Icon links (panier, favoris, compte) ──────────────────── */
 .mf-icon-link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -155,6 +156,24 @@ a:hover {
   background: var(--mf-light);
   color: var(--mf-orange);
   border-color: rgba(255, 122, 0, 0.3);
+}
+
+.mf-icon-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #dc3545;
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
 }
 
 /* ── Footer ────────────────────────────────────────────────── */

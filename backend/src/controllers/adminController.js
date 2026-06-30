@@ -42,6 +42,9 @@ const {
   BACKOFFICE_ROLES,
   BACKOFFICE_SELLER_CONFLICT_MESSAGE,
 } = require("../models/shared/constants");
+const {
+  notifySellerStatusChanged,
+} = require("../services/notificationEvents");
 
 const DEFAULT_LIMIT = 50;
 
@@ -250,6 +253,10 @@ const updateSellerStatus = async (req, res, next) => {
     }
 
     await profile.populate("user", "firstName lastName email");
+
+    await notifySellerStatusChanged({ profile, status: target }).catch((error) => {
+      console.warn("Notifications statut vendeur:", error?.message || error);
+    });
 
     return res.status(200).json({
       success: true,

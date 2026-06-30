@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import TopBar from "@/components/layout/TopBar";
 import { siteConfig } from "@/config/site";
+import { getUnreadNotificationCount } from "@/lib/notifications";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
@@ -32,6 +33,7 @@ export default async function RootLayout({
 }>) {
   const { user, sellerStatus, showSellerEntry } =
     await getSellerNavigationState();
+  const unreadNotifications = user ? await getUnreadNotificationCount() : 0;
 
   return (
     <html lang="fr" className={inter.className}>
@@ -46,6 +48,7 @@ export default async function RootLayout({
             user={user}
             sellerStatus={sellerStatus}
             showSellerEntry={showSellerEntry}
+            unreadNotifications={unreadNotifications}
           />
           <main>{children}</main>
           <Footer sellerStatus={sellerStatus} showSellerEntry={showSellerEntry} />

@@ -18,7 +18,8 @@
  *     Handler re-sanitise de toute façon, défense en profondeur).
  *   - `currency` n'est pas envoyée (forcée à GNF côté serveur).
  *   - `status` limité au MVP : "active" / "out_of_stock".
- *   - `coverImageUrl` = URL texte (pas d'upload de fichier au MVP).
+ *   - L'upload image passe par /api/uploads/product-image et renseigne
+ *     `coverImageUrl` avec l'URL HTTPS retournée par le backend.
  *   - L'ownership final est garanti par le backend (PATCH sur un produit
  *     d'un autre vendeur -> 403/404 relayé en message inline).
  *
@@ -42,7 +43,6 @@ export type SellerProductFormValues = {
   description: string;
   price: string;
   stockQuantity: string;
-  sku: string;
   coverImageUrl: string;
   deliveryFee: string;
   isFreeDelivery: boolean;
@@ -63,12 +63,25 @@ const EMPTY_VALUES: SellerProductFormValues = {
   description: "",
   price: "",
   stockQuantity: "",
-  sku: "",
   coverImageUrl: "",
   deliveryFee: "0",
   isFreeDelivery: false,
   status: "active",
   category: "",
+};
+
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+const ALLOWED_IMAGE_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/avif",
+]);
+
+type UploadImageResponse = {
+  success?: boolean;
+  message?: string;
+  image?: { url?: string } | null;
 };
 
 export default function SellerProductForm({
@@ -82,6 +95,10 @@ export default function SellerProductForm({
     initial ?? EMPTY_VALUES,
   );
   const [submitting, setSubmitting] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState(
+    initial?.coverImageUrl ?? "",
+  );
   const [error, setError] = useState<string | null>(null);
 
   function update<K extends keyof SellerProductFormValues>(
@@ -89,6 +106,51 @@ export default function SellerProductForm({
     value: SellerProductFormValues[K],
   ) {
     setValues((prev) => ({ ...prev, [key]: value }));
+  }
+
+  async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_IMAGE_MIME_TYPES.has(file.type)) {
+      setError("Format image non supporté. Utilisez JPG, PNG, WebP ou AVIF.");
+      event.currentTarget.value = "";
+      return;
+    }
+
+    if (file.size <= 0 || file.size > MAX_IMAGE_BYTES) {
+      setError("Image trop lourde. Taille maximum : 4 Mo.");
+      event.currentTarget.value = "";
+      return;
+    }
+
+    setError(null);
+    setUploadingImage(true);
+
+    const formData = new FormData();
+    formData.append("image", file);
+
+    try {
+      const res = await fetch("/api/uploads/product-image", {
+        method: "POST",
+        body: formData,
+      });
+      const body = (await res.json().catch(() => null)) as
+        | UploadImageResponse
+        | null;
+
+      if (!res.ok || !body?.success || !body.image?.url) {
+        setError(body?.message ?? "Upload image impossible.");
+        return;
+      }
+
+      update("coverImageUrl", body.image.url);
+      setImagePreviewUrl(body.image.url);
+    } catch {
+      setError("Service d'upload indisponible. Réessayez plus tard.");
+    } finally {
+      setUploadingImage(false);
+    }
   }
 
   function validate(): string | null {
@@ -107,6 +169,9 @@ export default function SellerProductForm({
     if (values.stockQuantity === "" || Number(values.stockQuantity) < 0) {
       return "Le stock doit être un nombre positif.";
     }
+    if (uploadingImage) {
+      return "Veuillez attendre la fin de l'upload image.";
+    }
     return null;
   }
 
@@ -118,7 +183,6 @@ export default function SellerProductForm({
       description: values.description.trim(),
       price: Number(values.price),
       stockQuantity: Number(values.stockQuantity),
-      sku: values.sku.trim(),
       coverImageUrl: values.coverImageUrl.trim(),
       deliveryFee: Number(values.deliveryFee || 0),
       isFreeDelivery: values.isFreeDelivery,
@@ -295,21 +359,6 @@ export default function SellerProductForm({
         </div>
 
         <div className="col-sm-6">
-          <label className="form-label fw-semibold" htmlFor="p-sku">
-            SKU (optionnel)
-          </label>
-          <input
-            id="p-sku"
-            type="text"
-            className="form-control"
-            value={values.sku}
-            onChange={(e) => update("sku", e.target.value)}
-            maxLength={64}
-            disabled={submitting}
-          />
-        </div>
-
-        <div className="col-sm-6">
           <label className="form-label fw-semibold" htmlFor="p-delivery">
             Frais de livraison (GNF)
           </label>
@@ -327,20 +376,59 @@ export default function SellerProductForm({
 
         <div className="col-12">
           <label className="form-label fw-semibold" htmlFor="p-cover">
-            Image (URL)
+            Image du produit
           </label>
+          <input
+            id="p-cover-file"
+            type="file"
+            className="form-control mb-2"
+            accept="image/jpeg,image/png,image/webp,image/avif"
+            onChange={handleImageUpload}
+            disabled={submitting || uploadingImage}
+          />
+          <div className="form-text mb-2">
+            JPG, PNG, WebP ou AVIF. Taille maximum : 4 Mo.
+          </div>
+          {uploadingImage && (
+            <div className="alert alert-info py-2 px-3 small mb-2" role="status">
+              <span
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+                aria-hidden="true"
+              ></span>
+              Upload de l&apos;image en cours…
+            </div>
+          )}
+          {imagePreviewUrl && (
+            <div
+              className="border rounded-3 mb-2"
+              aria-label="Aperçu de l'image produit"
+              style={{
+                width: "100%",
+                aspectRatio: "16 / 9",
+                backgroundColor: "#f8f9fa",
+                backgroundImage: `url(${JSON.stringify(imagePreviewUrl)})`,
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+                backgroundSize: "cover",
+              }}
+            />
+          )}
           <input
             id="p-cover"
             type="url"
             className="form-control"
-            placeholder="https://…"
+            placeholder="URL générée automatiquement après upload"
             value={values.coverImageUrl}
-            onChange={(e) => update("coverImageUrl", e.target.value)}
-            disabled={submitting}
+            onChange={(e) => {
+              update("coverImageUrl", e.target.value);
+              setImagePreviewUrl(e.target.value.trim());
+            }}
+            disabled={submitting || uploadingImage}
           />
           <div className="form-text">
-            Collez l&apos;adresse d&apos;une image en ligne (l&apos;upload de
-            fichier sera disponible plus tard).
+            Vous pouvez aussi coller une URL d&apos;image HTTPS si l&apos;image
+            est déjà hébergée ailleurs.
           </div>
         </div>
 
@@ -369,7 +457,11 @@ export default function SellerProductForm({
       )}
 
       <div className="d-flex gap-2 mt-4">
-        <button type="submit" className="btn btn-warning fw-bold" disabled={submitting}>
+        <button
+          type="submit"
+          className="btn btn-warning fw-bold"
+          disabled={submitting || uploadingImage}
+        >
           {submitting ? (
             <>
               <span

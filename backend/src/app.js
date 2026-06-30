@@ -16,6 +16,7 @@ const productRoutes = require("./routes/productRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const favoriteRoutes = require("./routes/favoriteRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const uploadRoutes = require("./routes/uploadRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const newsletterRoutes = require("./routes/newsletterRoutes");
 
@@ -40,6 +41,15 @@ app.use(
     origin: corsOrigins,
     credentials: true,
   }),
+);
+
+// Upload images produit: limite JSON dediee, car le frontend transmet
+// temporairement l'image en data URL avant stockage Cloudinary.
+app.use(
+  "/api/uploads",
+  generalApiRateLimiter,
+  express.json({ limit: "7mb" }),
+  uploadRoutes,
 );
 
 app.use(express.json());

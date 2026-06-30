@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { AuthUser } from "@/types/auth";
 import styles from "@/styles/seller.module.css";
 
 const CATEGORIES = [
@@ -22,11 +23,16 @@ const PRODUCT_COUNTS = [
   "Plus de 100 produits",
 ];
 
-export default function SellerForm() {
+type SellerFormProps = {
+  user: AuthUser;
+};
+
+export default function SellerForm({ user }: SellerFormProps) {
   const router = useRouter();
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fullName = `${user.firstName} ${user.lastName}`.trim();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -34,7 +40,6 @@ export default function SellerForm() {
     setSending(true);
 
     const form = new FormData(e.currentTarget);
-    const sellerName = String(form.get("sellerName") || "").trim();
     const sellerPhone = String(form.get("sellerPhone") || "").trim();
     const storeName = String(form.get("storeName") || "").trim();
     const shopCategory = String(form.get("shopCategory") || "").trim();
@@ -43,7 +48,6 @@ export default function SellerForm() {
     const sellerMessage = String(form.get("sellerMessage") || "").trim();
 
     const description = [
-      sellerName ? `Responsable : ${sellerName}` : "",
       shopCategory ? `Catégorie principale : ${shopCategory}` : "",
       productCount ? `Nombre de produits : ${productCount}` : "",
       sellerMessage,
@@ -123,23 +127,16 @@ export default function SellerForm() {
   return (
     <form id="formulaire-vendeur" className={styles.formCard} onSubmit={handleSubmit}>
       <div className="row g-3">
-        <div className="col-md-6">
-          <label className={styles.inputLabel} htmlFor="sellerName">
-            Nom complet
-          </label>
-          <input
-            id="sellerName"
-            name="sellerName"
-            className={styles.inputField}
-            type="text"
-            placeholder="Ex : Mamadou Diallo"
-            required
-          />
+        <div className="col-12">
+          <div className="alert alert-light border mb-1" role="status">
+            <strong>Compte connecté :</strong>{" "}
+            {fullName || user.email}. La boutique sera rattachée à ce compte.
+          </div>
         </div>
 
         <div className="col-md-6">
           <label className={styles.inputLabel} htmlFor="sellerPhone">
-            Téléphone
+            Téléphone business / boutique
           </label>
           <input
             id="sellerPhone"
@@ -149,6 +146,9 @@ export default function SellerForm() {
             placeholder="+224 6XX XX XX XX"
             required
           />
+          <p className="form-text mb-0">
+            Numéro public de la boutique, différent du numéro personnel si besoin.
+          </p>
         </div>
 
         <div className="col-md-6">

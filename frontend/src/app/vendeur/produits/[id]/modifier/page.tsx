@@ -56,7 +56,6 @@ function toFormValues(product: ApiProduct): SellerProductFormValues {
     description: product.description,
     price: String(product.price ?? ""),
     stockQuantity: String(product.stockQuantity ?? ""),
-    sku: product.sku ?? "",
     coverImageUrl: product.coverImageUrl ?? "",
     deliveryFee: String(product.deliveryFee ?? 0),
     isFreeDelivery: !!product.isFreeDelivery,

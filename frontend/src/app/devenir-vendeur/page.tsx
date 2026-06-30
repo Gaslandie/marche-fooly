@@ -399,7 +399,7 @@ export default async function DevenirVendeurPage() {
                   </Link>
                 </div>
               ) : user ? (
-                <SellerForm />
+                <SellerForm user={user} />
               ) : (
                 <div
                   id="formulaire-vendeur"

@@ -15,9 +15,9 @@ export async function getSellerNavigationState(): Promise<SellerNavigationState>
     getCurrentUser(),
     getMySellerProfile(),
   ]);
-  const sellerStatus = sellerProfile?.status ?? null;
-  const showSellerEntry =
-    Boolean(sellerStatus) || !user || !hasBackOfficeAccess(user.role);
+  const isBackOfficeUser = user ? hasBackOfficeAccess(user.role) : false;
+  const sellerStatus = isBackOfficeUser ? null : sellerProfile?.status ?? null;
+  const showSellerEntry = !isBackOfficeUser;
 
   return {
     user,

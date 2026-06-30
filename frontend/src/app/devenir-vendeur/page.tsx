@@ -5,6 +5,7 @@ import SellerForm from "@/components/seller/SellerForm";
 import AccordionFaq from "@/components/common/AccordionFaq";
 import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { getCurrentUser } from "@/lib/auth";
+import { hasBackOfficeAccess } from "@/lib/admin";
 import { getMySellerProfile } from "@/lib/seller";
 import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
 import styles from "@/styles/seller.module.css";
@@ -94,7 +95,8 @@ export default async function DevenirVendeurPage() {
     getCurrentUser(),
     getMySellerProfile(),
   ]);
-  const sellerStatus = sellerProfile?.status ?? null;
+  const isBackOfficeUser = user ? hasBackOfficeAccess(user.role) : false;
+  const sellerStatus = isBackOfficeUser ? null : sellerProfile?.status ?? null;
   const sellerCta = getSellerCta(sellerStatus, {
     defaultLabel: "Créer ma boutique",
   });
@@ -117,7 +119,11 @@ export default async function DevenirVendeurPage() {
                 <Link href="/" className={styles.breadcrumbLink}>Accueil</Link>
               </li>
               <li className={`breadcrumb-item active ${styles.breadcrumbCurrent}`} aria-current="page">
-                {hasSellerStatus ? "Statut vendeur" : "Devenir vendeur"}
+                {isBackOfficeUser
+                  ? "Compte vendeur séparé"
+                  : hasSellerStatus
+                    ? "Statut vendeur"
+                    : "Devenir vendeur"}
               </li>
             </ol>
           </nav>
@@ -129,21 +135,29 @@ export default async function DevenirVendeurPage() {
                 Espace vendeurs Marché Fooly
               </span>
               <h1 className={`${styles.sellerTitle} mb-4`}>
-                {hasSellerStatus
+                {isBackOfficeUser
+                  ? "Utilisez un compte vendeur séparé"
+                  : hasSellerStatus
                   ? "Suivez votre activité vendeur avec FOOLY"
                   : "Vendez en ligne facilement avec FOOLY"}
               </h1>
               <p className="fs-5 text-secondary mb-4">
-                {hasSellerStatus
+                {isBackOfficeUser
+                  ? "Les comptes owner, admin et staff sont réservés au back office. Pour vendre sur Marché Fooly, créez un compte vendeur séparé avec d'autres informations."
+                  : hasSellerStatus
                   ? "Votre compte possède déjà une boutique ou une demande vendeur. Consultez votre espace pour suivre son statut."
                   : "Créez votre boutique gratuitement et commencez à vendre partout à Sangarédi. Marché Fooly aide les commerçants locaux à gagner en visibilité et à recevoir plus de commandes."}
               </p>
               <div className="d-flex flex-wrap gap-3">
                 <Link
-                  href={hasSellerStatus ? sellerCta.href : "#formulaire-vendeur"}
+                  href={isBackOfficeUser ? "/admin" : hasSellerStatus ? sellerCta.href : "#formulaire-vendeur"}
                   className="btn btn-warning fw-bold"
                 >
-                  {hasSellerStatus ? sellerCta.label : "Créer ma boutique"}{" "}
+                  {isBackOfficeUser
+                    ? "Retour au back office"
+                    : hasSellerStatus
+                      ? sellerCta.label
+                      : "Créer ma boutique"}{" "}
                   <i className="bi bi-arrow-right ms-1" aria-hidden="true"></i>
                 </Link>
                 <Link href="/boutique" className="btn btn-outline-dark fw-bold">
@@ -294,10 +308,16 @@ export default async function DevenirVendeurPage() {
             <div className="col-lg-5">
               <span className={catalogStyles.eyebrow}>Demande vendeur</span>
               <h2 className={catalogStyles.sectionTitle}>
-                {hasSellerStatus ? "Votre statut vendeur FOOLY" : "Créer votre boutique FOOLY"}
+                {isBackOfficeUser
+                  ? "Compte vendeur séparé requis"
+                  : hasSellerStatus
+                    ? "Votre statut vendeur FOOLY"
+                    : "Créer votre boutique FOOLY"}
               </h2>
               <p className={catalogStyles.sectionDescription}>
-                {hasSellerStatus
+                {isBackOfficeUser
+                  ? "Votre compte back-office ne peut pas porter une boutique vendeur. Créez un autre compte pour déposer une demande vendeur."
+                  : hasSellerStatus
                   ? "Votre compte possède déjà un statut vendeur. Vous pouvez suivre votre demande ou accéder à votre espace vendeur."
                   : user
                   ? "Remplissez ce formulaire pour créer votre boutique sur Marché Fooly. Votre demande sera traitée par l'équipe FOOLY."
@@ -317,7 +337,37 @@ export default async function DevenirVendeurPage() {
             </div>
 
             <div className="col-lg-7">
-              {sellerProfile ? (
+              {isBackOfficeUser ? (
+                <div
+                  id="formulaire-vendeur"
+                  className={styles.formCard}
+                  style={{ textAlign: "center", padding: "3rem" }}
+                >
+                  <div
+                    style={{
+                      width: 72,
+                      height: 72,
+                      borderRadius: "50%",
+                      background: "var(--mf-dark)",
+                      display: "grid",
+                      placeItems: "center",
+                      margin: "0 auto 1.25rem",
+                      fontSize: "2rem",
+                      color: "#ffffff",
+                    }}
+                  >
+                    <i className="bi bi-shield-lock" aria-hidden="true"></i>
+                  </div>
+                  <h3 className="h4 fw-bold mb-2">Utilisez un compte vendeur séparé</h3>
+                  <p className="text-secondary mb-4">
+                    Ce compte sert au back office. Pour ouvrir une boutique, créez un
+                    compte vendeur séparé avec un autre email et un autre téléphone.
+                  </p>
+                  <Link href="/admin" className="btn btn-warning fw-bold">
+                    Retour au back office
+                  </Link>
+                </div>
+              ) : sellerProfile ? (
                 <div
                   id="formulaire-vendeur"
                   className={styles.formCard}

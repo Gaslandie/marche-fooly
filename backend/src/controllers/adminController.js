@@ -38,6 +38,10 @@ const User = require("../models/User");
 const SellerProfile = require("../models/SellerProfile");
 const Product = require("../models/Product");
 const Order = require("../models/Order");
+const {
+  BACKOFFICE_ROLES,
+  BACKOFFICE_SELLER_CONFLICT_MESSAGE,
+} = require("../models/shared/constants");
 
 const DEFAULT_LIMIT = 50;
 
@@ -213,6 +217,25 @@ const updateSellerStatus = async (req, res, next) => {
 
     const target = req.body.status; // approved | rejected | suspended
 
+    if (target === "approved") {
+      const profileUser = await User.findById(profile.user).select("role");
+      if (!profileUser) {
+        return res.status(404).json({
+          success: false,
+          message: "Utilisateur vendeur introuvable",
+          data: null,
+        });
+      }
+
+      if (BACKOFFICE_ROLES.includes(profileUser.role)) {
+        return res.status(409).json({
+          success: false,
+          message: BACKOFFICE_SELLER_CONFLICT_MESSAGE,
+          data: null,
+        });
+      }
+    }
+
     profile.status = target;
     if (target === "approved") {
       profile.approvedAt = new Date();
@@ -266,6 +289,24 @@ const updateUserRole = async (req, res, next) => {
     }
 
     const targetRole = req.body.role;
+    if (targetRole === "admin" || targetRole === "staff") {
+      const conflictingSellerProfile = await SellerProfile.findOne({
+        user: targetUser._id,
+        status: { $in: ["pending", "approved"] },
+      })
+        .select("_id status")
+        .lean();
+
+      if (conflictingSellerProfile) {
+        return res.status(409).json({
+          success: false,
+          message:
+            "Ce compte possède déjà une fiche vendeur active ou en attente. Supprimez ou suspendez cette fiche avant de lui donner un rôle back-office.",
+          data: { sellerStatus: conflictingSellerProfile.status },
+        });
+      }
+    }
+
     targetUser.role = targetRole;
     targetUser.status = "active";
     await targetUser.save();

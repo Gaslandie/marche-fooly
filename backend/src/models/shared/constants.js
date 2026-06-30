@@ -6,6 +6,8 @@ const USER_ROLES = ["customer", "seller", "staff", "admin", "owner"];
 const BACKOFFICE_ROLES = ["owner", "admin", "staff"];
 const ADMIN_OPERATION_ROLES = ["owner", "admin"];
 const TEAM_TARGET_ROLES = ["customer", "staff", "admin"];
+const BACKOFFICE_SELLER_CONFLICT_MESSAGE =
+  "Ce compte back-office ne peut pas devenir vendeur. Créez un compte vendeur séparé.";
 const ACCOUNT_STATUSES = ["pending", "active", "suspended"];
 const SELLER_STATUSES = ["pending", "approved", "rejected", "suspended"];
 const PRODUCT_STATUSES = ["draft", "active", "archived", "out_of_stock"];
@@ -27,6 +29,7 @@ module.exports = {
   BACKOFFICE_ROLES,
   ADMIN_OPERATION_ROLES,
   TEAM_TARGET_ROLES,
+  BACKOFFICE_SELLER_CONFLICT_MESSAGE,
   ACCOUNT_STATUSES,
   SELLER_STATUSES,
   PRODUCT_STATUSES,

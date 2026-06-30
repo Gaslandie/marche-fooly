@@ -36,6 +36,10 @@
 
 const SellerProfile = require("../models/SellerProfile");
 const {
+  BACKOFFICE_ROLES,
+  BACKOFFICE_SELLER_CONFLICT_MESSAGE,
+} = require("../models/shared/constants");
+const {
   UPDATE_SELLER_ME_ALLOWED_FIELDS,
 } = require("../validators/sellerValidators");
 
@@ -99,6 +103,14 @@ const toPublicSellerProfile = (doc) => ({
 const apply = async (req, res, next) => {
   try {
     const user = req.user;
+
+    if (BACKOFFICE_ROLES.includes(user.role)) {
+      return res.status(403).json({
+        success: false,
+        message: BACKOFFICE_SELLER_CONFLICT_MESSAGE,
+        data: null,
+      });
+    }
 
     const existing = await SellerProfile.findOne({ user: user._id })
       .select("_id status")

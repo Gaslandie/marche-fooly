@@ -3,9 +3,7 @@
  *
  * Role exact du fichier:
  *   Inserer ou mettre a jour les categories initiales de la marketplace.
- *   La liste reprend EXACTEMENT les 14 categories deja definies cote front
- *   dans frontend/src/data/categories.ts pour eviter toute dissonance
- *   front/back (slugs, noms et descriptions sont alignes).
+ *   La liste definit les categories officielles exposees par l'API.
  *
  * Ou il est utilise:
  *   - Manuellement: `node src/scripts/seedCategories.js` depuis backend/
@@ -50,7 +48,7 @@ const mongoose = require("mongoose");
 const Category = require("../models/Category");
 const { slugify } = require("../utils/slugify");
 
-// Liste alignee sur frontend/src/data/categories.ts (14 entrees).
+// Liste officielle des categories racines.
 // L'ordre du tableau definit le sortOrder (index * 10).
 const SEED_CATEGORIES = [
   {
@@ -75,6 +73,11 @@ const SEED_CATEGORIES = [
   {
     name: "Alimentation",
     description: "Produits du quotidien et offres alimentaires locales.",
+  },
+  {
+    name: "Divers & bonnes affaires",
+    description:
+      "Articles varies, lots et produits pratiques proposes par les vendeurs.",
   },
   {
     name: "Automobile",

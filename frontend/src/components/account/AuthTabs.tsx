@@ -58,11 +58,13 @@ export default function AuthTabs() {
   const [loginData, setLoginData] = useState(EMPTY_LOGIN);
   const [loginStatus, setLoginStatus] = useState<Status>("idle");
   const [loginMessage, setLoginMessage] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
 
   // --- État du formulaire d'inscription ---
   const [registerData, setRegisterData] = useState(EMPTY_REGISTER);
   const [registerStatus, setRegisterStatus] = useState<Status>("idle");
   const [registerMessage, setRegisterMessage] = useState("");
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
   const loginLoading = loginStatus === "loading";
   const registerLoading = registerStatus === "loading";
@@ -189,20 +191,39 @@ export default function AuthTabs() {
             <label className={styles.formLabel} htmlFor="login-password">
               Mot de passe
             </label>
-            <input
-              id="login-password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              className={styles.formInput}
-              placeholder="••••••••"
-              value={loginData.password}
-              onChange={(e) =>
-                setLoginData({ ...loginData, password: e.target.value })
-              }
-              required
-              disabled={loginLoading}
-            />
+            <div className={styles.passwordField}>
+              <input
+                id="login-password"
+                name="password"
+                type={showLoginPassword ? "text" : "password"}
+                autoComplete="current-password"
+                className={`${styles.formInput} ${styles.passwordInput}`}
+                placeholder="••••••••"
+                value={loginData.password}
+                onChange={(e) =>
+                  setLoginData({ ...loginData, password: e.target.value })
+                }
+                required
+                disabled={loginLoading}
+              />
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() => setShowLoginPassword((visible) => !visible)}
+                aria-label={
+                  showLoginPassword
+                    ? "Masquer le mot de passe"
+                    : "Afficher le mot de passe"
+                }
+                aria-pressed={showLoginPassword}
+                disabled={loginLoading}
+              >
+                <i
+                  className={`bi ${showLoginPassword ? "bi-eye-slash" : "bi-eye"}`}
+                  aria-hidden="true"
+                ></i>
+              </button>
+            </div>
 
             <div className="mb-4"></div>
 
@@ -347,21 +368,40 @@ export default function AuthTabs() {
             <label className={styles.formLabel} htmlFor="reg-password">
               Mot de passe
             </label>
-            <input
-              id="reg-password"
-              name="password"
-              type="password"
-              autoComplete="new-password"
-              className={styles.formInput}
-              placeholder="Minimum 8 caractères"
-              value={registerData.password}
-              onChange={(e) =>
-                setRegisterData({ ...registerData, password: e.target.value })
-              }
-              required
-              minLength={8}
-              disabled={registerLoading}
-            />
+            <div className={styles.passwordField}>
+              <input
+                id="reg-password"
+                name="password"
+                type={showRegisterPassword ? "text" : "password"}
+                autoComplete="new-password"
+                className={`${styles.formInput} ${styles.passwordInput}`}
+                placeholder="Minimum 8 caractères"
+                value={registerData.password}
+                onChange={(e) =>
+                  setRegisterData({ ...registerData, password: e.target.value })
+                }
+                required
+                minLength={8}
+                disabled={registerLoading}
+              />
+              <button
+                type="button"
+                className={styles.passwordToggle}
+                onClick={() => setShowRegisterPassword((visible) => !visible)}
+                aria-label={
+                  showRegisterPassword
+                    ? "Masquer le mot de passe"
+                    : "Afficher le mot de passe"
+                }
+                aria-pressed={showRegisterPassword}
+                disabled={registerLoading}
+              >
+                <i
+                  className={`bi ${showRegisterPassword ? "bi-eye-slash" : "bi-eye"}`}
+                  aria-hidden="true"
+                ></i>
+              </button>
+            </div>
 
             <div className="form-check mb-4 mt-3">
               <input

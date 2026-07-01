@@ -7,6 +7,7 @@ const {
   authRateLimiter,
   generalApiRateLimiter,
   publicFormRateLimiter,
+  uploadRateLimiter,
 } = require("./middlewares/rateLimiters");
 const healthRoutes = require("./routes/healthRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -18,6 +19,7 @@ const favoriteRoutes = require("./routes/favoriteRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
+const mediaRoutes = require("./routes/mediaRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const newsletterRoutes = require("./routes/newsletterRoutes");
 
@@ -44,14 +46,12 @@ app.use(
   }),
 );
 
-// Upload images produit: limite JSON dediee, car le frontend transmet
-// temporairement l'image en data URL avant stockage Cloudinary.
-app.use(
-  "/api/uploads",
-  generalApiRateLimiter,
-  express.json({ limit: "7mb" }),
-  uploadRoutes,
-);
+// Upload images produit: multipart en memoire, optimise puis stocke en GridFS.
+app.use("/api/uploads", uploadRateLimiter, uploadRoutes);
+
+// Images publiques: pas de rate-limit API general pour ne pas penaliser
+// l'affichage catalogue. Le cache HTTP long limite les lectures repetees.
+app.use("/api/media", mediaRoutes);
 
 app.use(express.json());
 

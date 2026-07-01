@@ -62,6 +62,11 @@ const {
   PUBLIC_PRODUCT_STATUSES,
   escapeRegex,
 } = require("../validators/productValidators");
+const {
+  ProductImageError,
+  markProductImageAttached,
+  verifyProductImageForSeller,
+} = require("../services/productImageService");
 
 // Helper: serialise le ref soit comme objet (si populated) soit comme
 // string ObjectId, soit null. Garde un contrat API stable.
@@ -85,6 +90,21 @@ const categoryShape = (c) => ({
   name: c.name,
 });
 
+const coverImageShape = (coverImage) => {
+  if (!coverImage) return null;
+  return {
+    largeFileId: coverImage.largeFileId?.toString?.() || "",
+    thumbFileId: coverImage.thumbFileId?.toString?.() || "",
+    largeUrl: coverImage.largeUrl || "",
+    thumbUrl: coverImage.thumbUrl || "",
+    version: coverImage.version || "",
+    width: coverImage.width || 0,
+    height: coverImage.height || 0,
+    mimeType: coverImage.mimeType || "",
+    bytes: coverImage.bytes || 0,
+  };
+};
+
 const toPublicProduct = (doc) => ({
   id: doc._id.toString(),
   name: doc.name,
@@ -102,6 +122,7 @@ const toPublicProduct = (doc) => ({
     isPrimary: !!img.isPrimary,
   })),
   coverImageUrl: doc.coverImageUrl || "",
+  coverImage: coverImageShape(doc.coverImage),
   status: doc.status,
   tags: doc.tags || [],
   deliveryFee: doc.deliveryFee || 0,
@@ -167,6 +188,26 @@ const reject404 = (res) =>
   res
     .status(404)
     .json({ success: false, message: "Produit introuvable", data: null });
+
+const applyCoverImagePayload = async (payload, sellerId) => {
+  if (!Object.prototype.hasOwnProperty.call(payload, "coverImage")) {
+    return null;
+  }
+
+  if (!payload.coverImage) {
+    payload.coverImage = null;
+    payload.coverImageUrl = "";
+    return null;
+  }
+
+  const coverImage = await verifyProductImageForSeller(
+    payload.coverImage,
+    sellerId,
+  );
+  payload.coverImage = coverImage;
+  payload.coverImageUrl = coverImage.largeUrl;
+  return coverImage;
+};
 
 // --- Listing public --------------------------------------------------------
 
@@ -333,7 +374,19 @@ const create = async (req, res, next) => {
     payload.seller = req.sellerProfile._id;
     payload.currency = "GNF";
 
+    const pendingCoverImage = await applyCoverImagePayload(
+      payload,
+      req.sellerProfile._id,
+    );
+
     const created = await Product.create(payload);
+    if (pendingCoverImage) {
+      await markProductImageAttached(created.coverImage, created._id).catch(
+        (error) => {
+          console.warn("Attachement image produit:", error?.message || error);
+        },
+      );
+    }
 
     return res.status(201).json({
       success: true,
@@ -341,6 +394,13 @@ const create = async (req, res, next) => {
       data: { product: toPublicProduct(created) },
     });
   } catch (error) {
+    if (error instanceof ProductImageError) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message,
+        data: null,
+      });
+    }
     const dup = mapDuplicateKey(error);
     if (dup) return res.status(dup.status).json(dup.body);
     return next(error);
@@ -397,14 +457,20 @@ const update = async (req, res, next) => {
       }
     }
 
+    const incoming = { ...req.body };
+    const pendingCoverImage = await applyCoverImagePayload(
+      incoming,
+      product.seller,
+    );
+
     // Whitelist effective selon le role.
     const allowed = isAdmin
       ? [...UPDATE_PRODUCT_ALLOWED_FIELDS, "isFeatured"]
       : UPDATE_PRODUCT_ALLOWED_FIELDS;
 
     for (const field of allowed) {
-      if (Object.prototype.hasOwnProperty.call(req.body, field)) {
-        product[field] = req.body[field];
+      if (Object.prototype.hasOwnProperty.call(incoming, field)) {
+        product[field] = incoming[field];
       }
     }
 
@@ -414,6 +480,13 @@ const update = async (req, res, next) => {
     product.currency = "GNF";
 
     await product.save();
+    if (pendingCoverImage) {
+      await markProductImageAttached(product.coverImage, product._id).catch(
+        (error) => {
+          console.warn("Attachement image produit:", error?.message || error);
+        },
+      );
+    }
 
     return res.status(200).json({
       success: true,
@@ -421,6 +494,13 @@ const update = async (req, res, next) => {
       data: { product: toPublicProduct(product) },
     });
   } catch (error) {
+    if (error instanceof ProductImageError) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message,
+        data: null,
+      });
+    }
     const ver = mapVersionError(error);
     if (ver) return res.status(ver.status).json(ver.body);
     const dup = mapDuplicateKey(error);

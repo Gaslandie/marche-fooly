@@ -74,6 +74,18 @@ export type ApiProductImage = {
   isPrimary: boolean;
 };
 
+export type ApiProductCoverImage = {
+  largeFileId: string;
+  thumbFileId: string;
+  largeUrl: string;
+  thumbUrl: string;
+  version: string;
+  width: number;
+  height: number;
+  mimeType: string;
+  bytes: number;
+};
+
 /** Référence catégorie « peuplée » dans un produit (categoryShape backend). */
 export type ApiCategoryRef = {
   id: string;
@@ -108,6 +120,7 @@ export type ApiProduct = {
   sku: string;
   images: ApiProductImage[];
   coverImageUrl: string;
+  coverImage: ApiProductCoverImage | null;
   status: string;
   tags: string[];
   deliveryFee: number;

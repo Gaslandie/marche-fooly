@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { backendJson, readAuthToken } from "@/lib/auth";
+import { getBackendUrl, readAuthToken } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -12,23 +12,43 @@ const ALLOWED_IMAGE_MIME_TYPES = new Set([
 ]);
 
 type BackendUploadBody = {
+  success?: boolean;
   message?: string;
   data?: {
     image?: {
+      id?: string;
       url?: string;
-      publicId?: string;
+      largeUrl?: string;
+      thumbUrl?: string;
+      fileId?: string;
+      largeFileId?: string;
+      thumbFileId?: string;
+      version?: string;
       width?: number | null;
       height?: number | null;
       format?: string;
       bytes?: number;
       mimeType?: string;
+      sourceMimeType?: string;
     };
   };
 };
+type BackendImage = NonNullable<NonNullable<BackendUploadBody["data"]>["image"]>;
 
-function toDataUrl(file: File, buffer: ArrayBuffer) {
-  const base64 = Buffer.from(buffer).toString("base64");
-  return `data:${file.type};base64,${base64}`;
+function resolveBackendMediaUrl(value: string | undefined) {
+  if (!value) return value;
+  if (value.startsWith("/api/")) return `${getBackendUrl()}${value}`;
+  return value;
+}
+
+function normalizeImage(image?: BackendImage) {
+  if (!image || typeof image !== "object") return null;
+  return {
+    ...image,
+    url: resolveBackendMediaUrl(image.url),
+    largeUrl: resolveBackendMediaUrl(image.largeUrl),
+    thumbUrl: resolveBackendMediaUrl(image.thumbUrl),
+  };
 }
 
 export async function POST(request: Request) {
@@ -80,28 +100,18 @@ export async function POST(request: Request) {
     );
   }
 
-  let imageDataUrl: string;
-  try {
-    imageDataUrl = toDataUrl(fileEntry, await fileEntry.arrayBuffer());
-  } catch {
-    return NextResponse.json(
-      { success: false, message: "Lecture de l'image impossible.", image: null },
-      { status: 400 },
-    );
-  }
+  const backendForm = new FormData();
+  backendForm.append("image", fileEntry, fileEntry.name);
 
-  let result: { status: number; ok: boolean; body: unknown };
+  let res: Response;
   try {
-    result = await backendJson("/api/uploads/product-image", {
+    res = await fetch(`${getBackendUrl()}/api/uploads/product-image`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        imageDataUrl,
-        fileName: fileEntry.name,
-      }),
+      body: backendForm,
+      cache: "no-store",
     });
   } catch {
     return NextResponse.json(
@@ -114,15 +124,15 @@ export async function POST(request: Request) {
     );
   }
 
-  const body = result.body as BackendUploadBody | null;
-  if (!result.ok) {
+  const body = (await res.json().catch(() => null)) as BackendUploadBody | null;
+  if (!res.ok) {
     return NextResponse.json(
       {
         success: false,
         message: body?.message ?? "Upload image impossible.",
         image: null,
       },
-      { status: result.status },
+      { status: res.status },
     );
   }
 
@@ -130,7 +140,7 @@ export async function POST(request: Request) {
     {
       success: true,
       message: body?.message ?? "Image produit téléversée",
-      image: body?.data?.image ?? null,
+      image: normalizeImage(body?.data?.image),
     },
     { status: 201 },
   );

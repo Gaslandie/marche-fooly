@@ -57,6 +57,13 @@ function getApiBaseUrl(): string {
   return raw.replace(/\/+$/, "");
 }
 
+/** Convertit une URL media backend relative en URL absolue utilisable par le navigateur. */
+export function resolveApiMediaUrl(value: string | null | undefined): string {
+  if (!value) return "";
+  if (value.startsWith("/api/")) return `${getApiBaseUrl()}${value}`;
+  return value;
+}
+
 /** Durée de revalidation du cache (secondes). */
 const REVALIDATE_SECONDS = 60;
 
@@ -157,7 +164,7 @@ export function toProductItem(api: ApiProduct): ProductItem {
     stockQuantity: api.stockQuantity,
     inStock,
     sku: api.sku,
-    coverImageUrl: api.coverImageUrl,
+    coverImageUrl: resolveApiMediaUrl(api.coverImageUrl),
     deliveryFee: api.deliveryFee,
     isFreeDelivery: api.isFreeDelivery,
     pickupAddress: api.pickupAddress ?? null,

@@ -11,6 +11,7 @@
     "start": "node src/server.js",
     "check:db": "node src/utils/checkDatabaseConnection.js",
     "admin:restore": "node src/scripts/restoreAdminUser.js",
+    "images:cleanup": "node src/scripts/cleanupOrphanProductImages.js",
     "owner:promote": "node src/scripts/promoteOwner.js",
     "test": "echo \"No tests configured\""
   },
@@ -25,10 +26,13 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.1",
     "express-validator": "^7.3.2",
+    "file-type": "^22.0.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.2",
-    "nodemailer": "^9.0.3"
+    "multer": "^2.2.0",
+    "nodemailer": "^9.0.3",
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

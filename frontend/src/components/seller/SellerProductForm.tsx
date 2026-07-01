@@ -19,7 +19,7 @@
  *   - `currency` n'est pas envoyée (forcée à GNF côté serveur).
  *   - `status` limité au MVP : "active" / "out_of_stock".
  *   - L'upload image passe par /api/uploads/product-image et renseigne
- *     `coverImageUrl` avec l'URL HTTPS retournée par le backend.
+ *     `coverImage` avec la reference GridFS retournee par le backend.
  *   - L'ownership final est garanti par le backend (PATCH sur un produit
  *     d'un autre vendeur -> 403/404 relayé en message inline).
  *
@@ -44,10 +44,17 @@ export type SellerProductFormValues = {
   price: string;
   stockQuantity: string;
   coverImageUrl: string;
+  coverImage: ProductCoverImageInput | null;
   deliveryFee: string;
   isFreeDelivery: boolean;
   status: "active" | "out_of_stock";
   category: string;
+};
+
+export type ProductCoverImageInput = {
+  largeFileId: string;
+  thumbFileId: string;
+  version: string;
 };
 
 type Props = {
@@ -64,6 +71,7 @@ const EMPTY_VALUES: SellerProductFormValues = {
   price: "",
   stockQuantity: "",
   coverImageUrl: "",
+  coverImage: null,
   deliveryFee: "0",
   isFreeDelivery: false,
   status: "active",
@@ -81,7 +89,13 @@ const ALLOWED_IMAGE_MIME_TYPES = new Set([
 type UploadImageResponse = {
   success?: boolean;
   message?: string;
-  image?: { url?: string } | null;
+  image?: {
+    url?: string;
+    largeUrl?: string;
+    largeFileId?: string;
+    thumbFileId?: string;
+    version?: string;
+  } | null;
 };
 
 export default function SellerProductForm({
@@ -139,13 +153,27 @@ export default function SellerProductForm({
         | UploadImageResponse
         | null;
 
-      if (!res.ok || !body?.success || !body.image?.url) {
+      const uploaded = body?.image;
+      const previewUrl = uploaded?.largeUrl || uploaded?.url || "";
+      if (
+        !res.ok ||
+        !body?.success ||
+        !previewUrl ||
+        !uploaded?.largeFileId ||
+        !uploaded.thumbFileId ||
+        !uploaded.version
+      ) {
         setError(body?.message ?? "Upload image impossible.");
         return;
       }
 
-      update("coverImageUrl", body.image.url);
-      setImagePreviewUrl(body.image.url);
+      update("coverImage", {
+        largeFileId: uploaded.largeFileId,
+        thumbFileId: uploaded.thumbFileId,
+        version: uploaded.version,
+      });
+      update("coverImageUrl", previewUrl);
+      setImagePreviewUrl(previewUrl);
     } catch {
       setError("Service d'upload indisponible. Réessayez plus tard.");
     } finally {
@@ -177,18 +205,21 @@ export default function SellerProductForm({
 
   // Corps strictement whitelisté (le Route Handler re-sanitise aussi).
   function buildBody() {
-    return {
+    const payload: Record<string, unknown> = {
       name: values.name.trim(),
       shortDescription: values.shortDescription.trim(),
       description: values.description.trim(),
       price: Number(values.price),
       stockQuantity: Number(values.stockQuantity),
-      coverImageUrl: values.coverImageUrl.trim(),
       deliveryFee: Number(values.deliveryFee || 0),
       isFreeDelivery: values.isFreeDelivery,
       status: values.status,
       category: values.category,
     };
+    if (values.coverImage) {
+      payload.coverImage = values.coverImage;
+    }
+    return payload;
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -375,7 +406,7 @@ export default function SellerProductForm({
         </div>
 
         <div className="col-12">
-          <label className="form-label fw-semibold" htmlFor="p-cover">
+          <label className="form-label fw-semibold" htmlFor="p-cover-file">
             Image du produit
           </label>
           <input
@@ -414,22 +445,6 @@ export default function SellerProductForm({
               }}
             />
           )}
-          <input
-            id="p-cover"
-            type="url"
-            className="form-control"
-            placeholder="URL générée automatiquement après upload"
-            value={values.coverImageUrl}
-            onChange={(e) => {
-              update("coverImageUrl", e.target.value);
-              setImagePreviewUrl(e.target.value.trim());
-            }}
-            disabled={submitting || uploadingImage}
-          />
-          <div className="form-text">
-            Vous pouvez aussi coller une URL d&apos;image HTTPS si l&apos;image
-            est déjà hébergée ailleurs.
-          </div>
         </div>
 
         <div className="col-12">

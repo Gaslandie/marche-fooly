@@ -57,6 +57,7 @@ function toFormValues(product: ApiProduct): SellerProductFormValues {
     price: String(product.price ?? ""),
     stockQuantity: String(product.stockQuantity ?? ""),
     coverImageUrl: product.coverImageUrl ?? "",
+    coverImage: null,
     deliveryFee: String(product.deliveryFee ?? 0),
     isFreeDelivery: !!product.isFreeDelivery,
     // Statut borné au MVP (un éventuel draft/archived retombe sur "active").

@@ -58,6 +58,28 @@ const generalApiRateLimiter = rateLimit({
 });
 
 /**
+ * Rate limiter dedie aux uploads images produit.
+ *
+ * - windowMs: 15 minutes
+ * - limit: 30 uploads par IP par fenetre
+ * - Objectif: proteger la memoire et le stockage sans gener un vendeur
+ *   normal qui ajoute quelques produits.
+ */
+const uploadRateLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 30,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      success: false,
+      message: "Trop d'uploads. Reessayez dans quelques minutes.",
+      data: null,
+    });
+  },
+});
+
+/**
  * Rate limiter strict pour les formulaires PUBLICS sans authentification
  * (POST /api/contact, POST /api/newsletter). Ces routes sont des cibles
  * classiques de bots/spam car elles ne demandent ni JWT ni CAPTCHA au MVP.
@@ -90,4 +112,5 @@ module.exports = {
   authRateLimiter,
   generalApiRateLimiter,
   publicFormRateLimiter,
+  uploadRateLimiter,
 };

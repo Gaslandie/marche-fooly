@@ -11,6 +11,76 @@ const { imageSchema, addressSchema } = require("./shared/subschemas");
 const { slugify } = require("../utils/slugify");
 
 const { ObjectId } = mongoose.Schema.Types;
+const INTERNAL_PRODUCT_IMAGE_URL_REGEX =
+  /^\/api\/media\/images\/[a-f0-9]{24}\?v=[A-Za-z0-9._-]{1,120}$/;
+
+const productCoverImageSchema = new mongoose.Schema(
+  {
+    largeFileId: {
+      type: ObjectId,
+      default: null,
+    },
+    thumbFileId: {
+      type: ObjectId,
+      default: null,
+    },
+    largeUrl: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    thumbUrl: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    version: {
+      type: String,
+      trim: true,
+      maxlength: 120,
+      default: "",
+    },
+    contentHash: {
+      type: String,
+      trim: true,
+      maxlength: 128,
+      default: "",
+    },
+    width: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    height: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    mimeType: {
+      type: String,
+      trim: true,
+      default: "image/webp",
+    },
+    bytes: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    uploadedAt: {
+      type: Date,
+      default: null,
+    },
+  },
+  createSchemaOptions({ _id: false }),
+);
+
+const productCoverUrlValidator = {
+  validator: (value) =>
+    !value ||
+    optionalUrlValidator.validator(value) ||
+    INTERNAL_PRODUCT_IMAGE_URL_REGEX.test(value),
+  message: "URL image produit invalide",
+};
 
 /**
  * Produit vendable sur la marketplace.
@@ -127,8 +197,12 @@ const productSchema = new mongoose.Schema(
     coverImageUrl: {
       type: String,
       trim: true,
-      validate: optionalUrlValidator,
+      validate: productCoverUrlValidator,
       default: "",
+    },
+    coverImage: {
+      type: productCoverImageSchema,
+      default: null,
     },
     isFeatured: {
       type: Boolean,

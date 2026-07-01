@@ -1,6 +1,9 @@
 const express = require("express");
 
-const { uploadProductImage } = require("../controllers/uploadController");
+const {
+  parseProductImageUpload,
+  uploadProductImage,
+} = require("../controllers/uploadController");
 const { authenticate } = require("../middlewares/authenticate");
 const {
   requireApprovedSeller,
@@ -12,6 +15,7 @@ router.post(
   "/product-image",
   authenticate,
   requireApprovedSeller,
+  parseProductImageUpload,
   uploadProductImage,
 );
 

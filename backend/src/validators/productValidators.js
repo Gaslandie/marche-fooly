@@ -75,6 +75,7 @@ const CREATE_PRODUCT_ALLOWED_FIELDS = [
   "sku",
   "images",
   "coverImageUrl",
+  "coverImage",
   "status",
   "tags",
   "deliveryFee",
@@ -204,6 +205,27 @@ const coverImageUrlOptional = body("coverImageUrl")
   .matches(HTTP_URL_REGEX)
   .withMessage("coverImageUrl: l'URL doit commencer par http:// ou https://");
 
+const coverImageOptional = body("coverImage")
+  .optional({ values: "null" })
+  .custom((value) => {
+    if (!value || typeof value !== "object" || Array.isArray(value)) {
+      throw new Error("coverImage: objet attendu");
+    }
+    if (!isObjectIdString(value.largeFileId || value.fileId)) {
+      throw new Error("coverImage.largeFileId: ObjectId valide requis");
+    }
+    if (!isObjectIdString(value.thumbFileId)) {
+      throw new Error("coverImage.thumbFileId: ObjectId valide requis");
+    }
+    if (
+      typeof value.version !== "string" ||
+      !/^[A-Za-z0-9._-]{1,120}$/.test(value.version.trim())
+    ) {
+      throw new Error("coverImage.version: version valide requise");
+    }
+    return true;
+  });
+
 const categoryRequired = body("category")
   .custom(isObjectIdString)
   .withMessage("category: ObjectId valide requis");
@@ -301,6 +323,7 @@ const createProductValidators = [
   skuOptional,
   ...imagesValidators,
   coverImageUrlOptional,
+  coverImageOptional,
   statusInputRequiredOptional(false),
   ...tagsValidators,
   intNonNegativeOptional("deliveryFee", "deliveryFee"),
@@ -320,6 +343,7 @@ const updateProductValidators = [
   skuOptional,
   ...imagesValidators,
   coverImageUrlOptional,
+  coverImageOptional,
   statusInputRequiredOptional(true),
   ...tagsValidators,
   intNonNegativeOptional("deliveryFee", "deliveryFee"),

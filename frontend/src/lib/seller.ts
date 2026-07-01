@@ -33,6 +33,7 @@
  */
 
 import { backendJson, readAuthToken } from "@/lib/auth";
+import { resolveApiMediaUrl } from "@/lib/api";
 import type { OrderPagination, PublicOrder } from "@/lib/orders";
 import type { ApiProduct } from "@/types/api";
 
@@ -113,7 +114,10 @@ export async function getSellerProducts(
     );
     if (!result.ok) return [];
     const body = result.body as { data?: { items?: ApiProduct[] } } | null;
-    return body?.data?.items ?? [];
+    return (body?.data?.items ?? []).map((product) => ({
+      ...product,
+      coverImageUrl: resolveApiMediaUrl(product.coverImageUrl),
+    }));
   } catch {
     return [];
   }
@@ -161,7 +165,7 @@ export const SELLER_PRODUCT_ALLOWED_FIELDS = [
   "price",
   "stockQuantity",
   "sku",
-  "coverImageUrl",
+  "coverImage",
   "deliveryFee",
   "isFreeDelivery",
   "status",

@@ -10,11 +10,22 @@ type ProductCardProps = {
 };
 
 export default function ProductCard({ product, view = "grid" }: ProductCardProps) {
+  const hasImage = Boolean(product.coverImageUrl);
+
   return (
     <article className={[styles.productCard, view === "list" ? styles.productCardList : ""].filter(Boolean).join(" ")}>
       <div className={[styles.productMedia, view === "list" ? styles.productMediaList : ""].filter(Boolean).join(" ")}>
         {product.badge ? <span className={styles.productBadge}>{product.badge}</span> : null}
-        <i className={product.icon} aria-hidden="true"></i>
+        {hasImage ? (
+          <img
+            src={product.coverImageUrl}
+            alt={product.name}
+            className={styles.productImage}
+            loading="lazy"
+          />
+        ) : (
+          <i className={product.icon} aria-hidden="true"></i>
+        )}
       </div>
 
       <div className={styles.productBody}>

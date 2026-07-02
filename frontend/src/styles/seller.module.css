@@ -104,6 +104,31 @@
   flex-shrink: 0;
 }
 
+.productRowIdentity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 220px;
+}
+
+.productThumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: #fff3e5;
+  color: var(--mf-orange);
+}
+
+.productThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* ── Benefit & step cards ──────────────────────────────────── */
 .benefitCard {
   background: #ffffff;

@@ -23,6 +23,7 @@ import Link from "next/link";
 import DeleteProductButton from "@/components/seller/DeleteProductButton";
 import type { ApiProduct } from "@/types/api";
 import { formatPrice } from "@/utils/formatPrice";
+import styles from "@/styles/seller.module.css";
 
 type Props = {
   products: ApiProduct[];
@@ -80,12 +81,27 @@ export default function SellerProductList({ products }: Props) {
               return (
                 <tr key={product.id}>
                   <td>
-                    <div className="fw-semibold">{product.name}</div>
-                    {product.sku && (
-                      <div className="text-secondary small">
-                        SKU {product.sku}
+                    <div className={styles.productRowIdentity}>
+                      <div className={styles.productThumb}>
+                        {product.coverImageUrl ? (
+                          <img
+                            src={product.coverImageUrl}
+                            alt={product.name}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <i className="bi bi-box-seam" aria-hidden="true"></i>
+                        )}
                       </div>
-                    )}
+                      <div>
+                        <div className="fw-semibold">{product.name}</div>
+                        {product.sku && (
+                          <div className="text-secondary small">
+                            SKU {product.sku}
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </td>
                   <td>{formatPrice(product.price, product.currency)}</td>
                   <td>{product.stockQuantity}</td>

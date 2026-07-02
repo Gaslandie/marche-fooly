@@ -71,7 +71,16 @@ export default function ProductDetails({ product }: Props) {
               {product.badge && (
                 <span className={styles.galleryBadge}>{product.badge}</span>
               )}
-              <i className={`${product.icon} ${styles.mainImageIcon}`} aria-hidden="true"></i>
+              {product.coverImageUrl ? (
+                <img
+                  src={product.coverImageUrl}
+                  alt={product.name}
+                  className={styles.mainProductImage}
+                  loading="eager"
+                />
+              ) : (
+                <i className={`${product.icon} ${styles.mainImageIcon}`} aria-hidden="true"></i>
+              )}
             </div>
           </div>
 

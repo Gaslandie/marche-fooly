@@ -10,6 +10,8 @@ type Props = {
 };
 
 export default function WishlistItem({ product }: Props) {
+  const hasImage = Boolean(product.coverImageUrl);
+
   return (
     <article className={styles.wishlistCard}>
       <div className={styles.wishlistMedia}>
@@ -20,7 +22,16 @@ export default function WishlistItem({ product }: Props) {
           productId={product.productId}
           className={styles.wishlistRemove}
         />
-        <i className={product.icon} aria-hidden="true"></i>
+        {hasImage ? (
+          <img
+            src={product.coverImageUrl}
+            alt={product.name}
+            className={styles.wishlistImage}
+            loading="lazy"
+          />
+        ) : (
+          <i className={product.icon} aria-hidden="true"></i>
+        )}
       </div>
 
       <span className={styles.stockPill}>

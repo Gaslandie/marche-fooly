@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import ProductCard from "@/components/product/ProductCard";
 import WishlistItem from "@/components/wishlist/WishlistItem";
 import WishlistToolbar from "@/components/wishlist/WishlistToolbar";
-import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { getProducts } from "@/lib/api";
 import { getCurrentUser } from "@/lib/auth";
 import { getMyFavorites } from "@/lib/favorites";
@@ -211,13 +210,6 @@ export default async function FavorisPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ── Newsletter ────────────────────────────────────────────── */}
-      <section className="py-5" style={{ background: "var(--mf-light)" }}>
-        <div className="container">
-          <NewsletterBanner />
         </div>
       </section>
     </>

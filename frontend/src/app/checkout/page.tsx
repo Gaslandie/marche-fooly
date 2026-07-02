@@ -3,7 +3,7 @@
  *
  * Rôle du fichier :
  *   Page de finalisation de commande. Protégée côté serveur :
- *     - utilisateur non connecté -> redirect("/mon-compte")
+ *     - utilisateur non connecté -> redirect("/mon-compte?retour=/checkout")
  *   Pré-charge l'utilisateur et le passe au `CheckoutForm` (Client) qui
  *   se charge de la logique métier (panier via useCart, soumission via
  *   /api/orders).
@@ -21,7 +21,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
-import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { getCurrentUser } from "@/lib/auth";
 import styles from "@/styles/checkout.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
@@ -37,7 +36,7 @@ export const dynamic = "force-dynamic";
 export default async function CheckoutPage() {
   const user = await getCurrentUser();
   if (!user) {
-    redirect("/mon-compte");
+    redirect("/mon-compte?retour=/checkout");
   }
 
   return (
@@ -100,13 +99,6 @@ export default async function CheckoutPage() {
               <OrderSummary />
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ── Newsletter ────────────────────────────────────────────── */}
-      <section className="py-5" style={{ background: "var(--mf-light)" }}>
-        <div className="container">
-          <NewsletterBanner />
         </div>
       </section>
     </>

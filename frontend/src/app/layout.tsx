@@ -20,9 +20,12 @@ export const metadata: Metadata = {
   },
   description: `${siteConfig.name} — ${siteConfig.slogan}. Marketplace locale à ${siteConfig.location}.`,
   icons: {
-    icon: [{ url: "/images/logo/favicon_fooly.png", type: "image/png" }],
-    shortcut: "/images/logo/favicon_fooly.png",
-    apple: "/images/logo/favicon_fooly.png",
+    icon: [
+      { url: "/favicon.png", type: "image/png" },
+      { url: "/images/logo/favicon_fooly.png", type: "image/png" },
+    ],
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
 };
 

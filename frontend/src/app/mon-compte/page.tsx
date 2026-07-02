@@ -22,7 +22,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AuthTabs from "@/components/account/AuthTabs";
 import AccountSidebar from "@/components/account/AccountSidebar";
-import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { getCurrentUser } from "@/lib/auth";
 import { getMyFavoriteCount } from "@/lib/favorites";
 import { getMyOrderStats } from "@/lib/orders";
@@ -259,13 +258,6 @@ export default async function MonComptePage() {
               </div>
             </div>
           )}
-        </div>
-      </section>
-
-      {/* ── Newsletter ────────────────────────────────────────────── */}
-      <section className="py-5" style={{ background: "var(--mf-light)" }}>
-        <div className="container">
-          <NewsletterBanner />
         </div>
       </section>
     </>

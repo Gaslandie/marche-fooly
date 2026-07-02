@@ -26,7 +26,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import OrdersHistory from "@/components/orders/OrdersHistory";
-import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { getCurrentUser } from "@/lib/auth";
 import { getMyOrders } from "@/lib/orders";
 import { ORDER_STATUS_CLASS, ORDER_STATUS_LABEL } from "@/lib/orderStatus";
@@ -189,13 +188,6 @@ export default async function CommandesPage() {
               </Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* ── Newsletter ────────────────────────────────────────────── */}
-      <section className="py-5" style={{ background: "var(--mf-light)" }}>
-        <div className="container">
-          <NewsletterBanner />
         </div>
       </section>
     </>

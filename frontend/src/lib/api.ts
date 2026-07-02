@@ -116,6 +116,65 @@ function toCurrency(value: string): CurrencyCode {
   return value === "GNF" ? "GNF" : "GNF";
 }
 
+const CATEGORY_ICON_BY_SLUG: Record<string, string> = {
+  "telephones-accessoires": "bi bi-phone",
+  "maison-cuisine": "bi bi-house-heart",
+  electromenagers: "bi bi-tv",
+  alimentation: "bi bi-basket",
+  automobile: "bi bi-car-front",
+  "bebe-maternite": "bi bi-balloon-heart",
+  "vetements-femme": "bi bi-bag-heart",
+  "vetements-homme": "bi bi-person",
+  "sacs-bijoux": "bi bi-gem",
+  "beaute-soins": "bi bi-stars",
+  "meubles-decoration": "bi bi-lamp",
+  "sport-loisirs": "bi bi-bicycle",
+  "outils-bricolage": "bi bi-tools",
+  mixte: "bi bi-shop-window",
+  "tout-venant": "bi bi-shop-window",
+};
+
+function normalizeCategoryKey(value: string): string {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function categoryIcon(api: ApiCategory): string {
+  const mappedIcon = CATEGORY_ICON_BY_SLUG[api.slug];
+  if (mappedIcon) return mappedIcon;
+
+  const label = normalizeCategoryKey(`${api.slug} ${api.name}`);
+  if (label.includes("telephone") || label.includes("accessoire")) {
+    return "bi bi-phone";
+  }
+  if (label.includes("maison") || label.includes("cuisine")) {
+    return "bi bi-house-heart";
+  }
+  if (label.includes("electro")) return "bi bi-tv";
+  if (label.includes("aliment")) return "bi bi-basket";
+  if (label.includes("auto") || label.includes("voiture")) {
+    return "bi bi-car-front";
+  }
+  if (label.includes("bebe") || label.includes("maternite")) {
+    return "bi bi-balloon-heart";
+  }
+  if (label.includes("femme") || label.includes("mode")) {
+    return "bi bi-bag-heart";
+  }
+  if (label.includes("homme")) return "bi bi-person";
+  if (label.includes("bijou") || label.includes("sac")) return "bi bi-gem";
+  if (label.includes("beaute") || label.includes("soin")) return "bi bi-stars";
+  if (label.includes("meuble") || label.includes("decor")) return "bi bi-lamp";
+  if (label.includes("sport") || label.includes("loisir")) return "bi bi-bicycle";
+  if (label.includes("outil") || label.includes("bricol")) return "bi bi-tools";
+  if (label.includes("mixte") || label.includes("general")) {
+    return "bi bi-shop-window";
+  }
+  return "bi bi-grid-3x3-gap";
+}
+
 /** Extrait le slug d'une référence catégorie (objet peuplé ou string/null). */
 function refCategorySlug(category: ApiProduct["category"]): string {
   if (category && typeof category === "object") return category.slug;
@@ -184,7 +243,7 @@ export function toCategoryItem(api: ApiCategory): CategoryItem {
     name: api.name,
     shortDescription: api.description,
     description: api.description,
-    icon: "bi bi-grid-3x3-gap",
+    icon: categoryIcon(api),
     productCount: api.productCount ?? 0,
     featured: false,
   };

@@ -199,6 +199,36 @@ function refSellerSlug(seller: ApiProduct["seller"]): string {
   return "";
 }
 
+function toProductImages(api: ApiProduct): ProductItem["images"] {
+  const images = (api.images || [])
+    .map((image) => ({
+      url: resolveApiMediaUrl(image.url),
+      thumbUrl: resolveApiMediaUrl(image.thumbUrl || image.url),
+      altText: image.altText || api.name,
+      sortOrder: image.sortOrder || 0,
+      isPrimary: !!image.isPrimary,
+    }))
+    .filter((image) => Boolean(image.url))
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const coverUrl = resolveApiMediaUrl(api.coverImageUrl);
+  if (coverUrl && !images.some((image) => image.url === coverUrl)) {
+    images.unshift({
+      url: coverUrl,
+      thumbUrl: coverUrl,
+      altText: api.name,
+      sortOrder: -1,
+      isPrimary: images.length === 0,
+    });
+  }
+
+  return images.slice(0, 3).map((image, index) => ({
+    ...image,
+    sortOrder: index,
+    isPrimary: index === 0,
+  }));
+}
+
 /**
  * Convertit un produit API en `ProductItem` attendu par les composants.
  * Les champs absents de l'API reçoivent des placeholders neutres
@@ -206,6 +236,8 @@ function refSellerSlug(seller: ApiProduct["seller"]): string {
  */
 export function toProductItem(api: ApiProduct): ProductItem {
   const inStock = api.stockQuantity > 0;
+  const images = toProductImages(api);
+  const coverImageUrl = images[0]?.url || resolveApiMediaUrl(api.coverImageUrl);
 
   return {
     slug: api.slug,
@@ -223,7 +255,8 @@ export function toProductItem(api: ApiProduct): ProductItem {
     stockQuantity: api.stockQuantity,
     inStock,
     sku: api.sku,
-    coverImageUrl: resolveApiMediaUrl(api.coverImageUrl),
+    coverImageUrl,
+    images,
     deliveryFee: api.deliveryFee,
     isFreeDelivery: api.isFreeDelivery,
     pickupAddress: api.pickupAddress ?? null,
@@ -284,8 +317,15 @@ export async function getProducts(
 export async function getProductBySlug(
   slug: string,
 ): Promise<ProductItem | null> {
-  const candidates = await getProducts({ q: slug, limit: 100 });
-  return candidates.find((product) => product.slug === slug) ?? null;
+  let normalizedSlug = slug;
+  try {
+    normalizedSlug = decodeURIComponent(slug);
+  } catch {
+    normalizedSlug = slug;
+  }
+  normalizedSlug = normalizedSlug.trim().toLowerCase();
+  const candidates = await getProducts({ q: normalizedSlug, limit: 100 });
+  return candidates.find((product) => product.slug === normalizedSlug) ?? null;
 }
 
 /** Récupère la liste publique des catégories actives (triées par sortOrder). */

@@ -27,6 +27,7 @@ export type ProductItem = {
   inStock: boolean;
   sku: string;
   coverImageUrl: string;
+  images: ProductImageItem[];
   deliveryFee: number;
   isFreeDelivery: boolean;
   pickupAddress: {
@@ -39,6 +40,14 @@ export type ProductItem = {
   // - sellerSlug : utilisé pour la règle mono-vendeur côté panier
   productId: string;
   sellerSlug: string;
+};
+
+export type ProductImageItem = {
+  url: string;
+  thumbUrl: string;
+  altText: string;
+  sortOrder: number;
+  isPrimary: boolean;
 };
 
 export type ProductSortKey = "recommended" | "price-asc" | "price-desc";

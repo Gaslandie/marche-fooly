@@ -291,9 +291,9 @@ const verifyProductImageForSeller = async (value, sellerProfileId) => {
   };
 };
 
-const markProductImageAttached = async (coverImage, productId) => {
-  if (!coverImage) return;
-  const ids = [coverImage.largeFileId, coverImage.thumbFileId]
+const markProductImageAttached = async (image, productId) => {
+  if (!image) return;
+  const ids = [image.largeFileId, image.thumbFileId]
     .map(toObjectId)
     .filter(Boolean);
   if (!ids.length) return;
@@ -325,16 +325,25 @@ const cleanupTemporaryProductImages = async ({ olderThanHours = 24 } = {}) => {
     .project({ _id: 1 })
     .toArray();
 
-  const [largeRefs, thumbRefs] = await Promise.all([
+  const [coverLargeRefs, coverThumbRefs, imageLargeRefs, imageThumbRefs] =
+    await Promise.all([
     Product.distinct("coverImage.largeFileId", {
       "coverImage.largeFileId": { $exists: true, $ne: null },
     }),
     Product.distinct("coverImage.thumbFileId", {
       "coverImage.thumbFileId": { $exists: true, $ne: null },
     }),
+    Product.distinct("images.largeFileId", {
+      "images.largeFileId": { $exists: true, $ne: null },
+    }),
+    Product.distinct("images.thumbFileId", {
+      "images.thumbFileId": { $exists: true, $ne: null },
+    }),
   ]);
   const referenced = new Set(
-    [...largeRefs, ...thumbRefs].map((id) => id.toString()),
+    [...coverLargeRefs, ...coverThumbRefs, ...imageLargeRefs, ...imageThumbRefs].map(
+      (id) => id.toString(),
+    ),
   );
 
   let deleted = 0;

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ProductBuyBox from "@/components/product/ProductBuyBox";
+import ProductGallery from "@/components/product/ProductGallery";
 import type { ProductItem } from "@/types/catalog";
 import { formatPrice } from "@/utils/formatPrice";
 import styles from "@/styles/product.module.css";
@@ -66,23 +67,12 @@ export default function ProductDetails({ product }: Props) {
       <div className="row g-4 align-items-start">
         {/* Gallery + Seller */}
         <div className="col-lg-6">
-          <div className={styles.galleryPanel}>
-            <div className={`${styles.mainImage} mb-3`}>
-              {product.badge && (
-                <span className={styles.galleryBadge}>{product.badge}</span>
-              )}
-              {product.coverImageUrl ? (
-                <img
-                  src={product.coverImageUrl}
-                  alt={product.name}
-                  className={styles.mainProductImage}
-                  loading="eager"
-                />
-              ) : (
-                <i className={`${product.icon} ${styles.mainImageIcon}`} aria-hidden="true"></i>
-              )}
-            </div>
-          </div>
+          <ProductGallery
+            images={product.images}
+            productName={product.name}
+            fallbackIcon={product.icon}
+            badge={product.badge}
+          />
 
           {/* Seller card */}
           <div className={`${styles.sellerCard} mt-4`}>

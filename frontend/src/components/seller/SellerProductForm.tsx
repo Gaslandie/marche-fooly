@@ -19,7 +19,7 @@
  *   - `currency` n'est pas envoyée (forcée à GNF côté serveur).
  *   - `status` limité au MVP : "active" / "out_of_stock".
  *   - L'upload image passe par /api/uploads/product-image et renseigne
- *     `coverImage` avec la reference GridFS retournee par le backend.
+ *     `images` avec les references GridFS retournees par le backend.
  *   - L'ownership final est garanti par le backend (PATCH sur un produit
  *     d'un autre vendeur -> 403/404 relayé en message inline).
  *
@@ -45,6 +45,7 @@ export type SellerProductFormValues = {
   stockQuantity: string;
   coverImageUrl: string;
   coverImage: ProductCoverImageInput | null;
+  images: ProductImageInput[];
   deliveryFee: string;
   isFreeDelivery: boolean;
   status: "active" | "out_of_stock";
@@ -55,6 +56,12 @@ export type ProductCoverImageInput = {
   largeFileId: string;
   thumbFileId: string;
   version: string;
+};
+
+export type ProductImageInput = ProductCoverImageInput & {
+  url: string;
+  thumbUrl: string;
+  altText?: string;
 };
 
 type Props = {
@@ -72,6 +79,7 @@ const EMPTY_VALUES: SellerProductFormValues = {
   stockQuantity: "",
   coverImageUrl: "",
   coverImage: null,
+  images: [],
   deliveryFee: "0",
   isFreeDelivery: false,
   status: "active",
@@ -79,6 +87,7 @@ const EMPTY_VALUES: SellerProductFormValues = {
 };
 
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+const MAX_PRODUCT_IMAGES = 3;
 const ALLOWED_IMAGE_MIME_TYPES = new Set([
   "image/jpeg",
   "image/png",
@@ -95,6 +104,7 @@ type UploadImageResponse = {
     largeFileId?: string;
     thumbFileId?: string;
     version?: string;
+    thumbUrl?: string;
   } | null;
 };
 
@@ -110,9 +120,6 @@ export default function SellerProductForm({
   );
   const [submitting, setSubmitting] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
-  const [imagePreviewUrl, setImagePreviewUrl] = useState(
-    initial?.coverImageUrl ?? "",
-  );
   const [error, setError] = useState<string | null>(null);
 
   function update<K extends keyof SellerProductFormValues>(
@@ -122,18 +129,34 @@ export default function SellerProductForm({
     setValues((prev) => ({ ...prev, [key]: value }));
   }
 
+  function applyImages(nextImages: ProductImageInput[]) {
+    const limited = nextImages.slice(0, MAX_PRODUCT_IMAGES);
+    const primary = limited[0] ?? null;
+    setValues((prev) => ({
+      ...prev,
+      images: limited,
+      coverImage: primary
+        ? {
+            largeFileId: primary.largeFileId,
+            thumbFileId: primary.thumbFileId,
+            version: primary.version,
+          }
+        : null,
+      coverImageUrl: primary?.url ?? "",
+    }));
+  }
+
+  function removeImage(indexToRemove: number) {
+    applyImages(values.images.filter((_, index) => index !== indexToRemove));
+  }
+
   async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(event.target.files ?? []);
+    if (!files.length) return;
 
-    if (!ALLOWED_IMAGE_MIME_TYPES.has(file.type)) {
-      setError("Format image non supporté. Utilisez JPG, PNG, WebP ou AVIF.");
-      event.currentTarget.value = "";
-      return;
-    }
-
-    if (file.size <= 0 || file.size > MAX_IMAGE_BYTES) {
-      setError("Image trop lourde. Taille maximum : 4 Mo.");
+    const remainingSlots = MAX_PRODUCT_IMAGES - values.images.length;
+    if (remainingSlots <= 0 || files.length > remainingSlots) {
+      setError("Maximum 3 photos par produit.");
       event.currentTarget.value = "";
       return;
     }
@@ -141,43 +164,61 @@ export default function SellerProductForm({
     setError(null);
     setUploadingImage(true);
 
-    const formData = new FormData();
-    formData.append("image", file);
-
     try {
-      const res = await fetch("/api/uploads/product-image", {
-        method: "POST",
-        body: formData,
-      });
-      const body = (await res.json().catch(() => null)) as
-        | UploadImageResponse
-        | null;
+      const uploadedImages: ProductImageInput[] = [];
+      for (const file of files) {
+        if (!ALLOWED_IMAGE_MIME_TYPES.has(file.type)) {
+          throw new Error("Format image non supporté. Utilisez JPG, PNG, WebP ou AVIF.");
+        }
 
-      const uploaded = body?.image;
-      const previewUrl = uploaded?.largeUrl || uploaded?.url || "";
-      if (
-        !res.ok ||
-        !body?.success ||
-        !previewUrl ||
-        !uploaded?.largeFileId ||
-        !uploaded.thumbFileId ||
-        !uploaded.version
-      ) {
-        setError(body?.message ?? "Upload image impossible.");
-        return;
+        if (file.size <= 0 || file.size > MAX_IMAGE_BYTES) {
+          throw new Error("Image trop lourde. Taille maximum : 4 Mo.");
+        }
+
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const res = await fetch("/api/uploads/product-image", {
+          method: "POST",
+          body: formData,
+        });
+        const body = (await res.json().catch(() => null)) as
+          | UploadImageResponse
+          | null;
+
+        const uploaded = body?.image;
+        const previewUrl = uploaded?.largeUrl || uploaded?.url || "";
+        if (
+          !res.ok ||
+          !body?.success ||
+          !previewUrl ||
+          !uploaded?.largeFileId ||
+          !uploaded.thumbFileId ||
+          !uploaded.version
+        ) {
+          throw new Error(body?.message ?? "Upload image impossible.");
+        }
+
+        uploadedImages.push({
+          largeFileId: uploaded.largeFileId,
+          thumbFileId: uploaded.thumbFileId,
+          version: uploaded.version,
+          url: previewUrl,
+          thumbUrl: uploaded.thumbUrl || previewUrl,
+          altText: values.name.trim(),
+        });
       }
 
-      update("coverImage", {
-        largeFileId: uploaded.largeFileId,
-        thumbFileId: uploaded.thumbFileId,
-        version: uploaded.version,
-      });
-      update("coverImageUrl", previewUrl);
-      setImagePreviewUrl(previewUrl);
-    } catch {
-      setError("Service d'upload indisponible. Réessayez plus tard.");
+      applyImages([...values.images, ...uploadedImages]);
+    } catch (uploadError) {
+      setError(
+        uploadError instanceof Error
+          ? uploadError.message
+          : "Service d'upload indisponible. Réessayez plus tard.",
+      );
     } finally {
       setUploadingImage(false);
+      event.currentTarget.value = "";
     }
   }
 
@@ -216,8 +257,20 @@ export default function SellerProductForm({
       status: values.status,
       category: values.category,
     };
-    if (values.coverImage) {
-      payload.coverImage = values.coverImage;
+    payload.images = values.images.map((image, index) => ({
+      largeFileId: image.largeFileId,
+      thumbFileId: image.thumbFileId,
+      version: image.version,
+      altText: image.altText || values.name.trim(),
+      sortOrder: index,
+      isPrimary: index === 0,
+    }));
+    if (values.images[0]) {
+      payload.coverImage = {
+        largeFileId: values.images[0].largeFileId,
+        thumbFileId: values.images[0].thumbFileId,
+        version: values.images[0].version,
+      };
     }
     return payload;
   }
@@ -407,18 +460,19 @@ export default function SellerProductForm({
 
         <div className="col-12">
           <label className="form-label fw-semibold" htmlFor="p-cover-file">
-            Image du produit
+            Photos du produit
           </label>
           <input
             id="p-cover-file"
             type="file"
             className="form-control mb-2"
             accept="image/jpeg,image/png,image/webp,image/avif"
+            multiple
             onChange={handleImageUpload}
-            disabled={submitting || uploadingImage}
+            disabled={submitting || uploadingImage || values.images.length >= MAX_PRODUCT_IMAGES}
           />
           <div className="form-text mb-2">
-            JPG, PNG, WebP ou AVIF. Taille maximum : 4 Mo.
+            Jusqu&apos;à 3 photos. JPG, PNG, WebP ou AVIF. Taille maximum : 4 Mo par photo.
           </div>
           {uploadingImage && (
             <div className="alert alert-info py-2 px-3 small mb-2" role="status">
@@ -430,20 +484,38 @@ export default function SellerProductForm({
               Upload de l&apos;image en cours…
             </div>
           )}
-          {imagePreviewUrl && (
-            <div
-              className="border rounded-3 mb-2"
-              aria-label="Aperçu de l'image produit"
-              style={{
-                width: "100%",
-                aspectRatio: "16 / 9",
-                backgroundColor: "#f8f9fa",
-                backgroundImage: `url(${JSON.stringify(imagePreviewUrl)})`,
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat",
-                backgroundSize: "cover",
-              }}
-            />
+          {values.images.length > 0 && (
+            <div className="row g-2">
+              {values.images.map((image, index) => (
+                <div className="col-6 col-md-4" key={`${image.largeFileId}-${index}`}>
+                  <div
+                    className="border rounded-3 position-relative overflow-hidden bg-light"
+                    style={{ aspectRatio: "1 / 1" }}
+                  >
+                    <img
+                      src={image.thumbUrl || image.url}
+                      alt={`Photo ${index + 1} du produit`}
+                      className="w-100 h-100"
+                      style={{ objectFit: "contain", background: "#ffffff" }}
+                    />
+                    {index === 0 && (
+                      <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-2">
+                        Principale
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      className="btn btn-sm btn-dark position-absolute top-0 end-0 m-2"
+                      onClick={() => removeImage(index)}
+                      disabled={submitting || uploadingImage}
+                      aria-label={`Retirer la photo ${index + 1}`}
+                    >
+                      <i className="bi bi-x-lg" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
 

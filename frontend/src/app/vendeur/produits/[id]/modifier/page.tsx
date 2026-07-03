@@ -27,6 +27,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import SellerProductForm, {
+  type ProductImageInput,
   type SellerProductFormValues,
 } from "@/components/seller/SellerProductForm";
 import { getCategoryOptions } from "@/lib/api";
@@ -49,15 +50,62 @@ function categoryId(category: ApiProduct["category"]): string {
   return "";
 }
 
+function productImages(product: ApiProduct): ProductImageInput[] {
+  const gallery = (product.images || [])
+    .filter((image) => image.largeFileId && image.thumbFileId && image.version && image.url)
+    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+    .slice(0, 3)
+    .map((image) => ({
+      largeFileId: image.largeFileId,
+      thumbFileId: image.thumbFileId,
+      version: image.version,
+      url: image.url,
+      thumbUrl: image.thumbUrl || image.url,
+      altText: image.altText || product.name,
+    }));
+
+  if (gallery.length > 0) return gallery;
+
+  if (
+    product.coverImage?.largeFileId &&
+    product.coverImage.thumbFileId &&
+    product.coverImage.version &&
+    product.coverImageUrl
+  ) {
+    return [
+      {
+        largeFileId: product.coverImage.largeFileId,
+        thumbFileId: product.coverImage.thumbFileId,
+        version: product.coverImage.version,
+        url: product.coverImageUrl,
+        thumbUrl: product.coverImage.thumbUrl || product.coverImageUrl,
+        altText: product.name,
+      },
+    ];
+  }
+
+  return [];
+}
+
 function toFormValues(product: ApiProduct): SellerProductFormValues {
+  const images = productImages(product);
+  const primary = images[0] ?? null;
+
   return {
     name: product.name,
     shortDescription: product.shortDescription ?? "",
     description: product.description,
     price: String(product.price ?? ""),
     stockQuantity: String(product.stockQuantity ?? ""),
-    coverImageUrl: product.coverImageUrl ?? "",
-    coverImage: null,
+    coverImageUrl: primary?.url ?? product.coverImageUrl ?? "",
+    coverImage: primary
+      ? {
+          largeFileId: primary.largeFileId,
+          thumbFileId: primary.thumbFileId,
+          version: primary.version,
+        }
+      : null,
+    images,
     deliveryFee: String(product.deliveryFee ?? 0),
     isFreeDelivery: !!product.isFreeDelivery,
     // Statut borné au MVP (un éventuel draft/archived retombe sur "active").

@@ -117,6 +117,11 @@ export async function getSellerProducts(
     return (body?.data?.items ?? []).map((product) => ({
       ...product,
       coverImageUrl: resolveApiMediaUrl(product.coverImageUrl),
+      images: (product.images || []).map((image) => ({
+        ...image,
+        url: resolveApiMediaUrl(image.url),
+        thumbUrl: resolveApiMediaUrl(image.thumbUrl || image.url),
+      })),
     }));
   } catch {
     return [];
@@ -165,6 +170,7 @@ export const SELLER_PRODUCT_ALLOWED_FIELDS = [
   "price",
   "stockQuantity",
   "sku",
+  "images",
   "coverImage",
   "deliveryFee",
   "isFreeDelivery",

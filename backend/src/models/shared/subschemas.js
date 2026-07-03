@@ -82,13 +82,75 @@ const contactDetailsSchema = new mongoose.Schema(
  * Image produit ou categorie.
  * On limite les champs au strict utile pour le front et le SEO.
  */
+const { ObjectId } = mongoose.Schema.Types;
+const INTERNAL_PRODUCT_IMAGE_URL_REGEX =
+  /^\/api\/media\/images\/[a-f0-9]{24}\?v=[A-Za-z0-9._-]{1,120}$/;
+
+const imageUrlValidator = {
+  validator: (value) =>
+    !value ||
+    optionalUrlValidator.validator(value) ||
+    INTERNAL_PRODUCT_IMAGE_URL_REGEX.test(value),
+  message: "URL image invalide",
+};
+
 const imageSchema = new mongoose.Schema(
   {
     url: {
       type: String,
       required: true,
       trim: true,
-      validate: optionalUrlValidator,
+      validate: imageUrlValidator,
+    },
+    thumbUrl: {
+      type: String,
+      trim: true,
+      default: "",
+      validate: imageUrlValidator,
+    },
+    largeFileId: {
+      type: ObjectId,
+      default: null,
+    },
+    thumbFileId: {
+      type: ObjectId,
+      default: null,
+    },
+    version: {
+      type: String,
+      trim: true,
+      maxlength: 120,
+      default: "",
+    },
+    contentHash: {
+      type: String,
+      trim: true,
+      maxlength: 128,
+      default: "",
+    },
+    width: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    height: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    mimeType: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    bytes: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    uploadedAt: {
+      type: Date,
+      default: null,
     },
     altText: {
       type: String,

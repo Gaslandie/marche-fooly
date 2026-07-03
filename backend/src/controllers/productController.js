@@ -105,6 +105,23 @@ const coverImageShape = (coverImage) => {
   };
 };
 
+const productImageShape = (img) => ({
+  url: img.url || "",
+  thumbUrl: img.thumbUrl || "",
+  largeFileId: img.largeFileId?.toString?.() || "",
+  thumbFileId: img.thumbFileId?.toString?.() || "",
+  version: img.version || "",
+  contentHash: img.contentHash || "",
+  width: img.width || 0,
+  height: img.height || 0,
+  mimeType: img.mimeType || "",
+  bytes: img.bytes || 0,
+  uploadedAt: img.uploadedAt || null,
+  altText: img.altText || "",
+  sortOrder: img.sortOrder || 0,
+  isPrimary: !!img.isPrimary,
+});
+
 const toPublicProduct = (doc) => ({
   id: doc._id.toString(),
   name: doc.name,
@@ -115,12 +132,7 @@ const toPublicProduct = (doc) => ({
   currency: doc.currency,
   stockQuantity: doc.stockQuantity,
   sku: doc.sku || "",
-  images: (doc.images || []).map((img) => ({
-    url: img.url,
-    altText: img.altText || "",
-    sortOrder: img.sortOrder || 0,
-    isPrimary: !!img.isPrimary,
-  })),
+  images: (doc.images || []).map(productImageShape),
   coverImageUrl: doc.coverImageUrl || "",
   coverImage: coverImageShape(doc.coverImage),
   status: doc.status,
@@ -209,6 +221,92 @@ const applyCoverImagePayload = async (payload, sellerId) => {
   return coverImage;
 };
 
+const coverImageFromProductImage = (image) => ({
+  largeFileId: image.largeFileId,
+  thumbFileId: image.thumbFileId,
+  largeUrl: image.url,
+  thumbUrl: image.thumbUrl,
+  version: image.version,
+  contentHash: image.contentHash,
+  width: image.width,
+  height: image.height,
+  mimeType: image.mimeType,
+  bytes: image.bytes,
+  uploadedAt: image.uploadedAt,
+});
+
+const normalizeExternalImage = (image, index) => ({
+  url: String(image.url || "").trim(),
+  thumbUrl: String(image.thumbUrl || image.url || "").trim(),
+  altText: String(image.altText || "").trim().slice(0, 160),
+  sortOrder: Number.isInteger(Number(image.sortOrder))
+    ? Math.max(0, Number(image.sortOrder))
+    : index,
+  isPrimary: !!image.isPrimary,
+});
+
+const applyProductImagesPayload = async (payload, sellerId) => {
+  if (!Object.prototype.hasOwnProperty.call(payload, "images")) {
+    return null;
+  }
+
+  if (!Array.isArray(payload.images)) {
+    throw new ProductImageError("images: tableau attendu.");
+  }
+  if (payload.images.length > 3) {
+    throw new ProductImageError("Maximum 3 images par produit.");
+  }
+  if (payload.images.length === 0) {
+    payload.images = [];
+    payload.coverImage = null;
+    payload.coverImageUrl = "";
+    return [];
+  }
+
+  const normalized = [];
+  for (const [index, image] of payload.images.entries()) {
+    if (image?.largeFileId || image?.fileId || image?.thumbFileId) {
+      const verified = await verifyProductImageForSeller(image, sellerId);
+      normalized.push({
+        url: verified.largeUrl,
+        thumbUrl: verified.thumbUrl,
+        largeFileId: verified.largeFileId,
+        thumbFileId: verified.thumbFileId,
+        version: verified.version,
+        contentHash: verified.contentHash,
+        width: verified.width,
+        height: verified.height,
+        mimeType: verified.mimeType,
+        bytes: verified.bytes,
+        uploadedAt: verified.uploadedAt,
+        altText: String(image.altText || "").trim().slice(0, 160),
+        sortOrder: index,
+        isPrimary: index === 0,
+      });
+      continue;
+    }
+
+    normalized.push(normalizeExternalImage(image, index));
+  }
+
+  const primaryIndex = normalized.findIndex((image) => image.isPrimary);
+  normalized.forEach((image, index) => {
+    image.sortOrder = index;
+    image.isPrimary = primaryIndex >= 0 ? index === primaryIndex : index === 0;
+  });
+
+  const primary = normalized.find((image) => image.isPrimary) || normalized[0];
+  payload.images = normalized;
+  if (primary.largeFileId && primary.thumbFileId) {
+    payload.coverImage = coverImageFromProductImage(primary);
+  } else {
+    payload.coverImage = null;
+  }
+  payload.coverImageUrl = primary.url;
+
+  return normalized.filter((image) => image.largeFileId && image.thumbFileId);
+};
+
 // --- Listing public --------------------------------------------------------
 
 const listPublic = async (req, res, next) => {
@@ -266,6 +364,7 @@ const listPublic = async (req, res, next) => {
     if (req.query.q) {
       const safe = escapeRegex(req.query.q);
       filter.$or = [
+        { slug: { $regex: safe, $options: "i" } },
         { name: { $regex: safe, $options: "i" } },
         { description: { $regex: safe, $options: "i" } },
       ];
@@ -374,19 +473,24 @@ const create = async (req, res, next) => {
     payload.seller = req.sellerProfile._id;
     payload.currency = "GNF";
 
-    const pendingCoverImage = await applyCoverImagePayload(
+    const pendingImages = await applyProductImagesPayload(
       payload,
       req.sellerProfile._id,
     );
+    const pendingCoverImage =
+      pendingImages === null
+        ? await applyCoverImagePayload(payload, req.sellerProfile._id)
+        : null;
 
     const created = await Product.create(payload);
-    if (pendingCoverImage) {
-      await markProductImageAttached(created.coverImage, created._id).catch(
-        (error) => {
+    const imagesToAttach = pendingImages ?? (pendingCoverImage ? [created.coverImage] : []);
+    await Promise.all(
+      imagesToAttach.map((image) =>
+        markProductImageAttached(image, created._id).catch((error) => {
           console.warn("Attachement image produit:", error?.message || error);
-        },
-      );
-    }
+        }),
+      ),
+    );
 
     return res.status(201).json({
       success: true,
@@ -458,10 +562,11 @@ const update = async (req, res, next) => {
     }
 
     const incoming = { ...req.body };
-    const pendingCoverImage = await applyCoverImagePayload(
-      incoming,
-      product.seller,
-    );
+    const pendingImages = await applyProductImagesPayload(incoming, product.seller);
+    const pendingCoverImage =
+      pendingImages === null
+        ? await applyCoverImagePayload(incoming, product.seller)
+        : null;
 
     // Whitelist effective selon le role.
     const allowed = isAdmin
@@ -480,13 +585,14 @@ const update = async (req, res, next) => {
     product.currency = "GNF";
 
     await product.save();
-    if (pendingCoverImage) {
-      await markProductImageAttached(product.coverImage, product._id).catch(
-        (error) => {
+    const imagesToAttach = pendingImages ?? (pendingCoverImage ? [product.coverImage] : []);
+    await Promise.all(
+      imagesToAttach.map((image) =>
+        markProductImageAttached(image, product._id).catch((error) => {
           console.warn("Attachement image produit:", error?.message || error);
-        },
-      );
-    }
+        }),
+      ),
+    );
 
     return res.status(200).json({
       success: true,

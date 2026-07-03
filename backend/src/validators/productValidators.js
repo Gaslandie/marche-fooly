@@ -50,6 +50,8 @@ const { body, param, query } = require("express-validator");
 const mongoose = require("mongoose");
 
 const HTTP_URL_REGEX = /^https?:\/\/.+/i;
+const INTERNAL_PRODUCT_IMAGE_URL_REGEX =
+  /^\/api\/media\/images\/[a-f0-9]{24}\?v=[A-Za-z0-9._-]{1,120}$/;
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 // Statuts visibles cote public. Le controleur les utilise pour filtrer
@@ -58,10 +60,10 @@ const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 // "archived" sont exclus.
 const PUBLIC_PRODUCT_STATUSES = ["active", "out_of_stock"];
 
-// Statuts acceptes EN ENTREE (POST/PATCH). "out_of_stock" est exclu:
-// c'est un statut derive par le hook pre-validate du modele quand
-// stockQuantity === 0 et status === "active".
-const INPUT_PRODUCT_STATUSES = ["draft", "active", "archived"];
+// Statuts acceptes EN ENTREE (POST/PATCH). "out_of_stock" peut etre choisi
+// explicitement par le vendeur; le modele derive aussi active -> out_of_stock
+// quand stockQuantity === 0.
+const INPUT_PRODUCT_STATUSES = ["draft", "active", "archived", "out_of_stock"];
 
 // Whitelist des champs creables (POST). Tout champ hors liste est
 // ignore par le controleur, meme s'il passe le validator.
@@ -202,8 +204,8 @@ const coverImageUrlOptional = body("coverImageUrl")
   .isString()
   .bail()
   .trim()
-  .matches(HTTP_URL_REGEX)
-  .withMessage("coverImageUrl: l'URL doit commencer par http:// ou https://");
+  .custom((value) => HTTP_URL_REGEX.test(value) || INTERNAL_PRODUCT_IMAGE_URL_REGEX.test(value))
+  .withMessage("coverImageUrl: URL http(s) ou media interne requise");
 
 const coverImageOptional = body("coverImage")
   .optional({ values: "null" })
@@ -243,22 +245,55 @@ const statusInputRequiredOptional = (required) => {
     .bail()
     .isIn(INPUT_PRODUCT_STATUSES)
     .withMessage(
-      `status: doit valoir ${INPUT_PRODUCT_STATUSES.join(", ")} (out_of_stock est derive)`,
+      `status: doit valoir ${INPUT_PRODUCT_STATUSES.join(", ")}`,
     );
 };
 
 const imagesValidators = [
   body("images")
     .optional()
-    .isArray({ max: 10 })
-    .withMessage("images: tableau de 10 elements maximum"),
+    .isArray({ max: 3 })
+    .withMessage("images: tableau de 3 elements maximum"),
+  body("images.*")
+    .optional()
+    .custom((value) => {
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw new Error("images[]: objet attendu");
+      }
+
+      const hasGridFsRef =
+        isObjectIdString(value.largeFileId || value.fileId) &&
+        isObjectIdString(value.thumbFileId) &&
+        /^[A-Za-z0-9._-]{1,120}$/.test(String(value.version || "").trim());
+      const hasExternalUrl =
+        typeof value.url === "string" && HTTP_URL_REGEX.test(value.url);
+      if (!hasGridFsRef && !hasExternalUrl) {
+        throw new Error("images[]: image televersee ou URL http(s) requise");
+      }
+
+      if (
+        typeof value.url === "string" &&
+        value.url.startsWith("/api/") &&
+        !INTERNAL_PRODUCT_IMAGE_URL_REGEX.test(value.url)
+      ) {
+        throw new Error("images[].url: URL interne invalide");
+      }
+      return true;
+    }),
   body("images.*.url")
     .optional()
     .isString()
     .bail()
     .trim()
-    .matches(HTTP_URL_REGEX)
-    .withMessage("images[].url: URL http(s) requise"),
+    .custom((value) => HTTP_URL_REGEX.test(value) || INTERNAL_PRODUCT_IMAGE_URL_REGEX.test(value))
+    .withMessage("images[].url: URL http(s) ou media interne requise"),
+  body("images.*.thumbUrl")
+    .optional({ values: "falsy" })
+    .isString()
+    .bail()
+    .trim()
+    .custom((value) => HTTP_URL_REGEX.test(value) || INTERNAL_PRODUCT_IMAGE_URL_REGEX.test(value))
+    .withMessage("images[].thumbUrl: URL http(s) ou media interne requise"),
   body("images.*.altText")
     .optional({ values: "falsy" })
     .isString()

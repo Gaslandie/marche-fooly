@@ -69,6 +69,16 @@ export type ApiCategory = {
 /** Une image de produit. */
 export type ApiProductImage = {
   url: string;
+  thumbUrl: string;
+  largeFileId: string;
+  thumbFileId: string;
+  version: string;
+  contentHash: string;
+  width: number;
+  height: number;
+  mimeType: string;
+  bytes: number;
+  uploadedAt: string | null;
   altText: string;
   sortOrder: number;
   isPrimary: boolean;

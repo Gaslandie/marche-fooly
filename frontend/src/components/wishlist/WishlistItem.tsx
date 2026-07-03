@@ -51,7 +51,10 @@ export default function WishlistItem({ product }: Props) {
           product={product}
           className="btn btn-warning btn-sm fw-bold w-100"
         />
-        <Link href={`/produit/${product.slug}`} className="btn btn-light btn-sm">
+        <Link
+          href={`/produit/${encodeURIComponent(product.slug)}`}
+          className="btn btn-light btn-sm"
+        >
           Voir
         </Link>
       </div>

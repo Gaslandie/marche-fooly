@@ -44,7 +44,10 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
             product={product}
             className="btn btn-warning btn-sm"
           />
-          <Link href={`/produit/${product.slug}`} className="btn btn-outline-dark btn-sm">
+          <Link
+            href={`/produit/${encodeURIComponent(product.slug)}`}
+            className="btn btn-outline-dark btn-sm"
+          >
             Voir
           </Link>
         </div>

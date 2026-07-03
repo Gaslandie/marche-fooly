@@ -52,13 +52,13 @@ function categoryId(category: ApiProduct["category"]): string {
 
 function productImages(product: ApiProduct): ProductImageInput[] {
   const gallery = (product.images || [])
-    .filter((image) => image.largeFileId && image.thumbFileId && image.version && image.url)
+    .filter((image) => image.url)
     .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
     .slice(0, 3)
     .map((image) => ({
-      largeFileId: image.largeFileId,
-      thumbFileId: image.thumbFileId,
-      version: image.version,
+      ...(image.largeFileId ? { largeFileId: image.largeFileId } : {}),
+      ...(image.thumbFileId ? { thumbFileId: image.thumbFileId } : {}),
+      ...(image.version ? { version: image.version } : {}),
       url: image.url,
       thumbUrl: image.thumbUrl || image.url,
       altText: image.altText || product.name,
@@ -90,6 +90,14 @@ function productImages(product: ApiProduct): ProductImageInput[] {
 function toFormValues(product: ApiProduct): SellerProductFormValues {
   const images = productImages(product);
   const primary = images[0] ?? null;
+  const coverImage =
+    primary?.largeFileId && primary.thumbFileId && primary.version
+      ? {
+          largeFileId: primary.largeFileId,
+          thumbFileId: primary.thumbFileId,
+          version: primary.version,
+        }
+      : null;
 
   return {
     name: product.name,
@@ -98,13 +106,7 @@ function toFormValues(product: ApiProduct): SellerProductFormValues {
     price: String(product.price ?? ""),
     stockQuantity: String(product.stockQuantity ?? ""),
     coverImageUrl: primary?.url ?? product.coverImageUrl ?? "",
-    coverImage: primary
-      ? {
-          largeFileId: primary.largeFileId,
-          thumbFileId: primary.thumbFileId,
-          version: primary.version,
-        }
-      : null,
+    coverImage,
     images,
     deliveryFee: String(product.deliveryFee ?? 0),
     isFreeDelivery: !!product.isFreeDelivery,

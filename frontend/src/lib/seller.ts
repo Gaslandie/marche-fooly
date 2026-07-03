@@ -117,6 +117,13 @@ export async function getSellerProducts(
     return (body?.data?.items ?? []).map((product) => ({
       ...product,
       coverImageUrl: resolveApiMediaUrl(product.coverImageUrl),
+      coverImage: product.coverImage
+        ? {
+            ...product.coverImage,
+            largeUrl: resolveApiMediaUrl(product.coverImage.largeUrl),
+            thumbUrl: resolveApiMediaUrl(product.coverImage.thumbUrl),
+          }
+        : product.coverImage,
       images: (product.images || []).map((image) => ({
         ...image,
         url: resolveApiMediaUrl(image.url),

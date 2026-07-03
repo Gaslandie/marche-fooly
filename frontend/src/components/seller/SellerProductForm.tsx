@@ -58,7 +58,7 @@ export type ProductCoverImageInput = {
   version: string;
 };
 
-export type ProductImageInput = ProductCoverImageInput & {
+export type ProductImageInput = Partial<ProductCoverImageInput> & {
   url: string;
   thumbUrl: string;
   altText?: string;
@@ -135,7 +135,7 @@ export default function SellerProductForm({
     setValues((prev) => ({
       ...prev,
       images: limited,
-      coverImage: primary
+      coverImage: primary?.largeFileId && primary.thumbFileId && primary.version
         ? {
             largeFileId: primary.largeFileId,
             thumbFileId: primary.thumbFileId,
@@ -258,14 +258,20 @@ export default function SellerProductForm({
       category: values.category,
     };
     payload.images = values.images.map((image, index) => ({
-      largeFileId: image.largeFileId,
-      thumbFileId: image.thumbFileId,
-      version: image.version,
+      ...(image.largeFileId ? { largeFileId: image.largeFileId } : {}),
+      ...(image.thumbFileId ? { thumbFileId: image.thumbFileId } : {}),
+      ...(image.version ? { version: image.version } : {}),
+      url: image.url,
+      thumbUrl: image.thumbUrl || image.url,
       altText: image.altText || values.name.trim(),
       sortOrder: index,
       isPrimary: index === 0,
     }));
-    if (values.images[0]) {
+    if (
+      values.images[0]?.largeFileId &&
+      values.images[0].thumbFileId &&
+      values.images[0].version
+    ) {
       payload.coverImage = {
         largeFileId: values.images[0].largeFileId,
         thumbFileId: values.images[0].thumbFileId,

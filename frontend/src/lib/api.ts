@@ -324,8 +324,17 @@ export async function getProductBySlug(
     normalizedSlug = slug;
   }
   normalizedSlug = normalizedSlug.trim().toLowerCase();
+
+  const byExactSlug = (product: ProductItem) => product.slug === normalizedSlug;
   const candidates = await getProducts({ q: normalizedSlug, limit: 100 });
-  return candidates.find((product) => product.slug === normalizedSlug) ?? null;
+  const directMatch = candidates.find(byExactSlug);
+  if (directMatch) return directMatch;
+
+  // Fallback production: certains backends deployes ne cherchent pas encore
+  // dans le champ `slug` pour ?q=. On recharge alors la liste publique et on
+  // matche le slug exact cote frontend.
+  const allProducts = await getProducts({ limit: 100 });
+  return allProducts.find(byExactSlug) ?? null;
 }
 
 /** Récupère la liste publique des catégories actives (triées par sortOrder). */

@@ -116,6 +116,16 @@ const SEED_CATEGORIES = [
     name: "Vêtements Enfant",
     description: "Tenues, chaussures et accessoires pour enfants.",
   },
+  {
+    name: "Cosmétiques",
+    description:
+      "Produits de beauté, soins, parfums et accessoires cosmétiques.",
+  },
+  {
+    name: "Restaurants",
+    description:
+      "Repas, plats préparés, snacks et offres de restauration locale.",
+  },
 ];
 
 const fieldsEqual = (doc, payload) => {

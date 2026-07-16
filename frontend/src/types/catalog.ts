@@ -27,6 +27,13 @@ export type ProductItem = {
   inStock: boolean;
   sku: string;
   coverImageUrl: string;
+  /**
+   * Variante « vignette » (≈480px WebP) de l'image de couverture, générée par
+   * le backend. À utiliser sur les listes/cartes produits pour alléger le
+   * chargement ; `coverImageUrl` (≈1200px) reste réservé aux grands affichages.
+   * Repli sur `coverImageUrl` si aucune vignette n'est disponible.
+   */
+  coverThumbUrl: string;
   images: ProductImageItem[];
   deliveryFee: number;
   isFreeDelivery: boolean;

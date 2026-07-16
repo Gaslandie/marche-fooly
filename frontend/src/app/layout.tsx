@@ -19,14 +19,11 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: `${siteConfig.name} — ${siteConfig.slogan}. Marketplace locale à ${siteConfig.location}.`,
-  icons: {
-    icon: [
-      { url: "/favicon.png", type: "image/png" },
-      { url: "/images/logo/favicon_fooly.png", type: "image/png" },
-    ],
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
-  },
+  // Le favicon de marque (pin Marché Fooly) est fourni par la convention de
+  // fichier Next.js `src/app/icon.png` : Next génère automatiquement la balise
+  // <link rel="icon"> correspondante. Inutile de déclarer `icons` ici (cela
+  // ferait doublon). Un éventuel `apple-icon.png` peut être ajouté de la même
+  // façon plus tard.
 };
 
 export default async function RootLayout({

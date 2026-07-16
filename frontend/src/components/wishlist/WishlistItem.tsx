@@ -24,10 +24,11 @@ export default function WishlistItem({ product }: Props) {
         />
         {hasImage ? (
           <img
-            src={product.coverImageUrl}
+            src={product.coverThumbUrl || product.coverImageUrl}
             alt={product.name}
             className={styles.wishlistImage}
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <i className={product.icon} aria-hidden="true"></i>

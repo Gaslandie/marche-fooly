@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import CartIcon from "@/components/cart/CartIcon";
 import SearchBar from "@/components/common/SearchBar";
 import { siteConfig } from "@/config/site";
 import { hasBackOfficeAccess } from "@/lib/admin";
@@ -81,9 +82,7 @@ export default function Header({
             <Link href="/favoris" className="mf-icon-link" aria-label="Mes favoris">
               <i className="bi bi-heart" aria-hidden="true"></i>
             </Link>
-            <Link href="/panier" className="mf-icon-link" aria-label="Panier">
-              <i className="bi bi-cart3" aria-hidden="true"></i>
-            </Link>
+            <CartIcon />
             <Link href="/mon-compte" className="mf-icon-link" aria-label="Mon compte">
               <i className="bi bi-person-circle" aria-hidden="true"></i>
             </Link>

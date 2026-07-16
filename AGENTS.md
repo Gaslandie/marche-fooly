@@ -10,6 +10,16 @@ Objectif actuel :
 - garder l'ancienne maquette HTML comme reference visuelle, sans en faire la source principale ;
 - conserver une base professionnelle, maintenable, scalable et adaptee a une marketplace reelle.
 
+## Contexte production (IMPORTANT)
+
+- Le site est **EN PRODUCTION DEPUIS UN MOMENT** et utilise par de vrais utilisateurs.
+- Il existe deja de **vrais comptes vendeurs** et de **vrais produits** en base.
+- Toute modification doit etre faite avec **prudence** : eviter absolument les regressions et la corruption de donnees existantes.
+- Privilegier les changements **additifs et non destructifs** (surtout cote backend / base de donnees).
+- Ne jamais lancer de script qui modifie/supprime des donnees de production sans validation explicite de l'utilisateur.
+- Pour toute migration de donnees, script de nettoyage ou changement de schema : prevenir, expliquer l'impact, et attendre l'accord avant d'executer.
+- Avant de deployer : valider (`lint` + `build` frontend, tests backend) et signaler les tests manuels a faire.
+
 ## Stack actuelle
 
 - Frontend : Next.js dans `frontend/`

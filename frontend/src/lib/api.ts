@@ -218,10 +218,13 @@ function toProductImages(api: ApiProduct): ProductItem["images"] {
     .sort((a, b) => a.sortOrder - b.sortOrder);
 
   const coverUrl = resolveApiMediaUrl(api.coverImageUrl);
+  // Vraie vignette de couverture (480px) si le backend l'expose ; sinon la
+  // grande image. Évite de charger le 1200px là où un petit rendu suffit.
+  const coverThumb = resolveApiMediaUrl(api.coverImage?.thumbUrl) || coverUrl;
   if (coverUrl && !images.some((image) => image.url === coverUrl)) {
     images.unshift({
       url: coverUrl,
-      thumbUrl: coverUrl,
+      thumbUrl: coverThumb,
       altText: api.name,
       sortOrder: -1,
       isPrimary: images.length === 0,
@@ -244,6 +247,10 @@ export function toProductItem(api: ApiProduct): ProductItem {
   const inStock = api.stockQuantity > 0;
   const images = toProductImages(api);
   const coverImageUrl = images[0]?.url || resolveApiMediaUrl(api.coverImageUrl);
+  const coverThumbUrl =
+    resolveApiMediaUrl(api.coverImage?.thumbUrl) ||
+    images[0]?.thumbUrl ||
+    coverImageUrl;
 
   return {
     slug: api.slug,
@@ -262,6 +269,7 @@ export function toProductItem(api: ApiProduct): ProductItem {
     inStock,
     sku: api.sku,
     coverImageUrl,
+    coverThumbUrl,
     images,
     deliveryFee: api.deliveryFee,
     isFreeDelivery: api.isFreeDelivery,

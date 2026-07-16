@@ -28,6 +28,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart/CartProvider";
 import type { ProductItem } from "@/types/catalog";
@@ -51,12 +52,19 @@ export default function AddToCartButton({
   variant = "default",
   className,
 }: Props) {
-  const { addItem, replaceCartWith } = useCart();
+  const { addItem, replaceCartWith, lines } = useCart();
   const router = useRouter();
   const [feedback, setFeedback] = useState<Feedback | null>(null);
 
   const canAdd = !!product.productId && !!product.sellerSlug && product.inStock;
   const isBuyNow = variant === "buy-now";
+
+  // Quantité de CE produit déjà présente dans le panier (indication
+  // persistante : reste affichée tant que le produit est au panier, même
+  // après disparition du message de confirmation temporaire).
+  const inCartQty = product.productId
+    ? lines.find((l) => l.productId === product.productId)?.quantity ?? 0
+    : 0;
 
   const baseClass =
     className ??
@@ -146,6 +154,18 @@ export default function AddToCartButton({
         >
           {feedback.message}
         </div>
+      )}
+      {/* Indication persistante : ce produit est déjà dans le panier.
+          Affichée uniquement sur le bouton principal (pas sur « Acheter
+          maintenant ») pour éviter un doublon sur la fiche produit. */}
+      {!isBuyNow && inCartQty > 0 && (
+        <Link
+          href="/panier"
+          className="d-inline-flex align-items-center gap-1 small fw-semibold text-success text-decoration-none"
+        >
+          <i className="bi bi-check-circle-fill" aria-hidden="true"></i>
+          Dans le panier · {inCartQty}
+        </Link>
       )}
     </div>
   );

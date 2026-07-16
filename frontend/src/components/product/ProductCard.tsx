@@ -11,6 +11,9 @@ type ProductCardProps = {
 
 export default function ProductCard({ product, view = "grid" }: ProductCardProps) {
   const hasImage = Boolean(product.coverImageUrl);
+  // Sur les cartes, on charge la vignette légère (≈480px WebP) plutôt que la
+  // grande image (≈1200px) : même rendu visuel, bien moins de bande passante.
+  const cardImageUrl = product.coverThumbUrl || product.coverImageUrl;
 
   return (
     <article className={[styles.productCard, view === "list" ? styles.productCardList : ""].filter(Boolean).join(" ")}>
@@ -18,10 +21,11 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
         {product.badge ? <span className={styles.productBadge}>{product.badge}</span> : null}
         {hasImage ? (
           <img
-            src={product.coverImageUrl}
+            src={cardImageUrl}
             alt={product.name}
             className={styles.productImage}
             loading="lazy"
+            decoding="async"
           />
         ) : (
           <i className={product.icon} aria-hidden="true"></i>

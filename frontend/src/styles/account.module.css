@@ -232,6 +232,10 @@
   opacity: 0.55;
 }
 
+/* Séparateur « ou » sous les formulaires d'auth. Actuellement inutilisé
+   (placeholder Google retiré) mais CONSERVÉ EXPRÈS : il sera réutilisé lors
+   de la mise en place de la connexion Google —
+   cf. doc/plan/plan-connexion-inscription-google.md (étape F5). */
 .dividerLine {
   display: flex;
   align-items: center;

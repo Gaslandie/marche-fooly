@@ -156,6 +156,9 @@
 .wishlistActions {
   display: grid;
   grid-template-columns: 1fr auto;
+  /* start : le bouton « Voir » ne s'étire pas en hauteur quand le feedback
+     « ajouté au panier » agrandit la cellule voisine. */
+  align-items: start;
   gap: 8px;
   margin-top: 16px;
 }

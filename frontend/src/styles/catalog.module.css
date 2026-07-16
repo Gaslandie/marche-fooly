@@ -466,7 +466,18 @@
 .productActions {
   display: flex;
   flex-wrap: wrap;
+  /* flex-start : le bouton « Voir » garde sa hauteur naturelle (texte centré)
+     même quand le feedback « ajouté au panier » agrandit le bloc voisin. */
+  align-items: flex-start;
   gap: 0.75rem;
+}
+
+/* Le bloc « Ajouter au panier » (1er enfant) absorbe la largeur disponible :
+   le feedback s'affiche dans SA colonne sans déplacer le bouton « Voir »,
+   qui reste calé à droite de la carte. */
+.productActions > :first-child {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .emptyState {

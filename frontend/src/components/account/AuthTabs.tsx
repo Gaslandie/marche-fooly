@@ -28,8 +28,9 @@
  *
  * Note pour GitHub Copilot :
  *   - Le champ téléphone est `required` (le backend l'exige).
- *   - « Continuer avec Google » est volontairement désactivé : pas de
- *     fournisseur OAuth branché — on n'affiche pas de fausse promesse.
+ *   - Connexion Google : EN STAND-BY — aucun bouton Google n'est affiché
+ *     tant que rien n'est branché (pas de fausse promesse). Le plan de mise
+ *     en place complet est dans doc/plan/plan-connexion-inscription-google.md.
  */
 
 "use client";
@@ -242,7 +243,7 @@ export default function AuthTabs() {
 
             <button
               type="submit"
-              className="btn btn-warning fw-bold w-100 mb-3"
+              className="btn btn-warning fw-bold w-100"
               disabled={loginLoading}
             >
               {loginLoading ? (
@@ -259,19 +260,6 @@ export default function AuthTabs() {
                   Se connecter
                 </>
               )}
-            </button>
-
-            <div className={styles.dividerLine}>ou</div>
-
-            {/* Bouton désactivé : aucun fournisseur OAuth n'est branché.
-                Un bouton inactif n'affiche aucune fausse promesse. */}
-            <button
-              type="button"
-              className="btn btn-outline-dark w-100"
-              disabled
-            >
-              <i className="bi bi-google me-2" aria-hidden="true"></i>
-              Continuer avec Google
             </button>
           </form>
         </div>

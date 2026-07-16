@@ -132,12 +132,6 @@ export default async function MonComptePage() {
                       <span className={styles.infoValue}>{value}</span>
                     </div>
                   ))}
-                  <div className="mt-3">
-                    <button type="button" className="btn btn-outline-dark btn-sm" disabled>
-                      <i className="bi bi-pencil me-1" aria-hidden="true"></i>
-                      Modifier mes informations
-                    </button>
-                  </div>
                 </div>
 
                 {/* Quick stats réelles liées au compte connecté */}
@@ -237,12 +231,6 @@ export default async function MonComptePage() {
                       </div>
                     </div>
                   ))}
-                  <div className="mt-3">
-                    <button type="button" className="btn btn-outline-light btn-sm" disabled>
-                      <i className="bi bi-key me-1" aria-hidden="true"></i>
-                      Changer le mot de passe
-                    </button>
-                  </div>
                 </div>
               </div>
             </div>

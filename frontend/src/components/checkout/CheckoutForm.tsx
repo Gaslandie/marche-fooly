@@ -22,7 +22,8 @@
  *   - Mapping UI → backend :
  *       « Livraison à domicile »  -> cash_on_delivery + home_delivery
  *       « Retrait en boutique »   -> pay_on_pickup + seller_pickup
- *       « Mobile Money »          -> désactivé (« Bientôt disponible »)
+ *     (Mobile Money : retiré de l'UI — pas de fausse promesse tant que
+ *      le paiement mobile n'est pas réellement branché.)
  *   - shippingAddress n'est envoyée QUE pour la livraison à domicile.
  *   - Sur succès : `clearCart()` puis redirection vers la page de
  *     confirmation `/commande/[reference]`.
@@ -378,30 +379,7 @@ export default function CheckoutForm({ user }: Props) {
               </div>
             </div>
 
-            {/* Option 2 : Mobile Money — DÉSACTIVÉ */}
-            <div
-              className={styles.paymentOption}
-              aria-disabled="true"
-              style={{ opacity: 0.55, cursor: "not-allowed" }}
-            >
-              <div className={styles.paymentIcon}>
-                <i className="bi bi-phone" aria-hidden="true"></i>
-              </div>
-              <div>
-                <div className={styles.paymentLabel}>
-                  Mobile Money{" "}
-                  <span className="badge bg-secondary ms-2">Bientôt disponible</span>
-                </div>
-                <p className={styles.paymentDesc}>
-                  Orange Money, MTN MoMo. Activé prochainement.
-                </p>
-              </div>
-              <div className="ms-auto">
-                <Radio selected={false} />
-              </div>
-            </div>
-
-            {/* Option 3 : Retrait boutique + paiement au retrait */}
+            {/* Option 2 : Retrait boutique + paiement au retrait */}
             <div
               role="button"
               tabIndex={0}

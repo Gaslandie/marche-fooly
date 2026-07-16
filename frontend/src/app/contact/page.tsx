@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ContactForm from "@/components/contact/ContactForm";
 import AccordionFaq from "@/components/common/AccordionFaq";
-import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { siteConfig } from "@/config/site";
 import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
@@ -324,12 +323,6 @@ export default async function ContactPage() {
         </div>
       </section>
 
-      {/* ── Newsletter ────────────────────────────────────────────── */}
-      <section className="py-5" style={{ background: "var(--mf-light)" }}>
-        <div className="container">
-          <NewsletterBanner />
-        </div>
-      </section>
     </>
   );
 }

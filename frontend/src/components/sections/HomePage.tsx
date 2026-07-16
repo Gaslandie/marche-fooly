@@ -440,38 +440,6 @@ export default function HomePage({
         </div>
       </section>
 
-      <section className={styles.newsletterSection}>
-        <div className="container">
-          <div className={styles.newsletterBox}>
-            <div className="row align-items-center g-4">
-              <div className="col-lg-6">
-                <span className={styles.newsletterEyebrow}>Newsletter</span>
-                <h2>Recevez les meilleures offres</h2>
-                <p>
-                  Promos, nouveautés et bons plans directement dans votre boîte email pour
-                  suivre l&apos;actualité du marché local.
-                </p>
-              </div>
-              <div className="col-lg-6">
-                <form action="/contact" method="get" className={styles.newsletterForm}>
-                  <input type="hidden" name="topic" value="newsletter" />
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    className="form-control"
-                    placeholder="Votre adresse email"
-                    aria-label="Votre adresse email"
-                  />
-                  <button type="submit" className="btn btn-dark btn-lg">
-                    S&apos;inscrire
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

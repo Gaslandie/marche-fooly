@@ -29,8 +29,7 @@ const NAV_LINKS = [
   { icon: "bi bi-person", label: "Mon profil", href: "/mon-compte", active: true },
   { icon: "bi bi-bag", label: "Mes commandes", href: "/commandes", active: false },
   { icon: "bi bi-heart", label: "Mes favoris", href: "/favoris", active: false },
-  { icon: "bi bi-bell", label: "Notifications", href: "/mon-compte", active: false },
-  { icon: "bi bi-shield-check", label: "Sécurité", href: "/mon-compte", active: false },
+  { icon: "bi bi-bell", label: "Notifications", href: "/notifications", active: false },
 ];
 
 type AccountSidebarProps = {

@@ -3,7 +3,6 @@ import Image from "next/image";
 import Link from "next/link";
 import SellerForm from "@/components/seller/SellerForm";
 import AccordionFaq from "@/components/common/AccordionFaq";
-import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { getCurrentUser } from "@/lib/auth";
 import { hasBackOfficeAccess } from "@/lib/admin";
 import { getMySellerProfile } from "@/lib/seller";
@@ -453,12 +452,6 @@ export default async function DevenirVendeurPage() {
         </div>
       </section>
 
-      {/* ── Newsletter ────────────────────────────────────────────── */}
-      <section className="py-5" style={{ background: "var(--mf-light)" }}>
-        <div className="container">
-          <NewsletterBanner />
-        </div>
-      </section>
     </>
   );
 }

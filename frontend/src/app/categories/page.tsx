@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CategoryCard from "@/components/category/CategoryCard";
-import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { getCategories } from "@/lib/api";
 import { getSellerCta } from "@/lib/sellerCta";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
@@ -223,11 +222,6 @@ export default async function CategoriesPage() {
         </section>
       )}
 
-      <section className={styles.newsletterSection}>
-        <div className="container">
-          <NewsletterBanner />
-        </div>
-      </section>
     </>
   );
 }

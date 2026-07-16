@@ -3,7 +3,6 @@ import Link from "next/link";
 import ProductCard from "@/components/product/ProductCard";
 import ProductFilters from "@/components/product/ProductFilters";
 import ProductSort from "@/components/product/ProductSort";
-import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import { getCategories, getProducts } from "@/lib/api";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
 import styles from "@/styles/catalog.module.css";
@@ -245,11 +244,6 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
         </div>
       </section>
 
-      <section className={styles.newsletterSection}>
-        <div className="container">
-          <NewsletterBanner />
-        </div>
-      </section>
     </>
   );
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import CartView from "@/components/cart/CartView";
-import NewsletterBanner from "@/components/sections/NewsletterBanner";
 import styles from "@/styles/cart.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
@@ -107,12 +106,6 @@ export default function PanierPage() {
         </div>
       </section>
 
-      {/* ── Newsletter ────────────────────────────────────────────── */}
-      <section className="py-5" style={{ background: "var(--mf-light)" }}>
-        <div className="container">
-          <NewsletterBanner />
-        </div>
-      </section>
     </>
   );
 }

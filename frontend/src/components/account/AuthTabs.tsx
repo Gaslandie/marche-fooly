@@ -36,6 +36,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import styles from "@/styles/account.module.css";
 
@@ -226,7 +227,15 @@ export default function AuthTabs() {
               </button>
             </div>
 
-            <div className="mb-4"></div>
+            <div className="d-flex justify-content-end mt-2 mb-4">
+              <Link
+                href="/mot-de-passe-oublie"
+                className="small text-decoration-none"
+                style={{ color: "var(--mf-orange)", fontWeight: 600 }}
+              >
+                Mot de passe oublié ?
+              </Link>
+            </div>
 
             {loginStatus === "error" && (
               <div className="alert alert-danger py-2 px-3 small" role="alert">

@@ -59,6 +59,36 @@ const loginValidators = [
     .withMessage("Mot de passe requis"),
 ];
 
+const forgotPasswordValidators = [
+  body("email")
+    .isString()
+    .withMessage("Email requis")
+    .bail()
+    .trim()
+    .toLowerCase()
+    .isEmail()
+    .withMessage("Adresse email invalide")
+    .isLength({ max: 160 })
+    .withMessage("Email trop long"),
+];
+
+const resetPasswordValidators = [
+  // Token genere par crypto.randomBytes(32).toString("hex") : 64 hexa.
+  body("token")
+    .isString()
+    .withMessage("Lien invalide")
+    .bail()
+    .trim()
+    .matches(/^[a-f0-9]{64}$/)
+    .withMessage("Lien invalide"),
+  body("password")
+    .isString()
+    .withMessage("Mot de passe requis")
+    .bail()
+    .isLength({ min: 8, max: 128 })
+    .withMessage("Mot de passe: entre 8 et 128 caracteres"),
+];
+
 const HTTP_URL_REGEX = /^https?:\/\/.+/i;
 
 // Champs autorises pour la mise a jour du profil (whitelist).
@@ -111,6 +141,8 @@ const updateMeValidators = [
 module.exports = {
   registerValidators,
   loginValidators,
+  forgotPasswordValidators,
+  resetPasswordValidators,
   updateMeValidators,
   UPDATE_ME_ALLOWED_FIELDS,
 };

@@ -101,7 +101,62 @@ const sendNotificationEmail = async ({
   return { sent: true, skipped: false, messageId: info.messageId };
 };
 
+/**
+ * Indique si l'envoi d'emails est operationnel (flag + SMTP configures).
+ * Utilise par le flux "mot de passe oublie" pour repondre honnetement
+ * quand la reinitialisation par email n'est pas disponible.
+ */
+const isMailerEnabled = () => isConfigured(getMailConfig());
+
+/**
+ * Email de reinitialisation de mot de passe.
+ * `resetPath` est un chemin relatif frontend (avec le token en query) ;
+ * l'URL absolue est construite depuis APP_URL/FRONTEND_URL.
+ */
+const sendPasswordResetEmail = async ({ to, resetPath }) => {
+  const config = getMailConfig();
+
+  if (!isConfigured(config) || !to) {
+    return { sent: false, skipped: true };
+  }
+
+  const resetUrl = absoluteUrl(config, resetPath);
+  const safeUrl = escapeHtml(resetUrl);
+
+  const info = await getTransporter(config).sendMail({
+    from: config.from,
+    to,
+    replyTo: config.replyTo || undefined,
+    subject: "Reinitialisation de votre mot de passe - Marche Fooly",
+    text:
+      "Vous avez demande la reinitialisation de votre mot de passe Marche Fooly.\n\n" +
+      `Ouvrez ce lien pour choisir un nouveau mot de passe (valable 1 heure) :\n${resetUrl}\n\n` +
+      "Si vous n'etes pas a l'origine de cette demande, ignorez cet email : " +
+      "votre mot de passe actuel reste inchange.",
+    html: `
+      <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111827">
+        <h1 style="font-size:20px;margin:0 0 12px">Reinitialisation de votre mot de passe</h1>
+        <p style="margin:0 0 18px">
+          Vous avez demande la reinitialisation de votre mot de passe Marche Fooly.
+          Ce lien est valable <strong>1 heure</strong>.
+        </p>
+        <a href="${safeUrl}" style="display:inline-block;background:#ff6b00;color:#fff;text-decoration:none;padding:10px 14px;border-radius:8px;font-weight:700">
+          Choisir un nouveau mot de passe
+        </a>
+        <p style="margin:18px 0 0;color:#6b7280;font-size:13px">
+          Si vous n'etes pas a l'origine de cette demande, ignorez cet email :
+          votre mot de passe actuel reste inchange.
+        </p>
+      </div>
+    `,
+  });
+
+  return { sent: true, skipped: false, messageId: info.messageId };
+};
+
 module.exports = {
   sendNotificationEmail,
+  sendPasswordResetEmail,
+  isMailerEnabled,
 };
 

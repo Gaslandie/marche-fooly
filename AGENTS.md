@@ -113,6 +113,8 @@ Routes client principales :
 - `/commandes`
 - `/commande/[reference]`
 - `/mon-compte`
+- `/mot-de-passe-oublie`
+- `/reinitialiser-mot-de-passe`
 - `/favoris`
 - `/aide`
 - `/contact`
@@ -222,6 +224,9 @@ Regles categories :
 - Approbation/rejet/suspension vendeur
 - Contact
 - Newsletter
+- Mot de passe oublie (email avec lien de reinitialisation, token a usage
+  unique valable 1h ; necessite SMTP configure + NOTIFICATION_EMAIL_ENABLED=true
+  et APP_URL cote backend, sinon la page affiche les contacts directs)
 
 ## Modules a finaliser ou renforcer
 

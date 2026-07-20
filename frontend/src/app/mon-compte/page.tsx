@@ -14,8 +14,10 @@
  *     elle ne doit pas être pré-rendue / mise en cache.
  *
  * Limites connues :
- *   - Boutons « Modifier mes informations » / « Changer le mot de passe »
- *     et les préférences de notification : non fonctionnels pour l'instant.
+ *   - Pas encore d'édition du profil ni de changement de mot de passe
+ *     DEPUIS cette page (les boutons placeholder ont été retirés).
+ *     Le mot de passe oublié, lui, est géré via /mot-de-passe-oublie
+ *     (lien sur le formulaire de connexion).
  */
 
 import type { Metadata } from "next";

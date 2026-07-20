@@ -59,6 +59,18 @@ const userSchema = new mongoose.Schema(
       maxlength: 255,
       select: false,
     },
+    // Reinitialisation de mot de passe: on ne stocke JAMAIS le token en
+    // clair, uniquement son hash SHA-256 + une expiration courte. Champs
+    // absents sur les comptes existants (aucune migration necessaire).
+    passwordResetTokenHash: {
+      type: String,
+      default: null,
+      select: false,
+    },
+    passwordResetExpiresAt: {
+      type: Date,
+      default: null,
+    },
     role: {
       type: String,
       enum: USER_ROLES,

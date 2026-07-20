@@ -1,9 +1,21 @@
+const crypto = require("node:crypto");
+
 const User = require("../models/User");
 const { hashPassword, comparePassword } = require("../utils/password");
 const { signAuthToken } = require("../utils/jwt");
 const {
+  isMailerEnabled,
+  sendPasswordResetEmail,
+} = require("../utils/mailer");
+const {
   UPDATE_ME_ALLOWED_FIELDS,
 } = require("../validators/authValidators");
+
+/** Duree de validite d'un lien de reinitialisation (1 heure). */
+const PASSWORD_RESET_TTL_MS = 60 * 60 * 1000;
+
+const hashResetToken = (token) =>
+  crypto.createHash("sha256").update(token).digest("hex");
 
 /**
  * Format de sortie commun pour un utilisateur expose via l'API.
@@ -143,6 +155,122 @@ const login = async (req, res, next) => {
   }
 };
 
+/**
+ * POST /api/auth/forgot-password
+ * Anti-enumeration: la reponse est TOUJOURS le meme 200 generique, que
+ * l'email existe ou non. Le token n'est jamais stocke en clair (hash
+ * SHA-256 + expiration 1h). `updateOne` evite de re-valider les anciens
+ * documents (protection des donnees de production).
+ */
+const forgotPassword = async (req, res, next) => {
+  try {
+    // Reponse honnete si l'envoi d'emails n'est pas configure: on ne
+    // promet pas un email qui ne partira jamais.
+    if (!isMailerEnabled()) {
+      return res.status(503).json({
+        success: false,
+        message:
+          "La reinitialisation par email est momentanement indisponible. " +
+          "Contactez-nous pour recuperer votre compte.",
+        data: null,
+      });
+    }
+
+    const { email } = req.body;
+
+    const genericResponse = {
+      success: true,
+      message:
+        "Si un compte existe avec cet email, un lien de reinitialisation " +
+        "vient d'etre envoye. Pensez a verifier vos spams.",
+      data: null,
+    };
+
+    const user = await User.findOne({ email }).select("_id email").lean();
+    if (!user) {
+      return res.status(200).json(genericResponse);
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    await User.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          passwordResetTokenHash: hashResetToken(token),
+          passwordResetExpiresAt: new Date(Date.now() + PASSWORD_RESET_TTL_MS),
+        },
+      },
+    );
+
+    try {
+      await sendPasswordResetEmail({
+        to: user.email,
+        resetPath: `/reinitialiser-mot-de-passe?token=${token}`,
+      });
+    } catch (mailError) {
+      // Echec SMTP transitoire: on journalise sans casser l'anti-enumeration
+      // (une erreur ciblee revelerait que le compte existe).
+      console.error("[forgotPassword] envoi email impossible:", mailError.message);
+    }
+
+    return res.status(200).json(genericResponse);
+  } catch (error) {
+    return next(error);
+  }
+};
+
+/**
+ * POST /api/auth/reset-password
+ * Verifie le token (hash + expiration), remplace le mot de passe puis
+ * invalide le token (usage unique).
+ */
+const resetPassword = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+
+    const user = await User.findOne({
+      passwordResetTokenHash: hashResetToken(token),
+      passwordResetExpiresAt: { $gt: new Date() },
+    }).select("_id status");
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Ce lien de reinitialisation est invalide ou expire. " +
+          "Refaites une demande depuis « Mot de passe oublie ».",
+        data: null,
+      });
+    }
+
+    if (user.status === "suspended") {
+      return res.status(403).json({
+        success: false,
+        message: "Ce compte est suspendu",
+        data: null,
+      });
+    }
+
+    const passwordHash = await hashPassword(password);
+    await User.updateOne(
+      { _id: user._id },
+      {
+        $set: { passwordHash },
+        $unset: { passwordResetTokenHash: "", passwordResetExpiresAt: "" },
+      },
+    );
+
+    return res.status(200).json({
+      success: true,
+      message:
+        "Mot de passe mis a jour. Vous pouvez maintenant vous connecter.",
+      data: null,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
 const me = async (req, res) => {
   // req.user est garanti par le middleware authenticate.
   return res.status(200).json({
@@ -214,6 +342,8 @@ const logout = async (req, res) => {
 module.exports = {
   register,
   login,
+  forgotPassword,
+  resetPassword,
   me,
   updateMe,
   logout,

@@ -1,5 +1,27 @@
 # Guide — Activer l'envoi d'emails de Marché Fooly (à faire sur Render)
 
+> ## ⚠️ DÉCOUVERTE IMPORTANTE (20/07/2026) — À LIRE AVANT TOUT
+>
+> Les étapes A, B, C de ce guide ont été réalisées et les réglages sont
+> **corrects**… mais l'envoi échoue quand même (`Connection timeout` dans
+> les logs) car **Render bloque les ports SMTP (25, 465, 587) sur les
+> services GRATUITS** depuis le 26/09/2025 :
+> https://render.com/changelog/free-web-services-will-no-longer-allow-outbound-traffic-to-smtp-ports
+>
+> Deux issues possibles :
+> 1. **Passer le service Render en instance payante** (plan Starter).
+>    Les ports 465/587 s'ouvrent aussitôt : les réglages déjà en place
+>    fonctionneront **sans aucune autre action**. Bonus : le backend ne se
+>    met plus en veille (site plus rapide au premier chargement).
+>    → Dashboard Render → service `marche-fooly` → « Upgrade ».
+> 2. **Rester en gratuit** et envoyer les emails via une API HTTPS
+>    (ex. Brevo, gratuit jusqu'à 300 emails/jour) : nécessite un compte
+>    Brevo, une vérification du domaine (DNS chez Hostinger) et une
+>    modification du code — à planifier avec le développeur.
+>
+> Les variables déjà ajoutées (étape B) restent bonnes dans les deux cas :
+> ne rien supprimer.
+
 > **Pour qui ?** La personne qui a accès au compte **Render** (hébergeur du
 > backend) et au compte **Hostinger** (hébergeur de l'email
 > `contact@marchefooly.com`).

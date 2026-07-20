@@ -165,13 +165,12 @@ const login = async (req, res, next) => {
 const forgotPassword = async (req, res, next) => {
   try {
     // Reponse honnete si l'envoi d'emails n'est pas configure: on ne
-    // promet pas un email qui ne partira jamais.
+    // promet pas un email qui ne partira jamais. (Le frontend affiche
+    // son propre message neutre sur ce 503.)
     if (!isMailerEnabled()) {
       return res.status(503).json({
         success: false,
-        message:
-          "La reinitialisation par email est momentanement indisponible. " +
-          "Contactez-nous pour recuperer votre compte.",
+        message: "La reinitialisation par email est momentanement indisponible.",
         data: null,
       });
     }

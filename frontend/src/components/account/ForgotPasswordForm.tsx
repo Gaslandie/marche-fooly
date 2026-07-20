@@ -11,16 +11,17 @@
  *   - app/mot-de-passe-oublie/page.tsx
  *
  * Règles UX / honnêteté :
- *   - 503 = l'envoi d'emails n'est pas configuré côté backend : on
- *     affiche alors les moyens de contact directs (téléphone, WhatsApp)
- *     au lieu de promettre un email qui ne partira pas.
+ *   - 503 = l'envoi d'emails n'est pas configuré côté backend
+ *     (NOTIFICATION_EMAIL_ENABLED / SMTP_*). On affiche alors un simple
+ *     message neutre « indisponible, réessayez plus tard » — jamais un
+ *     faux « email envoyé ». Ce cas disparaît de lui-même dès que le
+ *     SMTP est configuré chez l'hébergeur.
  */
 
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { siteConfig } from "@/config/site";
 import styles from "@/styles/account.module.css";
 
 type Status = "idle" | "loading" | "success" | "error" | "unavailable";
@@ -47,7 +48,9 @@ export default function ForgotPasswordForm() {
 
       if (res.status === 503) {
         setStatus("unavailable");
-        setMessage(body?.message ?? "Service momentanément indisponible.");
+        setMessage(
+          "La réinitialisation en ligne est momentanément indisponible. Réessayez un peu plus tard.",
+        );
         return;
       }
 
@@ -114,27 +117,9 @@ export default function ForgotPasswordForm() {
               </div>
             )}
             {status === "unavailable" && (
-              <div className="alert alert-warning py-2 px-3 small" role="alert">
-                <p className="mb-2">
-                  <i className="bi bi-info-circle me-1" aria-hidden="true"></i>
-                  {message}
-                </p>
-                <p className="mb-0">
-                  Appelez-nous au{" "}
-                  <a href={siteConfig.phoneHref} className="fw-bold">
-                    {siteConfig.phone}
-                  </a>{" "}
-                  ou écrivez-nous sur{" "}
-                  <a
-                    href={siteConfig.whatsappHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="fw-bold"
-                  >
-                    WhatsApp
-                  </a>{" "}
-                  pour récupérer votre compte.
-                </p>
+              <div className="alert alert-secondary py-2 px-3 small" role="alert">
+                <i className="bi bi-clock-history me-1" aria-hidden="true"></i>
+                {message}
               </div>
             )}
 

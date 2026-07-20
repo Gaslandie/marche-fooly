@@ -201,16 +201,35 @@ const forgotPassword = async (req, res, next) => {
       },
     );
 
-    try {
-      await sendPasswordResetEmail({
-        to: user.email,
-        resetPath: `/reinitialiser-mot-de-passe?token=${token}`,
+    // Envoi NON bloquant: on repond tout de suite au client (l'utilisateur
+    // n'a pas a attendre le serveur SMTP, qui peut etre lent). L'email part
+    // en tache de fond. Render etant un serveur Node persistant, cette tache
+    // se termine bien apres la reponse. Toute issue est journalisee pour
+    // diagnostic (onglet Logs de Render).
+    sendPasswordResetEmail({
+      to: user.email,
+      resetPath: `/reinitialiser-mot-de-passe?token=${token}`,
+    })
+      .then((result) => {
+        if (result?.sent) {
+          console.log(
+            "[forgotPassword] email de reinitialisation envoye, id:",
+            result.messageId,
+          );
+        } else {
+          console.warn(
+            "[forgotPassword] email NON envoye (mailer desactive ou destinataire vide)",
+          );
+        }
+      })
+      .catch((mailError) => {
+        // Echec SMTP: on journalise sans casser l'anti-enumeration (une
+        // erreur cote client revelerait que le compte existe).
+        console.error(
+          "[forgotPassword] envoi email impossible:",
+          mailError?.message || mailError,
+        );
       });
-    } catch (mailError) {
-      // Echec SMTP transitoire: on journalise sans casser l'anti-enumeration
-      // (une erreur ciblee revelerait que le compte existe).
-      console.error("[forgotPassword] envoi email impossible:", mailError.message);
-    }
 
     return res.status(200).json(genericResponse);
   } catch (error) {

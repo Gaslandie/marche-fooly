@@ -45,6 +45,12 @@ const getTransporter = (config) => {
     port: config.port,
     secure: config.secure,
     auth,
+    // Delais maximaux: un serveur SMTP lent ou injoignable doit echouer
+    // proprement en quelques secondes, jamais rester suspendu (sinon la
+    // requete HTTP qui l'attend se bloque -> spinner infini cote client).
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 20000,
   });
 
   return transporter;

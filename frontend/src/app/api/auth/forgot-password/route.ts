@@ -38,6 +38,10 @@ export async function POST(request: Request) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
+      // Filet de sécurité : le backend répond normalement en <1 s (l'envoi
+      // email est en tâche de fond). Au-delà de 12 s, on ne laisse pas le
+      // formulaire tourner indéfiniment.
+      signal: AbortSignal.timeout(12000),
     });
   } catch {
     return NextResponse.json(

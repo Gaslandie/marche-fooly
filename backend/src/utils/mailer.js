@@ -13,6 +13,10 @@ const getMailConfig = () => {
 
   return {
     enabled: boolEnv(process.env.NOTIFICATION_EMAIL_ENABLED),
+    // Cle API Brevo (transactionnel HTTPS). Prioritaire sur SMTP quand
+    // presente: Render bloque les ports SMTP sur son offre gratuite, mais
+    // pas le HTTPS. Le SMTP reste un transport de secours/alternatif.
+    brevoApiKey: (process.env.BREVO_API_KEY || "").trim(),
     host,
     port,
     secure: boolEnv(process.env.SMTP_SECURE),
@@ -27,7 +31,27 @@ const getMailConfig = () => {
 };
 
 const isConfigured = (config) =>
-  config.enabled && config.host && config.port && config.from;
+  Boolean(
+    config.enabled &&
+      config.from &&
+      (config.brevoApiKey || (config.host && config.port)),
+  );
+
+/**
+ * Decompose une adresse `"Nom <email@domaine>"` (format SMTP_FROM) en
+ * `{ name, email }` pour l'API Brevo. Accepte aussi un email nu.
+ */
+const parseAddress = (value) => {
+  const raw = String(value || "").trim();
+  const match = raw.match(/^(.*)<([^<>]+)>\s*$/);
+  if (match) {
+    return {
+      name: match[1].trim().replace(/^"|"$/g, "") || undefined,
+      email: match[2].trim(),
+    };
+  }
+  return { email: raw };
+};
 
 const getTransporter = (config) => {
   if (transporter) return transporter;
@@ -55,6 +79,74 @@ const getTransporter = (config) => {
 
   return transporter;
 };
+
+const BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
+
+/**
+ * Envoi via l'API transactionnelle Brevo (HTTPS, port 443 — non bloque
+ * par Render). L'expediteur (SMTP_FROM) doit etre verifie dans Brevo.
+ * Doc: https://developers.brevo.com/docs/send-a-transactional-email
+ */
+const sendViaBrevoApi = async (config, { to, subject, text, html }) => {
+  const sender = parseAddress(config.from);
+  const replyTo = parseAddress(config.replyTo || config.from);
+
+  const res = await fetch(BREVO_API_URL, {
+    method: "POST",
+    headers: {
+      "api-key": config.brevoApiKey,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify({
+      sender,
+      to: [{ email: to }],
+      replyTo: { email: replyTo.email },
+      subject,
+      textContent: text,
+      htmlContent: html,
+    }),
+    // Meme philosophie que les timeouts SMTP: echouer proprement en
+    // quelques secondes plutot que rester suspendu.
+    signal: AbortSignal.timeout(10000),
+  });
+
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const errorBody = await res.json();
+      detail = errorBody?.message || "";
+    } catch {
+      // corps illisible: on garde juste le statut HTTP.
+    }
+    throw new Error(`Brevo API ${res.status}${detail ? `: ${detail}` : ""}`);
+  }
+
+  const body = await res.json().catch(() => ({}));
+  return { messageId: body?.messageId || "" };
+};
+
+/** Envoi via SMTP classique (nodemailer). */
+const sendViaSmtp = async (config, { to, subject, text, html }) => {
+  const info = await getTransporter(config).sendMail({
+    from: config.from,
+    to,
+    replyTo: config.replyTo || undefined,
+    subject,
+    text,
+    html,
+  });
+  return { messageId: info.messageId };
+};
+
+/**
+ * Point d'envoi unique: API Brevo si une cle est configuree, sinon SMTP.
+ * Les fonctions publiques construisent le contenu et passent par ici.
+ */
+const deliverEmail = (config, message) =>
+  config.brevoApiKey
+    ? sendViaBrevoApi(config, message)
+    : sendViaSmtp(config, message);
 
 const escapeHtml = (value) =>
   String(value || "")
@@ -87,10 +179,8 @@ const sendNotificationEmail = async ({
   const safeTitle = escapeHtml(title);
   const safeMessage = escapeHtml(message);
 
-  const info = await getTransporter(config).sendMail({
-    from: config.from,
+  const info = await deliverEmail(config, {
     to,
-    replyTo: config.replyTo || undefined,
     subject: subject || title,
     text: `${title}\n\n${message}\n\nVoir sur Marche Fooly: ${actionUrl}`,
     html: `
@@ -129,10 +219,8 @@ const sendPasswordResetEmail = async ({ to, resetPath }) => {
   const resetUrl = absoluteUrl(config, resetPath);
   const safeUrl = escapeHtml(resetUrl);
 
-  const info = await getTransporter(config).sendMail({
-    from: config.from,
+  const info = await deliverEmail(config, {
     to,
-    replyTo: config.replyTo || undefined,
     subject: "Reinitialisation de votre mot de passe - Marche Fooly",
     text:
       "Vous avez demande la reinitialisation de votre mot de passe Marche Fooly.\n\n" +

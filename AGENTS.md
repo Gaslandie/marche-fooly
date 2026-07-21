@@ -225,8 +225,9 @@ Regles categories :
 - Contact
 - Newsletter
 - Mot de passe oublie (email avec lien de reinitialisation, token a usage
-  unique valable 1h ; necessite SMTP configure + NOTIFICATION_EMAIL_ENABLED=true
-  et APP_URL cote backend, sinon la page affiche les contacts directs)
+  unique valable 1h ; necessite NOTIFICATION_EMAIL_ENABLED=true + APP_URL +
+  un transport email cote backend : BREVO_API_KEY (API HTTPS, prioritaire —
+  Render gratuit bloque les ports SMTP) ou SMTP classique en secours)
 
 ## Modules a finaliser ou renforcer
 

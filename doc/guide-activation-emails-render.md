@@ -1,26 +1,86 @@
 # Guide — Activer l'envoi d'emails de Marché Fooly (à faire sur Render)
 
-> ## ⚠️ DÉCOUVERTE IMPORTANTE (20/07/2026) — À LIRE AVANT TOUT
+> ## ⚠️ IMPORTANT — HISTORIQUE ET DÉCISION (20/07/2026)
 >
-> Les étapes A, B, C de ce guide ont été réalisées et les réglages sont
-> **corrects**… mais l'envoi échoue quand même (`Connection timeout` dans
-> les logs) car **Render bloque les ports SMTP (25, 465, 587) sur les
-> services GRATUITS** depuis le 26/09/2025 :
+> Les étapes A, B, C ci-dessous ont été réalisées et les réglages sont
+> **corrects**… mais l'envoi SMTP échoue (`Connection timeout`) car
+> **Render bloque les ports SMTP (25, 465, 587) sur les services
+> GRATUITS** depuis le 26/09/2025 :
 > https://render.com/changelog/free-web-services-will-no-longer-allow-outbound-traffic-to-smtp-ports
 >
-> Deux issues possibles :
-> 1. **Passer le service Render en instance payante** (plan Starter).
->    Les ports 465/587 s'ouvrent aussitôt : les réglages déjà en place
->    fonctionneront **sans aucune autre action**. Bonus : le backend ne se
->    met plus en veille (site plus rapide au premier chargement).
->    → Dashboard Render → service `marche-fooly` → « Upgrade ».
-> 2. **Rester en gratuit** et envoyer les emails via une API HTTPS
->    (ex. Brevo, gratuit jusqu'à 300 emails/jour) : nécessite un compte
->    Brevo, une vérification du domaine (DNS chez Hostinger) et une
->    modification du code — à planifier avec le développeur.
->
-> Les variables déjà ajoutées (étape B) restent bonnes dans les deux cas :
-> ne rien supprimer.
+> **Décision prise : rester en gratuit et envoyer via l'API Brevo**
+> (HTTPS, non bloquée). Le code du backend gère désormais les deux
+> transports ; il n'y a plus qu'à suivre la section « Étape D » ci-dessous.
+> Les variables déjà ajoutées (étape B) restent utiles : **ne rien
+> supprimer** (`SMTP_FROM`, `SMTP_REPLY_TO` et `APP_URL` servent aussi à
+> l'envoi Brevo ; le SMTP redeviendra un secours si le plan Render change).
+
+---
+
+## Étape D — Activer l'envoi via Brevo (la marche à suivre actuelle)
+
+Brevo est un service d'envoi d'emails avec une offre **gratuite de
+300 emails/jour** — largement suffisant pour démarrer. Environ 15 minutes.
+
+### D1. Créer le compte Brevo
+
+1. Aller sur **https://www.brevo.com** → « S'inscrire gratuitement ».
+2. Créer le compte (idéalement avec l'email `contact@marchefooly.com`),
+   confirmer l'email d'inscription, choisir l'offre **gratuite**.
+
+### D2. Déclarer et vérifier l'expéditeur
+
+Brevo n'envoie qu'au nom d'expéditeurs **vérifiés** :
+
+1. Dans Brevo : menu du compte (en haut à droite) →
+   **« Senders, Domains & Dedicated IPs »** → onglet **« Senders »** →
+   **« Add a sender »**.
+2. Renseigner : nom `Marche Fooly`, email `contact@marchefooly.com`.
+3. Brevo envoie un **code/lien de confirmation** à cette boîte : l'ouvrir
+   dans le webmail Hostinger (hpanel.hostinger.com → Emails → Webmail) et
+   confirmer.
+
+### D3. Créer la clé API
+
+1. Menu du compte (en haut à droite) → **« SMTP & API »** →
+   onglet **« API Keys »** → **« Generate a new API key »**.
+2. La nommer `marche-fooly-backend` et **copier la clé immédiatement**
+   (elle commence par `xkeysib-` et ne sera plus jamais affichée).
+   ⚠️ Bien rester dans l'onglet **API Keys** — la clé « SMTP » de l'onglet
+   voisin ne fonctionnera pas ici.
+
+### D4. Ajouter la clé sur Render
+
+1. **dashboard.render.com** → service **`marche-fooly`** → onglet
+   **« Environment »** → **« + Add Environment Variable »** :
+   - **Key** : `BREVO_API_KEY`
+   - **Value** : la clé copiée en D3
+2. Enregistrer avec **« Save and deploy »** et attendre le statut « Live ».
+
+### D5. Tester
+
+Comme l'étape C ci-dessous : demander un lien sur
+`www.marchefooly.com/mot-de-passe-oublie` avec un email de compte existant,
+et vérifier la réception (spams compris). Dans les logs Render, la ligne
+`[forgotPassword] email de reinitialisation envoye` confirme l'envoi.
+
+### D6. (Recommandé, à faire plus tard) Authentifier le domaine
+
+Tant que le domaine n'est pas authentifié (DKIM), Brevo peut afficher
+l'expéditeur via `@brevosend.com`, ce qui est moins professionnel :
+
+1. Dans Brevo : « Senders, Domains & Dedicated IPs » → **« Domains »** →
+   ajouter `marchefooly.com` → Brevo fournit des enregistrements DNS.
+2. Les ajouter dans **hPanel Hostinger → Domaines → Zone DNS**, puis
+   revenir dans Brevo cliquer « Authenticate ».
+
+### Dépannage spécifique Brevo (logs Render)
+
+| Message dans les logs | Cause | Solution |
+|---|---|---|
+| `Brevo API 401` | Clé incorrecte ou tronquée | Revérifier `BREVO_API_KEY` (clé API, pas clé SMTP) |
+| `Brevo API 400: sender ... not valid` | Expéditeur non vérifié | Refaire l'étape D2 |
+| Rien dans les logs, message « indisponible » sur le site | `NOTIFICATION_EMAIL_ENABLED` ≠ `true` | Vérifier la variable |
 
 > **Pour qui ?** La personne qui a accès au compte **Render** (hébergeur du
 > backend) et au compte **Hostinger** (hébergeur de l'email

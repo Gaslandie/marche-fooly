@@ -115,6 +115,7 @@ const toPublicOrder = (doc) => ({
   items: (doc.items || []).map((item) => ({
     product: item.product ? item.product.toString() : null,
     productName: item.productName,
+    productSlug: item.productSlug || "",
     sku: item.sku || "",
     unitPrice: item.unitPrice,
     quantity: item.quantity,
@@ -283,6 +284,7 @@ const create = async (req, res, next) => {
       snapshotItems.push({
         product: product._id,
         productName: product.name,
+        productSlug: product.slug || "",
         sku: product.sku || "",
         unitPrice: product.price,
         quantity,

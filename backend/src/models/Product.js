@@ -236,6 +236,10 @@ productSchema.pre("validate", function normalizeProductFields() {
   this.tags = [...new Set(normalizedTags.map((tag) => slugify(tag)).filter(Boolean))];
 });
 
+// Unicite par vendeur du SLUG uniquement (URLs publiques), pas du nom:
+// un meme nom d'affichage peut se repeter, le controleur de creation
+// attribue alors un slug suffixe (-2, -3, ...) via productSlugService.
+// L'index couvre tous les statuts, "archived" compris.
 productSchema.index({ seller: 1, slug: 1 }, { unique: true });
 productSchema.index({ category: 1, status: 1, createdAt: -1 });
 productSchema.index({ seller: 1, status: 1, createdAt: -1 });

@@ -92,6 +92,15 @@ export default function OrderCard({ order }: Props) {
               <p className={styles.orderItemMeta}>
                 Qté {item.quantity} ·{" "}
                 {formatPrice(item.unitPrice, order.currency)} / unité
+                {/* Réf (slug) affichée seulement si la commande contient
+                    deux articles du même nom, pour les distinguer. */}
+                {item.productSlug &&
+                order.items.some(
+                  (other, j) =>
+                    j !== i && other.productName === item.productName,
+                )
+                  ? ` · Réf ${item.productSlug}`
+                  : ""}
               </p>
             </div>
             <div className={styles.orderItemPrice}>

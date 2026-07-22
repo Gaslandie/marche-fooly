@@ -33,6 +33,17 @@ const orderItemSchema = new mongoose.Schema(
       trim: true,
       maxlength: 160,
     },
+    // Snapshot du slug produit au moment de la commande. Depuis l'option
+    // "noms communs" (plusieurs produits d'un meme vendeur peuvent porter
+    // le meme nom), c'est lui qui permet d'identifier sans ambiguite
+    // l'article commande. Champ additif: vide sur les commandes anterieures.
+    productSlug: {
+      type: String,
+      trim: true,
+      lowercase: true,
+      maxlength: 200,
+      default: "",
+    },
     sku: {
       type: String,
       trim: true,

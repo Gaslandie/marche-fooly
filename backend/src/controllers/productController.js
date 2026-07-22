@@ -42,6 +42,11 @@
  *   - Routes publiques: filtre status IN ["active","out_of_stock"]
  *     pour ne JAMAIS fuiter "draft" ou "archived".
  *   - DELETE = soft-delete (status="archived"), idempotent.
+ *   - Noms de produits NON uniques par vendeur: le slug (unique par
+ *     vendeur, base des URLs publiques) est attribue cote serveur a la
+ *     creation via productSlugService (suffixe -2, -3, ... si le nom est
+ *     deja pris, produits archives compris). Il n'est jamais recalcule
+ *     au PATCH (stabilite des URLs).
  *   - VersionError de Mongoose (optimisticConcurrency) -> 409 lisible.
  *   - 11000 sur (seller, slug) ou sku -> 409 lisible.
  *
@@ -67,6 +72,10 @@ const {
   markProductImageAttached,
   verifyProductImageForSeller,
 } = require("../services/productImageService");
+const {
+  findAvailableProductSlug,
+  ProductSlugLimitError,
+} = require("../services/productSlugService");
 
 // Helper: serialise le ref soit comme objet (si populated) soit comme
 // string ObjectId, soit null. Garde un contrat API stable.
@@ -171,7 +180,10 @@ const mapDuplicateKey = (error) => {
   if (field === "sku") {
     message = "Ce SKU est deja utilise";
   } else if (field === "slug" || error.keyPattern?.seller) {
-    message = "Vous avez deja un produit avec ce nom";
+    // Depuis la deduplication automatique des slugs (productSlugService),
+    // un nom deja utilise ne bloque plus la creation. Ce cas ne peut donc
+    // venir que d'une course residuelle apres plusieurs tentatives.
+    message = "Conflit lors de l'enregistrement du produit. Veuillez reessayer.";
   } else {
     message = "Conflit d'unicite";
   }
@@ -482,7 +494,25 @@ const create = async (req, res, next) => {
         ? await applyCoverImagePayload(payload, req.sellerProfile._id)
         : null;
 
-    const created = await Product.create(payload);
+    // Slug attribue cote serveur: plusieurs produits d'un meme vendeur
+    // peuvent porter le meme nom d'affichage, le slug est suffixe
+    // automatiquement (-2, -3, ...) pour garder des URLs uniques.
+    // En cas de course entre deux creations simultanees (E11000 sur
+    // (seller, slug)), on recalcule puis on reessaie avant d'abandonner.
+    let created = null;
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      payload.slug = await findAvailableProductSlug(
+        req.sellerProfile._id,
+        payload.name,
+      );
+      try {
+        created = await Product.create(payload);
+        break;
+      } catch (error) {
+        const isSlugRace = error?.code === 11000 && error?.keyPattern?.seller;
+        if (!isSlugRace || attempt === 3) throw error;
+      }
+    }
     const imagesToAttach = pendingImages ?? (pendingCoverImage ? [created.coverImage] : []);
     await Promise.all(
       imagesToAttach.map((image) =>
@@ -499,6 +529,13 @@ const create = async (req, res, next) => {
     });
   } catch (error) {
     if (error instanceof ProductImageError) {
+      return res.status(error.status).json({
+        success: false,
+        message: error.message,
+        data: null,
+      });
+    }
+    if (error instanceof ProductSlugLimitError) {
       return res.status(error.status).json({
         success: false,
         message: error.message,

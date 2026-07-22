@@ -124,6 +124,10 @@ export default async function VendeurCommandeDetailPage({ params }: PageProps) {
                   <div className="text-secondary small">
                     Quantité&nbsp;: {item.quantity}
                     {item.sku ? ` · SKU ${item.sku}` : ""}
+                    {/* Réf = slug produit : indispensable pour identifier
+                        l'article quand plusieurs produits de la boutique
+                        portent le même nom (vide sur anciennes commandes). */}
+                    {item.productSlug ? ` · Réf ${item.productSlug}` : ""}
                   </div>
                 </div>
                 <div className="text-end">

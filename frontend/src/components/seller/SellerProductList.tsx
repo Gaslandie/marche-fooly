@@ -78,6 +78,11 @@ export default function SellerProductList({ products }: Props) {
           <tbody>
             {products.map((product) => {
               const badge = statusBadge(product.status);
+              // Réf (slug) affichée quand un autre produit de la boutique
+              // porte le même nom, pour les distinguer dans la liste.
+              const hasHomonym = products.some(
+                (other) => other.id !== product.id && other.name === product.name,
+              );
               return (
                 <tr key={product.id}>
                   <td>
@@ -95,9 +100,12 @@ export default function SellerProductList({ products }: Props) {
                       </div>
                       <div>
                         <div className="fw-semibold">{product.name}</div>
-                        {product.sku && (
+                        {(product.sku || hasHomonym) && (
                           <div className="text-secondary small">
-                            SKU {product.sku}
+                            {product.sku ? `SKU ${product.sku}` : ""}
+                            {hasHomonym
+                              ? `${product.sku ? " · " : ""}Réf ${product.slug}`
+                              : ""}
                           </div>
                         )}
                       </div>

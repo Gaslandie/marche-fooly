@@ -8,7 +8,8 @@
 #   Couvre cas heureux ET cas interdits: RBAC, ownership cross-vendeur,
 #   champs interdits (mass-assignment), prix/stock invalides, currency
 #   etrangere, status "out_of_stock" interdit en entree, category inactive
-#   ou inexistante, soft-delete idempotent, isFeatured admin-only.
+#   ou inexistante, soft-delete idempotent, isFeatured admin-only,
+#   nom duplique chez un meme vendeur -> slug suffixe "-2" (7d/7e).
 #
 # Quand le lancer:
 #   - Apres le seed categories (`node src/scripts/seedCategories.js`).
@@ -24,7 +25,7 @@
 #   - Cree 4 users (1 customer, 2 sellers A et B, 1 admin) timestamps.
 #   - Cree 2 SellerProfile (A et B) approuves.
 #   - Cree 1 categorie ZZ_TEST inactive (pour scenario "categorie inactive").
-#   - Cree 1 Product appartenant a A.
+#   - Cree 2 Products appartenant a A (meme nom, slugs "-" et "-2").
 #   - Cleanup en fin (hard-delete via Mongoose): users, sellerprofiles,
 #     categorie test, produit.
 #
@@ -216,6 +217,25 @@ echo "         (produit ID=${PRODUCT_ID}, slug=${PRODUCT_SLUG}, sellerSlug=${SEL
 # Sanity: la route detail public retourne 200 quand status est public.
 call GET "/api/products/${SELLER_A_SLUG}/${PRODUCT_SLUG}" "" ""
 expect_status "7c" 200 "$CODE" "$RESP"
+
+# --- 7d) POST meme nom par A -> 201 avec slug deduplique "-2" ----------------
+# Option "noms communs": un meme vendeur peut reutiliser un nom de produit,
+# le serveur suffixe alors le slug automatiquement (URLs uniques).
+call POST "/api/products" "$TOKEN_A" "$(cat <<EOF
+{"name":"${PRODUCT_NAME}","description":"Description longue de test pour smoke (doublon de nom)","price":12000,"stockQuantity":3,"category":"${ACTIVE_CAT_ID}","status":"active"}
+EOF
+)"
+expect_status "7d" 201 "$CODE" "$RESP"
+PRODUCT_SLUG_DUP="$(echo "$RESP" | jq -r '.data.product.slug')"
+if [ "$PRODUCT_SLUG_DUP" != "${PRODUCT_SLUG}-2" ]; then
+  echo "KO 7d: slug deduplique attendu '${PRODUCT_SLUG}-2', recu '${PRODUCT_SLUG_DUP}'"
+  cleanup_and_exit 1
+fi
+echo "         (doublon de nom OK, slug=${PRODUCT_SLUG_DUP})"
+
+# --- 7e) Detail public du doublon -> 200 (URL distincte) ---------------------
+call GET "/api/products/${SELLER_A_SLUG}/${PRODUCT_SLUG_DUP}" "" ""
+expect_status "7e" 200 "$CODE" "$RESP"
 
 # --- 8) POST avec slug en body -> 422 (FORBIDDEN_AT_CREATE) -----------------
 call POST "/api/products" "$TOKEN_A" '{"name":"ZZ Smoke Product '"${EPOCH}"' alt1","description":"Description suffisamment longue de test","price":100,"stockQuantity":1,"category":"'"${ACTIVE_CAT_ID}"'","slug":"injection-slug"}'

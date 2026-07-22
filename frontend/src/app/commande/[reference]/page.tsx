@@ -148,6 +148,16 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
                     <div className="text-secondary small">
                       Quantité&nbsp;: {item.quantity}
                       {item.sku ? ` · SKU ${item.sku}` : ""}
+                      {/* Réf (slug) affichée seulement si la commande
+                          contient deux articles du même nom, pour les
+                          distinguer sans alourdir le cas courant. */}
+                      {item.productSlug &&
+                      order.items.some(
+                        (other, j) =>
+                          j !== index && other.productName === item.productName,
+                      )
+                        ? ` · Réf ${item.productSlug}`
+                        : ""}
                     </div>
                   </div>
                   <div className="text-end">

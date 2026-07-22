@@ -49,6 +49,10 @@ export type OrderAddress = {
 export type OrderItem = {
   product: string | null;
   productName: string;
+  /** Slug du produit au moment de la commande. Identifie l'article sans
+   * ambiguïté quand plusieurs produits du vendeur portent le même nom.
+   * Vide ("") sur les commandes antérieures à l'ajout du champ. */
+  productSlug?: string;
   sku: string;
   unitPrice: number;
   quantity: number;

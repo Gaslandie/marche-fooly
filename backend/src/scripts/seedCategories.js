@@ -126,6 +126,11 @@ const SEED_CATEGORIES = [
     description:
       "Repas, plats préparés, snacks et offres de restauration locale.",
   },
+  {
+    name: "Pharmacie / Parapharmacie",
+    description:
+      "Produits de pharmacie, parapharmacie, hygiène, soins et matériel de premiers secours.",
+  },
 ];
 
 const fieldsEqual = (doc, payload) => {

@@ -129,6 +129,7 @@ const CATEGORY_ICON_BY_SLUG: Record<string, string> = {
   "beaute-soins": "bi bi-stars",
   cosmetiques: "bi bi-flower1",
   restaurants: "bi bi-cup-hot",
+  "pharmacie-parapharmacie": "bi bi-capsule",
   "meubles-decoration": "bi bi-lamp",
   "sport-loisirs": "bi bi-bicycle",
   "outils-bricolage": "bi bi-tools",
@@ -167,6 +168,7 @@ function categoryIcon(api: ApiCategory): string {
   }
   if (label.includes("homme")) return "bi bi-person";
   if (label.includes("bijou") || label.includes("sac")) return "bi bi-gem";
+  if (label.includes("pharmac")) return "bi bi-capsule";
   if (label.includes("cosmetique")) return "bi bi-flower1";
   if (label.includes("restaurant") || label.includes("restauration")) {
     return "bi bi-cup-hot";

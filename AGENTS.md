@@ -1,5 +1,10 @@
 # AGENTS.md - Marché Fooly
 
+> **Socle commun GassTech** — le bloc `socle-gasstech` en bas de page fixe les rôles, les
+> niveaux de vérification, les interdits, et la **clôture d'un travail : rapport court, puis
+> 3 à 5 questions de gestion de projet**. Il est identique dans tous les projets et se met à
+> jour depuis `gasstech-project-template`. Les règles de cette page priment sur lui.
+
 ## Projet
 
 Marché Fooly est une marketplace locale basée à Sangarédi, Guinée.
@@ -381,3 +386,168 @@ Toute modification doit ameliorer ou preserver :
 - experience premium.
 
 Si une modification degrade un de ces points, elle doit etre corrigee.
+
+
+---
+
+<!-- BEGIN:socle-gasstech v1 -->
+<!--
+  Socle commun à tous les projets GassTech Solutions et projets clients.
+  Source de vérité : gasstech-project-template/socle/SOCLE_COMMUN.md
+  Ne pas éditer ce bloc dans un projet : éditer la source, puis relancer
+  `scripts/sync-socle.sh <chemin-du-projet>`. Toute modification faite ici sera écrasée.
+  Les règles PROPRES au projet s'écrivent en dehors de ce bloc, et priment sur lui.
+-->
+
+## Socle commun GassTech
+
+Ce bloc est identique dans tous les projets. Il dit comment on travaille ; le reste de ce
+fichier dit ce qu'est *ce* projet-ci. En cas de contradiction, la section propre au projet
+gagne, et la demande en cours gagne sur tout le reste.
+
+### Rôles par défaut
+
+- **Gassama** — propriétaire du produit. Il décide, arbitre, valide, teste dans l'app.
+- **Claude Code** — il **pense** : analyse, conception, découpage, revue contradictoire,
+  recherche de la cause réelle et des cas oubliés. Il implémente quand la tâche le lui demande.
+- **Codex** — il **implémente** : inspecte, code, teste, documente, ne dépasse pas le périmètre.
+
+C'est la répartition par défaut, **sauf mention contraire** dans la tâche ou dans la section
+propre au projet. Un prompt doit toujours dire explicitement de quoi il s'agit :
+conception, implémentation ou revue.
+
+Deux agents ne modifient jamais les mêmes fichiers en même temps. Celui qui implémente termine
+et rend son rapport **avant** que la revue commence. Un réviseur ne corrige pas de lui-même :
+il signale, et la correction devient une tâche confiée à un seul agent.
+
+### Lire avant d'agir
+
+Dans cet ordre, avant la première modification d'une session :
+
+1. `AGENTS.md` (ce fichier) ;
+2. `docs/PROJECT_CONTEXT.md` — les décisions produit déjà prises ;
+3. `docs/WORKLOG.md` — ce qui est en cours, par qui, et où ça en est ;
+4. la tâche active ;
+5. seulement les fichiers concernés par la tâche — pas d'exploration inutile du dépôt.
+
+Puis : regarder `git status` pour voir ce qu'un autre agent a en cours, annoncer son périmètre
+en quelques lignes, et s'y tenir.
+
+### Dire la vérité sur le niveau atteint
+
+Ces mots ne sont pas interchangeables. Nommer celui qui est réellement atteint :
+
+| Niveau | Ce que ça veut dire |
+| --- | --- |
+| **codé** | écrit, jamais passé au compilateur |
+| **compilé** | la compilation passe |
+| **testé** | un scénario concret a été déroulé, à la main ou par un test |
+| **installé / déployé** | posé sur un appareil ou un environnement nommé, à telle heure |
+| **commité / poussé** | dans git, sur telle branche |
+
+Ne jamais dire « c'est fait » pour « c'est écrit ». Si une partie n'a pas été vérifiée, le dire
+plutôt que de laisser croire. Une compilation qui échoue se signale ; elle ne s'enjambe pas.
+
+### Ce qu'on ne fait pas sans demande explicite
+
+- Pas de `commit`, `push`, `merge`, `rebase` ni `force-push`.
+- Pas de `git add .`, `git reset`, `git clean`, `git stash`, `git commit --amend` sur un dépôt
+  partagé : ils emportent le travail non commité de l'autre agent. Ajouter les fichiers un par
+  un, nommément.
+- Pas de refactorisation large, de reformatage global ni de « nettoyage » non demandé.
+- Pas de nouvelle dépendance, service externe ou outil sans raison documentée et vérification
+  de la documentation officielle.
+- Pas de suppression de fichier, de donnée ou de fonctionnalité sans avoir lu ce qu'on supprime
+  et l'avoir annoncé.
+- Pas de migration destructive, de script de nettoyage ou de changement de schéma en production
+  sans accord préalable, impact expliqué.
+- Jamais de secret, mot de passe, clé API, jeton ou `.env` dans Git.
+- Jamais de journalisation de données personnelles, même en débogage.
+
+### Zéro perte de données
+
+Toute saisie utilisateur irremplaçable doit être persistée avant de pouvoir être perdue par une
+fermeture, un crash, un changement d'écran ou une relance. Une restauration commence par une
+sauvegarde de sécurité de l'état courant. Sur un projet en production, on privilégie les
+changements additifs et non destructifs, et on suppose toujours qu'il y a de vraies données
+derrière.
+
+### Vérifier la documentation officielle, pas sa mémoire
+
+Les API bougent plus vite que la mémoire d'un modèle. Avant un changement qui mérite une
+vérification récente, aller lire la source officielle. Une croyance obsolète coûte un bug en
+production.
+
+Et quand un symptôme est signalé : ne pas corriger le symptôme, trouver la cause — puis
+chercher *où ailleurs* la même cause produit le même effet.
+
+### Ce fichier est vivant
+
+Chaque fois que le propriétaire exprime une préférence, corrige une façon de faire ou donne un
+retour, l'agent le **retranscrit ici**, dans la section qui convient — même quand il ne demande
+pas de le noter, même quand c'est dit en passant. Le but : il ne doit jamais avoir à redire
+deux fois la même chose, ni au même agent, ni au suivant.
+
+Mais tout retour n'est pas une règle :
+
+| On note | On ne note pas |
+| --- | --- |
+| Préférence durable et transversale | Consigne du moment (« ne compile pas maintenant ») |
+| Façon de travailler | Décision propre à une seule tâche |
+| Correction d'une erreur qu'on risque de refaire | Réaction ponctuelle sans portée générale |
+
+Retranscrire **le fond et le pourquoi**, pas la formulation. Corriger ou remplacer ce qui est
+contredit plutôt qu'empiler des règles contradictoires. Et lui dire en une phrase ce qu'on a
+noté, pour qu'il puisse rectifier.
+
+Si une règle est manifestement générale et pas propre à ce projet, la remonter dans le socle
+(`gasstech-project-template`) plutôt que de la recopier à la main dans chaque dépôt.
+
+### Clôture d'un travail : le rapport, puis les questions
+
+Un travail n'est pas fini quand le code marche. Il est fini quand le propriétaire a de quoi
+décider de la suite. Deux obligations, dans cet ordre.
+
+**1. Le rapport final** — court et honnête : résumé · fichiers touchés · commandes réellement
+lancées · vérifications avec le niveau atteint · décisions et hypothèses · limites et risques ·
+**une seule** prochaine étape proposée, sans la commencer. Modèle :
+`docs/templates/AGENT_REPORT.md`.
+
+**2. Les questions de fin de travail** — 3 à 5 questions **de gestion de projet**, jamais
+techniques.
+
+Ce sont les questions qu'on poserait à un chef de projet IT : celles d'un client, d'un
+investisseur, d'un associé, d'un partenaire, d'un utilisateur exigeant. Elles servent à faire
+remonter le propriétaire du code vers le produit, et à l'entraîner à défendre son projet devant
+quelqu'un qui ne lira jamais une ligne de code.
+
+Comment les poser :
+
+- **3 à 5 questions**, numérotées, en français, formulées comme une vraie personne les poserait ;
+- **ancrées sur ce qui vient d'être fait** et sur l'état réel du projet — jamais un bloc
+  générique recopié d'une fois sur l'autre ;
+- **aucune question technique** : rien sur le choix d'une base, d'une librairie, d'un pattern,
+  sur la structure d'un fichier ou l'architecture d'un écran ;
+- pas de question dont la réponse est déjà écrite dans le dépôt — ce n'est pas un contrôle de
+  connaissances, c'est un point de pilotage ;
+- **ne pas y répondre à sa place** : l'agent pose, le propriétaire répond s'il le souhaite ;
+- **varier les angles** d'une fois sur l'autre — piocher dans
+  `docs/templates/QUESTIONS_FIN_DE_TRAVAIL.md` ;
+- si une réponse produit une décision, la consigner dans `docs/PROJECT_CONTEXT.md` ou
+  `docs/WORKLOG.md` plutôt que de la laisser mourir dans le fil de conversation.
+
+Angles à faire tourner : valeur et utilisateurs · périmètre et priorités · délais et jalons ·
+risques et dépendances · coût et ressources · qualité et recette · parties prenantes et
+communication · mise en production et exploitation · données et conformité · suite et
+arbitrages.
+
+Pour fixer la cible :
+
+> ✗ « Pourquoi avoir choisi Room plutôt que SQLDelight pour cette table ? » — technique, et la
+> réponse est dans le dépôt.
+>
+> ✓ « Cette fonctionnalité change ce que voient les utilisateurs déjà installés au premier
+> lancement. Comment tu les préviens, et qu'est-ce que tu fais si les retours de la première
+> semaine sont mauvais ? »
+
+<!-- END:socle-gasstech -->

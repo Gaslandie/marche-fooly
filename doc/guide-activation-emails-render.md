@@ -80,6 +80,7 @@ l'expéditeur via `@brevosend.com`, ce qui est moins professionnel :
 |---|---|---|
 | `Brevo API 401` | Clé incorrecte ou tronquée | Revérifier `BREVO_API_KEY` (clé API, pas clé SMTP) |
 | `Brevo API 400: sender ... not valid` | Expéditeur non vérifié | Refaire l'étape D2 |
+| `Brevo API 403: ... SMTP account is not yet activated` | Compte Brevo neuf : l'envoi transactionnel est désactivé par défaut (anti-spam), la clé et la config sont bonnes | Envoyer un email à **contact@brevo.com** (depuis l'adresse du compte Brevo) demandant l'activation pour des emails transactionnels (mot de passe oublié, notifications de commandes, < 50/jour). Activation sous quelques heures à 2 jours ouvrés. Rien à changer sur Render ensuite |
 | Rien dans les logs, message « indisponible » sur le site | `NOTIFICATION_EMAIL_ENABLED` ≠ `true` | Vérifier la variable |
 
 > **Pour qui ?** La personne qui a accès au compte **Render** (hébergeur du

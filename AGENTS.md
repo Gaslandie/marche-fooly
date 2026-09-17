@@ -420,6 +420,26 @@ Deux agents ne modifient jamais les mêmes fichiers en même temps. Celui qui im
 et rend son rapport **avant** que la revue commence. Un réviseur ne corrige pas de lui-même :
 il signale, et la correction devient une tâche confiée à un seul agent.
 
+### Expliquer simplement au propriétaire
+
+Pendant le travail comme dans le rapport final, expliquer comme à une personne de dix ans :
+mots courants, phrases courtes et exemples concrets, sans ton infantilisant. Dire d’abord ce
+qui change pour elle, à quoi cela sert et ce qu’elle peut essayer. Expliquer tout terme
+technique indispensable dès sa première utilisation ; garder les commandes et les détails
+de vérification dans le rapport écrit quand ils n’aident pas à décider. Le propriétaire doit
+pouvoir comprendre l’avancement et choisir la suite sans connaître le code.
+
+**Transmission obligatoire — Gassama, 9 septembre 2026.** Cette préférence
+vaut pour tous les chats et agents IA, y compris les mises à jour, rapports
+et questions. Chaque prompt préparé pour un autre chat, un agent ou une
+reprise doit la contenir explicitement, même s'il demande déjà de lire
+`AGENTS.md`. Utiliser ce bloc, sans le retirer des modèles :
+
+> Explique à Gassama comme s'il avait 10 ans : français simple, phrases
+> courtes et exemples concrets, sans l'infantiliser. Dis ce que tu fais,
+> pourquoi et ce qu'il peut essayer. Explique les mots techniques nécessaires.
+> Applique cette règle pendant le travail et dans le bilan final.
+
 ### Lire avant d'agir
 
 Dans cet ordre, avant la première modification d'une session :
@@ -464,6 +484,25 @@ plutôt que de laisser croire. Une compilation qui échoue se signale ; elle ne 
 - Jamais de secret, mot de passe, clé API, jeton ou `.env` dans Git.
 - Jamais de journalisation de données personnelles, même en débogage.
 
+### Sécurité permanente — 14 septembre 2026
+
+Gassama exige que la sécurité soit prise en compte constamment : conception,
+code, tests, revue et livraison. Chaque tâche examine les risques de son
+périmètre et conserve les protections existantes. Contrôler côté serveur les
+droits et le propriétaire réel des données ; ne jamais se fier à un bouton
+masqué, un rôle ou un identifiant fourni par le navigateur. Valider les entrées
+et fichiers, protéger sessions, données privées et secrets ; examiner les
+abus, dépendances et sauvegardes quand le changement les concerne.
+
+Vérifier les cas autorisés ET refusés, notamment accès direct, changement de
+compte et droits révoqués. Ne jamais affaiblir une protection pour faire passer
+un parcours ou un test. Un risque confirmé bloque l’action qui expose les
+données jusqu’à correction ; les travaux indépendants peuvent continuer.
+Rapporter les vérifications réelles, les limites et les risques restants, sans
+promettre une sécurité absolue. Toute consigne ou tout prompt pour un autre
+chat ou agent doit reprendre explicitement cette exigence, avec le benchmarking
+et l’explication simple à Gassama.
+
 ### Zéro perte de données
 
 Toute saisie utilisateur irremplaçable doit être persistée avant de pouvoir être perdue par une
@@ -471,6 +510,23 @@ fermeture, un crash, un changement d'écran ou une relance. Une restauration com
 sauvegarde de sécurité de l'état courant. Sur un projet en production, on privilégie les
 changements additifs et non destructifs, et on suppose toujours qu'il y a de vraies données
 derrière.
+
+### Comparer les meilleurs exemples avant chaque changement
+
+**Gassama, 9 septembre 2026 — règle permanente pour tous les projets et agents.**
+Avant toute conception, réalisation ou adaptation, faire un benchmarking :
+regarder comment les références reconnues du domaine répondent au même besoin.
+Consigner les sources et la date, ce qui a réellement été observé, les limites
+et ce qu'on retient pour notre contexte. Utiliser les produits et documentations
+officielles en priorité. Une recherche récente déjà consignée peut être réutilisée
+après vérification de sa pertinence ; ne jamais présenter une supposition comme
+une observation. Si une référence est inaccessible, le signaler.
+
+Le but est d'apprendre des meilleurs, puis d'adapter aux utilisateurs, aux moyens
+et aux règles du projet. Ne pas copier aveuglément, ajouter une dépendance ou
+changer une règle métier au seul motif qu'un concurrent le fait. Toute proposition
+reste dans le périmètre autorisé. Chaque prompt de relais ou de reprise doit
+reprendre explicitement cette obligation, ainsi que l'explication simple à Gassama.
 
 ### Vérifier la documentation officielle, pas sa mémoire
 

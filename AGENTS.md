@@ -81,7 +81,7 @@ Objectif actuel :
 - Garder le positionnement : marketplace locale à Sangarédi, Guinée.
 - Preserver la coherence de marque : Marché Fooly / FOOLY / Le marché gagnant.
 - Preserver les informations de contact existantes sauf instruction contraire :
-  - Telephone : +224 624 27 38 05
+  - Telephone : +224 614 85 15 15
   - Email : contact@marchefooly.com
   - Localisation : Sangarédi, Guinée
 - Ne pas inventer de chiffres cote frontend.

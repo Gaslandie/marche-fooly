@@ -1,9 +1,9 @@
 export const siteConfig = {
   name: "Marché Fooly",
   slogan: "Le marché gagnant",
-  phone: "+224 624 27 38 05",
-  phoneHref: "tel:+224624273805",
-  whatsappHref: "https://wa.me/224624273805",
+  phone: "+224 614 85 15 15",
+  phoneHref: "tel:+224614851515",
+  whatsappHref: "https://wa.me/224614851515",
   email: "contact@marchefooly.com",
   location: "Sangarédi, Guinée",
 } as const;

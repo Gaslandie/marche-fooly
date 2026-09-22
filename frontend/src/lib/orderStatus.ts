@@ -71,6 +71,9 @@ const SELLER_TRANSITIONS: Record<string, SellerStatusTransition[]> = {
   ],
   shipped: [
     { target: "delivered", label: "Marquer comme livrée", intent: "advance" },
+    // Le vendeur aussi peut annuler après expédition (problème de
+    // logistique, intempéries… — décision cliente du 22/09/2026).
+    { target: "cancelled", label: "Annuler", intent: "cancel" },
   ],
   delivered: [],
   cancelled: [],
@@ -91,7 +94,8 @@ export function getSellerStatusTransitions(
  * Miroir de la machine d'état backend (customer -> cancelled) : décision
  * cliente du 22/09/2026, l'acheteur peut annuler tant qu'il n'a pas reçu
  * sa commande — donc tout statut avant "delivered", expédition comprise.
- * Le backend revérifie et reste juge final.
+ * (Le vendeur a les mêmes possibilités via SELLER_TRANSITIONS : problème
+ * de logistique, intempéries…) Le backend revérifie et reste juge final.
  */
 const CUSTOMER_CANCELLABLE_STATUSES = new Set([
   "pending",

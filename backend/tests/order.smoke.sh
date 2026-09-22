@@ -13,8 +13,9 @@
 #     - Champs interdits: 422 sur seller/customer/totalAmount/items[*].unitPrice/etc.
 #     - Validation: prix decimal, quantity 0, devise USD, produits archived/out_of_stock
 #     - Stock: decrement, compensation (verifie via cancel qui restitue)
-#     - Annulation acheteur jusqu'a la livraison (43-45): cancel customer
-#       sur commande expediee = 200, cancel seller sur expediee = 403
+#     - Annulation jusqu'a la livraison (43-47): cancel sur commande
+#       expediee = 200 pour le customer-owner ET le seller-owner, stock
+#       restitue dans les deux cas
 #     - Reference: format ORD-YYYYMMDD-XXXXX correctement genere
 #
 # Quand le lancer:
@@ -479,19 +480,15 @@ expect_status "43c" 200 "$CODE" "$RESP"
 call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_A" '{"status":"shipped"}'
 expect_status "43d" 200 "$CODE" "$RESP"
 
-# --- 44) Cancel d'une commande EXPEDIEE: refuse au seller, permis au customer
-# Le vendeur ne peut plus annuler apres expedition (403)...
-call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_A" '{"status":"cancelled"}'
-expect_status 44 403 "$CODE" "$RESP"
-# ... mais l'acheteur-proprietaire le peut (200 + cancelledAt).
+# --- 44) Cancel par le CUSTOMER d'une commande EXPEDIEE -> 200 -------------
 call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_C" '{"status":"cancelled"}'
-expect_status "44b" 200 "$CODE" "$RESP"
+expect_status 44 200 "$CODE" "$RESP"
 CANCELLED_AT3="$(echo "$RESP" | jq -r '.data.order.cancelledAt')"
 if [ "$CANCELLED_AT3" = "null" ] || [ -z "$CANCELLED_AT3" ]; then
-  echo "KO 44b: cancelledAt devrait etre set"; cleanup_and_exit 1
+  echo "KO 44: cancelledAt devrait etre set"; cleanup_and_exit 1
 fi
 
-# --- 45) Stock restitue apres le cancel post-expedition --------------------
+# --- 45) Stock restitue apres le cancel client post-expedition -------------
 STOCK_AFTER_CANCEL3="$(run_mongo "
   const p = await Product.findById('${AFREE_ID}').select('stockQuantity').lean();
   console.log('STOCK=' + p.stockQuantity);
@@ -500,7 +497,39 @@ if [ "$STOCK_AFTER_CANCEL3" != "5" ]; then
   echo "KO 45: stock attendu 5 apres cancel, recu ${STOCK_AFTER_CANCEL3}"
   cleanup_and_exit 1
 fi
-echo "OK 45 (stock AFREE restitue apres cancel post-expedition: ${STOCK_AFTER_CANCEL3})"
+echo "OK 45 (stock AFREE restitue apres cancel client post-expedition: ${STOCK_AFTER_CANCEL3})"
+
+# --- 46) Cancel par le SELLER d'une commande EXPEDIEE -> 200 ---------------
+# Le vendeur garde lui aussi l'annulation jusqu'a la livraison (probleme
+# de logistique, intemperies... — decision cliente du 22/09/2026).
+call POST "/api/orders" "$TOKEN_C" '{"items":[{"product":"'"${AFREE_ID}"'","quantity":2}],"paymentMethod":"cash_on_delivery","fulfillmentMethod":"seller_pickup","customerPhone":"'"${PHONE_C}"'"}'
+expect_status 46 201 "$CODE" "$RESP"
+CMD4_REF="$(echo "$RESP" | jq -r '.data.order.reference')"
+
+call PATCH "/api/orders/${CMD4_REF}/status" "$TOKEN_A" '{"status":"confirmed"}'
+expect_status "46b" 200 "$CODE" "$RESP"
+call PATCH "/api/orders/${CMD4_REF}/status" "$TOKEN_A" '{"status":"preparing"}'
+expect_status "46c" 200 "$CODE" "$RESP"
+call PATCH "/api/orders/${CMD4_REF}/status" "$TOKEN_A" '{"status":"shipped"}'
+expect_status "46d" 200 "$CODE" "$RESP"
+
+call PATCH "/api/orders/${CMD4_REF}/status" "$TOKEN_A" '{"status":"cancelled"}'
+expect_status "46e" 200 "$CODE" "$RESP"
+CANCELLED_AT4="$(echo "$RESP" | jq -r '.data.order.cancelledAt')"
+if [ "$CANCELLED_AT4" = "null" ] || [ -z "$CANCELLED_AT4" ]; then
+  echo "KO 46e: cancelledAt devrait etre set"; cleanup_and_exit 1
+fi
+
+# --- 47) Stock restitue apres le cancel vendeur post-expedition ------------
+STOCK_AFTER_CANCEL4="$(run_mongo "
+  const p = await Product.findById('${AFREE_ID}').select('stockQuantity').lean();
+  console.log('STOCK=' + p.stockQuantity);
+" | grep "^STOCK=" | cut -d= -f2)"
+if [ "$STOCK_AFTER_CANCEL4" != "5" ]; then
+  echo "KO 47: stock attendu 5 apres cancel, recu ${STOCK_AFTER_CANCEL4}"
+  cleanup_and_exit 1
+fi
+echo "OK 47 (stock AFREE restitue apres cancel vendeur post-expedition: ${STOCK_AFTER_CANCEL4})"
 
 echo "ALL OK"
 cleanup_and_exit 0

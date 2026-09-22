@@ -59,12 +59,12 @@
  *     preparing -> shipped              : seller-owner | admin
  *     preparing -> cancelled            : customer-owner | seller-owner | admin
  *     shipped -> delivered              : seller-owner | admin
- *     shipped -> cancelled              : customer-owner | admin
+ *     shipped -> cancelled              : customer-owner | seller-owner | admin
  *
- *   Regle metier (decision cliente, 22/09/2026): l'acheteur peut annuler
- *   sa commande TANT QU'IL NE L'A PAS RECUE (tout statut avant
- *   "delivered", expedition comprise). Le vendeur, lui, ne peut plus
- *   annuler une commande deja expediee (admin oui, pour le support).
+ *   Regle metier (decision cliente, 22/09/2026): tant que la commande
+ *   n'est pas livree (expedition comprise), l'acheteur peut annuler
+ *   (changement d'avis) ET le vendeur aussi (probleme de logistique,
+ *   intemperies, livreur indisponible...). Seul "delivered" verrouille.
  *
  *   A l'annulation: restituer le stock decremente.
  *
@@ -162,7 +162,7 @@ const STATUS_TRANSITIONS = {
   },
   shipped: {
     delivered: ["seller", "admin"],
-    cancelled: ["customer", "admin"],
+    cancelled: ["customer", "seller", "admin"],
   },
   delivered: {},
   cancelled: {},

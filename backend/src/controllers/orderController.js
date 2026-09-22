@@ -48,17 +48,23 @@
  *     pending  -> confirmed | cancelled
  *     confirmed -> preparing | cancelled
  *     preparing -> shipped | cancelled
- *     shipped  -> delivered
+ *     shipped  -> delivered | cancelled
  *     delivered/cancelled = etats terminaux
  *
  *   Autorisations transitions:
  *     pending -> cancelled              : customer-owner | seller-owner | admin
  *     pending -> confirmed              : seller-owner | admin
  *     confirmed -> preparing            : seller-owner | admin
- *     confirmed -> cancelled            : seller-owner | admin
+ *     confirmed -> cancelled            : customer-owner | seller-owner | admin
  *     preparing -> shipped              : seller-owner | admin
- *     preparing -> cancelled            : seller-owner | admin
+ *     preparing -> cancelled            : customer-owner | seller-owner | admin
  *     shipped -> delivered              : seller-owner | admin
+ *     shipped -> cancelled              : customer-owner | admin
+ *
+ *   Regle metier (decision cliente, 22/09/2026): l'acheteur peut annuler
+ *   sa commande TANT QU'IL NE L'A PAS RECUE (tout statut avant
+ *   "delivered", expedition comprise). Le vendeur, lui, ne peut plus
+ *   annuler une commande deja expediee (admin oui, pour le support).
  *
  *   A l'annulation: restituer le stock decremente.
  *
@@ -148,14 +154,15 @@ const STATUS_TRANSITIONS = {
   },
   confirmed: {
     preparing: ["seller", "admin"],
-    cancelled: ["seller", "admin"],
+    cancelled: ["customer", "seller", "admin"],
   },
   preparing: {
     shipped: ["seller", "admin"],
-    cancelled: ["seller", "admin"],
+    cancelled: ["customer", "seller", "admin"],
   },
   shipped: {
     delivered: ["seller", "admin"],
+    cancelled: ["customer", "admin"],
   },
   delivered: {},
   cancelled: {},

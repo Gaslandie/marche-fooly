@@ -13,6 +13,8 @@
 #     - Champs interdits: 422 sur seller/customer/totalAmount/items[*].unitPrice/etc.
 #     - Validation: prix decimal, quantity 0, devise USD, produits archived/out_of_stock
 #     - Stock: decrement, compensation (verifie via cancel qui restitue)
+#     - Annulation acheteur jusqu'a la livraison (43-45): cancel customer
+#       sur commande expediee = 200, cancel seller sur expediee = 403
 #     - Reference: format ORD-YYYYMMDD-XXXXX correctement genere
 #
 # Quand le lancer:
@@ -462,6 +464,43 @@ if [ "$STOCK_AFTER_CANCEL" != "5" ]; then
   cleanup_and_exit 1
 fi
 echo "OK 42 (stock AFREE restitue: ${STOCK_AFTER_CANCEL})"
+
+# --- 43) Annulation par le CUSTOMER apres confirmation/expedition ----------
+# Regle metier (decision cliente, 22/09/2026): l'acheteur peut annuler tant
+# que la commande n'est pas livree (pending, confirmed, preparing, shipped).
+call POST "/api/orders" "$TOKEN_C" '{"items":[{"product":"'"${AFREE_ID}"'","quantity":2}],"paymentMethod":"cash_on_delivery","fulfillmentMethod":"seller_pickup","customerPhone":"'"${PHONE_C}"'"}'
+expect_status 43 201 "$CODE" "$RESP"
+CMD3_REF="$(echo "$RESP" | jq -r '.data.order.reference')"
+
+call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_A" '{"status":"confirmed"}'
+expect_status "43b" 200 "$CODE" "$RESP"
+call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_A" '{"status":"preparing"}'
+expect_status "43c" 200 "$CODE" "$RESP"
+call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_A" '{"status":"shipped"}'
+expect_status "43d" 200 "$CODE" "$RESP"
+
+# --- 44) Cancel d'une commande EXPEDIEE: refuse au seller, permis au customer
+# Le vendeur ne peut plus annuler apres expedition (403)...
+call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_A" '{"status":"cancelled"}'
+expect_status 44 403 "$CODE" "$RESP"
+# ... mais l'acheteur-proprietaire le peut (200 + cancelledAt).
+call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_C" '{"status":"cancelled"}'
+expect_status "44b" 200 "$CODE" "$RESP"
+CANCELLED_AT3="$(echo "$RESP" | jq -r '.data.order.cancelledAt')"
+if [ "$CANCELLED_AT3" = "null" ] || [ -z "$CANCELLED_AT3" ]; then
+  echo "KO 44b: cancelledAt devrait etre set"; cleanup_and_exit 1
+fi
+
+# --- 45) Stock restitue apres le cancel post-expedition --------------------
+STOCK_AFTER_CANCEL3="$(run_mongo "
+  const p = await Product.findById('${AFREE_ID}').select('stockQuantity').lean();
+  console.log('STOCK=' + p.stockQuantity);
+" | grep "^STOCK=" | cut -d= -f2)"
+if [ "$STOCK_AFTER_CANCEL3" != "5" ]; then
+  echo "KO 45: stock attendu 5 apres cancel, recu ${STOCK_AFTER_CANCEL3}"
+  cleanup_and_exit 1
+fi
+echo "OK 45 (stock AFREE restitue apres cancel post-expedition: ${STOCK_AFTER_CANCEL3})"
 
 echo "ALL OK"
 cleanup_and_exit 0

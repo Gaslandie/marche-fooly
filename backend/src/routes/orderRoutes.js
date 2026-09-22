@@ -78,8 +78,9 @@
  *     pas reveler l'existence d'une reference a un attaquant qui scrute.
  *
  * Pourquoi pas de requireApprovedSeller sur PATCH /:reference/status:
- *   Les transitions peuvent etre faites par le customer (cancel d'un
- *   pending) ou l'admin (toute transition). Forcer requireApprovedSeller
+ *   Les transitions peuvent etre faites par le customer (annulation tant
+ *   que la commande n'est pas livree, decision cliente du 22/09/2026)
+ *   ou l'admin (toute transition). Forcer requireApprovedSeller
  *   en amont bloquerait ces deux cas. Le controleur fait la branche fine
  *   via determineActor().
  *

@@ -79,6 +79,10 @@ export type PublicOrder = {
   placedAt: string;
   deliveredAt: string | null;
   cancelledAt: string | null;
+  /** Qui a annulé : "customer" | "seller" | "admin" (vide sinon). */
+  cancelledBy?: string;
+  /** Motif d'annulation (obligatoire côté vendeur, sinon facultatif). */
+  cancellationReason?: string;
   createdAt: string;
   updatedAt: string;
 };

@@ -23,6 +23,9 @@
  *   - Le CLIENT envoie strictement: items[{product,quantity}],
  *     paymentMethod, fulfillmentMethod, shippingAddress (si home_delivery),
  *     customerPhone, notes.
+ *   - Au PATCH status: { status } et, pour une annulation,
+ *     cancellationReason (obligatoire cote vendeur, cf. controleur).
+ *     cancelledBy est derive du JWT, jamais lu du body.
  *   - TOUT le reste est calcule ou derive cote serveur:
  *     customer (depuis JWT), seller (depuis le 1er product), reference
  *     (generee), status (toujours "pending" a la creation), currency
@@ -195,8 +198,10 @@ const createOrderValidators = [
 ];
 
 // --- PATCH /api/orders/:reference/status -----------------------------------
-// Le client envoie uniquement { status: "<target>" }. Le controleur fait
-// la machine d'etat (transitions autorisees selon role et statut courant).
+// Le client envoie { status: "<target>" } et, pour une annulation, un
+// cancellationReason optionnel ici (le controleur le rend OBLIGATOIRE
+// quand l'acteur est le vendeur). Le controleur fait la machine d'etat
+// (transitions autorisees selon role et statut courant).
 const updateOrderStatusValidators = [
   body("status")
     .isString()
@@ -204,6 +209,14 @@ const updateOrderStatusValidators = [
     .bail()
     .isIn(ORDER_STATUSES)
     .withMessage(`status: doit valoir ${ORDER_STATUSES.join(", ")}`),
+  body("cancellationReason")
+    .optional({ values: "falsy" })
+    .isString()
+    .withMessage("cancellationReason: texte attendu")
+    .bail()
+    .trim()
+    .isLength({ max: 300 })
+    .withMessage("cancellationReason: 300 caracteres maximum"),
   // Aucun autre champ n'est accepte dans ce PATCH.
   // On refuse explicitement les classiques pour bloquer toute tentative
   // de modifier la commande via ce point d'entree.
@@ -214,6 +227,10 @@ const updateOrderStatusValidators = [
   body("customer").not().exists().withMessage("Champ interdit ici"),
   body("seller").not().exists().withMessage("Champ interdit ici"),
   body("reference").not().exists().withMessage("Champ interdit ici"),
+  // cancelledBy/cancelledAt sont derives du JWT et de l'horloge serveur:
+  // un client ne doit jamais pouvoir se faire passer pour un autre acteur.
+  body("cancelledBy").not().exists().withMessage("Champ interdit ici"),
+  body("cancelledAt").not().exists().withMessage("Champ interdit ici"),
 ];
 
 // --- Params -----------------------------------------------------------------

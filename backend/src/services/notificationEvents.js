@@ -125,19 +125,29 @@ const notifyOrderStatusChanged = async ({ order, previousStatus, actor }) => {
   const reference = order.reference;
   const statusLabel = ORDER_STATUS_LABELS[order.status] || order.status;
   const title = `Commande ${statusLabel}`;
+  const reason = (order.cancellationReason || "").trim();
   const metadata = {
     orderId: order._id.toString(),
     reference,
     previousStatus,
     status: order.status,
+    ...(order.status === "cancelled"
+      ? { cancelledBy: order.cancelledBy || "", cancellationReason: reason }
+      : {}),
   };
+
+  // Le motif accompagne l'annulation dans la notification: le client ne
+  // doit pas avoir a deviner pourquoi sa commande n'arrivera pas.
+  const reasonSuffix = reason ? ` Motif indique : ${reason}` : "";
 
   if (customer && actor !== "customer") {
     await safeCreateNotification({
       recipient: customer,
       type: "order_status_updated",
       title,
-      message: `Le statut de votre commande ${reference} est maintenant : ${statusLabel}.`,
+      message:
+        `Le statut de votre commande ${reference} est maintenant : ${statusLabel}.` +
+        reasonSuffix,
       href: `/commande/${reference}`,
       metadata,
       email: true,
@@ -149,7 +159,9 @@ const notifyOrderStatusChanged = async ({ order, previousStatus, actor }) => {
       recipient: sellerProfile.user,
       type: "order_status_updated",
       title,
-      message: `La commande ${reference} est maintenant : ${statusLabel}.`,
+      message:
+        `La commande ${reference} est maintenant : ${statusLabel}.` +
+        reasonSuffix,
       href: `/vendeur/commandes/${reference}`,
       metadata,
       email: true,

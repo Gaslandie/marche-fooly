@@ -112,6 +112,29 @@ export default async function VendeurCommandeDetailPage({ params }: PageProps) {
       <div className="row g-4">
         {/* Articles + totaux + timeline */}
         <div className="col-lg-8">
+          {/* Commande annulée : qui a annulé et pourquoi (le motif du
+              client aide le vendeur à s'organiser, et inversement). */}
+          {order.status === "cancelled" && (
+            <div className="alert alert-danger" role="status">
+              <h2 className="h6 fw-bold mb-2">
+                <i className="bi bi-x-circle me-2" aria-hidden="true"></i>
+                Commande annulée
+                {order.cancelledBy === "customer"
+                  ? " par le client"
+                  : order.cancelledBy === "seller"
+                    ? " par vous"
+                    : ""}
+              </h2>
+              {order.cancellationReason ? (
+                <p className="mb-0">
+                  <strong>Motif&nbsp;:</strong> {order.cancellationReason}
+                </p>
+              ) : (
+                <p className="mb-0">Aucun motif n&apos;a été précisé.</p>
+              )}
+            </div>
+          )}
+
           <div className="bg-white rounded-3 shadow-sm p-4 mb-4">
             <h2 className="h5 fw-bold mb-3">Articles</h2>
             {order.items.map((item, index) => (
@@ -199,6 +222,7 @@ export default async function VendeurCommandeDetailPage({ params }: PageProps) {
             <OrderStatusActions
               reference={order.reference}
               status={order.status}
+              customerPhone={order.customerPhone}
             />
           </div>
 

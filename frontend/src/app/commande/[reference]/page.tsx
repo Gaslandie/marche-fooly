@@ -182,6 +182,32 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
               </div>
             </div>
 
+            {/* Commande annulée : on affiche qui a annulé et pourquoi, pour
+                que le client ne reste pas sans explication. */}
+            {order.status === "cancelled" && (
+              <div className="alert alert-danger" role="status">
+                <h2 className="h6 fw-bold mb-2">
+                  <i className="bi bi-x-circle me-2" aria-hidden="true"></i>
+                  Commande annulée
+                  {order.cancelledBy === "seller"
+                    ? " par le vendeur"
+                    : order.cancelledBy === "customer"
+                      ? " à votre demande"
+                      : ""}
+                </h2>
+                {order.cancellationReason ? (
+                  <p className="mb-0">
+                    <strong>Motif&nbsp;:</strong> {order.cancellationReason}
+                  </p>
+                ) : (
+                  <p className="mb-0">
+                    Aucun motif n&apos;a été précisé. Contactez le vendeur pour
+                    en savoir plus.
+                  </p>
+                )}
+              </div>
+            )}
+
             {order.notes && (
               <div className="bg-white rounded-3 shadow-sm p-4 mb-4">
                 <h2 className="h6 fw-bold mb-2">Note pour le vendeur</h2>

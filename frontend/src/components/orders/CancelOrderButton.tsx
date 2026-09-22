@@ -55,8 +55,12 @@ export default function CancelOrderButton({
 
   if (!isCustomerCancellable(status)) return null;
 
-  /** Lancé APRÈS confirmation dans le dialogue. */
-  async function cancelOrder() {
+  /**
+   * Lancé APRÈS confirmation dans le dialogue. Le motif est facultatif
+   * côté acheteur (obligatoire seulement pour le vendeur, côté backend),
+   * mais il aide le vendeur à comprendre et à s'organiser.
+   */
+  async function cancelOrder(reason: string) {
     setConfirmOpen(false);
     setSubmitting(true);
     setFeedback(null);
@@ -67,7 +71,7 @@ export default function CancelOrderButton({
       const res = await fetch(`/api/orders/${reference}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "cancelled" }),
+        body: JSON.stringify({ status: "cancelled", cancellationReason: reason }),
       });
       httpStatus = res.status;
       body = await res.json();
@@ -156,6 +160,11 @@ export default function CancelOrderButton({
         }
         confirmLabel="Oui, annuler la commande"
         cancelLabel="Garder ma commande"
+        reason={{
+          label: "Motif (facultatif)",
+          placeholder: "Ex. : je me suis trompé de produit, je n'en ai plus besoin…",
+          hint: "Le vendeur verra ce motif ; cela l'aide à s'organiser.",
+        }}
         onConfirm={cancelOrder}
         onClose={() => setConfirmOpen(false)}
       />

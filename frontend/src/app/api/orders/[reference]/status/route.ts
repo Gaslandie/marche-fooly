@@ -11,8 +11,11 @@
  *
  * Règles de sécurité (IMPORTANT) :
  *   - JWT jamais exposé (cookie httpOnly -> Bearer côté serveur).
- *   - On ne transmet QUE `{ status }` (whitelist) : aucun autre champ du
- *     corps client n'est relayé.
+ *   - On ne transmet QUE `{ status, cancellationReason? }` (whitelist) :
+ *     aucun autre champ du corps client n'est relayé. `cancelledBy` est
+ *     dérivé du JWT côté backend, jamais accepté du client.
+ *   - Le motif est obligatoire côté backend quand c'est le vendeur qui
+ *     annule (422 relayé tel quel si absent).
  *   - Le backend reste la SOURCE DE VÉRITÉ : il revérifie l'acteur
  *     (ownership) ET la validité de la transition (machine d'état). On
  *     relaie ses codes : 422 (transition interdite), 403 (acteur non
@@ -54,11 +57,13 @@ export async function PATCH(request: Request, ctx: RouteContext) {
     );
   }
 
-  // Whitelist stricte : seul `status` est relayé.
-  const status =
-    raw && typeof raw === "object"
-      ? (raw as Record<string, unknown>).status
-      : undefined;
+  // Whitelist stricte : `status` et, pour une annulation, le motif.
+  const rawBody =
+    raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const status = rawBody.status;
+  const rawReason = rawBody.cancellationReason;
+  const cancellationReason =
+    typeof rawReason === "string" ? rawReason.trim().slice(0, 300) : "";
 
   if (typeof status !== "string" || status.length === 0) {
     return NextResponse.json(
@@ -77,7 +82,9 @@ export async function PATCH(request: Request, ctx: RouteContext) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify(
+          cancellationReason ? { status, cancellationReason } : { status },
+        ),
       },
     );
   } catch {

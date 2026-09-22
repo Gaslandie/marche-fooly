@@ -17,8 +17,12 @@
  *     la transition. On masque juste les transitions interdites (UX) et
  *     on relaie ses erreurs (422/403/404/409).
  *   - L'annulation demande une confirmation explicite via ConfirmDialog
- *     (dialogue dans la page, pas window.confirm) — le backend restaure
- *     le stock.
+ *     (dialogue dans la page, pas window.confirm) ET un MOTIF obligatoire
+ *     (décision cliente du 22/09/2026) : le backend refuse en 422 sans
+ *     motif, et le transmet au client dans sa notification. Le backend
+ *     restaure le stock.
+ *   - Après une annulation réussie, un bouton d'appel direct du client
+ *     (lien tel:) est proposé pour expliquer la raison de vive voix.
  *   - 409 (conflit de version) -> message dédié + router.refresh().
  *
  * Note pour GitHub Copilot :
@@ -40,11 +44,28 @@ import {
 type Props = {
   reference: string;
   status: string;
+  /** Téléphone du client, pour l'appel direct après une annulation. */
+  customerPhone?: string;
 };
 
 type Feedback = { kind: "success" | "error"; message: string };
 
-export default function OrderStatusActions({ reference, status }: Props) {
+/**
+ * Nettoie un numéro pour un lien `tel:` (on garde le + initial et les
+ * chiffres ; espaces, tirets et parenthèses sont retirés).
+ */
+function toTelHref(phone: string): string {
+  const cleaned = phone.trim().replace(/[^\d+]/g, "");
+  return cleaned.startsWith("+")
+    ? `+${cleaned.slice(1).replace(/\+/g, "")}`
+    : cleaned;
+}
+
+export default function OrderStatusActions({
+  reference,
+  status,
+  customerPhone = "",
+}: Props) {
   const router = useRouter();
   const transitions = getSellerStatusTransitions(status);
   const [pendingTarget, setPendingTarget] = useState<string | null>(null);
@@ -52,13 +73,42 @@ export default function OrderStatusActions({ reference, status }: Props) {
   // Transition « annuler » en attente de confirmation dans le dialogue.
   const [confirmCancel, setConfirmCancel] =
     useState<SellerStatusTransition | null>(null);
+  // Passe à vrai après une annulation réussie : on propose alors
+  // d'appeler le client tout de suite pour lui expliquer.
+  const [justCancelled, setJustCancelled] = useState(false);
 
+  const telHref = customerPhone ? toTelHref(customerPhone) : "";
+
+  /**
+   * Encart « appeler le client », affiché juste après une annulation :
+   * le vendeur explique de vive voix, sans chercher le numéro ailleurs.
+   */
+  const callClientBlock =
+    justCancelled && telHref ? (
+      <div className="alert alert-warning py-2 px-3 small mt-3 mb-0">
+        <p className="mb-2">
+          <i className="bi bi-telephone me-1" aria-hidden="true"></i>
+          Prévenez le client de vive voix : il a reçu le motif, mais un appel
+          évite les malentendus.
+        </p>
+        <a href={`tel:${telHref}`} className="btn btn-dark btn-sm fw-bold">
+          <i className="bi bi-telephone-fill me-1" aria-hidden="true"></i>
+          Appeler le client ({customerPhone})
+        </a>
+      </div>
+    ) : null;
+
+  // Statut terminal : plus aucune transition, mais on garde l'encart
+  // d'appel si l'annulation vient d'être faite depuis cet écran.
   if (transitions.length === 0) {
     return (
-      <p className="text-secondary small mb-0">
-        <i className="bi bi-check2-circle me-1" aria-hidden="true"></i>
-        Aucune action disponible pour ce statut.
-      </p>
+      <div>
+        <p className="text-secondary small mb-0">
+          <i className="bi bi-check2-circle me-1" aria-hidden="true"></i>
+          Aucune action disponible pour ce statut.
+        </p>
+        {callClientBlock}
+      </div>
     );
   }
 
@@ -71,8 +121,16 @@ export default function OrderStatusActions({ reference, status }: Props) {
     void applyTransition(transition);
   }
 
-  /** Lancé directement (avance) ou après confirmation (annulation). */
-  async function applyTransition(transition: SellerStatusTransition) {
+  /**
+   * Lancé directement (avance) ou après confirmation (annulation).
+   * `reason` n'est transmis que pour une annulation ; le backend le
+   * refuse en 422 s'il est vide côté vendeur.
+   */
+  async function applyTransition(
+    transition: SellerStatusTransition,
+    reason = "",
+  ) {
+    const isCancel = transition.intent === "cancel";
     setConfirmCancel(null);
     setPendingTarget(transition.target);
     setFeedback(null);
@@ -83,7 +141,11 @@ export default function OrderStatusActions({ reference, status }: Props) {
       const res = await fetch(`/api/orders/${reference}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: transition.target }),
+        body: JSON.stringify(
+          isCancel
+            ? { status: transition.target, cancellationReason: reason }
+            : { status: transition.target },
+        ),
       });
       httpStatus = res.status;
       body = await res.json();
@@ -116,6 +178,7 @@ export default function OrderStatusActions({ reference, status }: Props) {
 
     setFeedback({ kind: "success", message: body?.message ?? "Statut mis à jour." });
     setPendingTarget(null);
+    if (isCancel) setJustCancelled(true);
     router.refresh();
   }
 
@@ -174,6 +237,8 @@ export default function OrderStatusActions({ reference, status }: Props) {
         </div>
       )}
 
+      {callClientBlock}
+
       <ConfirmDialog
         open={confirmCancel !== null}
         title="Annuler cette commande ?"
@@ -183,8 +248,15 @@ export default function OrderStatusActions({ reference, status }: Props) {
         }
         confirmLabel="Oui, annuler la commande"
         cancelLabel="Retour"
-        onConfirm={() => {
-          if (confirmCancel) void applyTransition(confirmCancel);
+        reason={{
+          label: "Motif de l'annulation",
+          placeholder:
+            "Ex. : fortes pluies, route impraticable ; produit finalement indisponible…",
+          required: true,
+          hint: "Ce motif sera transmis au client pour qu'il comprenne la raison.",
+        }}
+        onConfirm={(reason) => {
+          if (confirmCancel) void applyTransition(confirmCancel, reason);
         }}
         onClose={() => setConfirmCancel(null)}
       />

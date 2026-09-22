@@ -191,6 +191,22 @@ const orderSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+    // Qui a annule ("customer" | "seller" | "admin") et pourquoi.
+    // Champs additifs (22/09/2026): les commandes existantes gardent "".
+    // Le motif est OBLIGATOIRE quand c'est le vendeur qui annule (le
+    // client doit comprendre pourquoi) — regle appliquee par le
+    // controleur, pas ici, car elle depend de l'acteur.
+    cancelledBy: {
+      type: String,
+      enum: ["", "customer", "seller", "admin"],
+      default: "",
+    },
+    cancellationReason: {
+      type: String,
+      trim: true,
+      maxlength: 300,
+      default: "",
+    },
   },
   createSchemaOptions({
     optimisticConcurrency: true,

@@ -15,7 +15,9 @@
 #     - Stock: decrement, compensation (verifie via cancel qui restitue)
 #     - Annulation jusqu'a la livraison (43-47): cancel sur commande
 #       expediee = 200 pour le customer-owner ET le seller-owner, stock
-#       restitue dans les deux cas
+#       restitue dans les deux cas ; motif OBLIGATOIRE cote vendeur
+#       (422 sans motif), facultatif cote client ; cancelledBy derive du
+#       JWT (422 si fourni dans le body)
 #     - Reference: format ORD-YYYYMMDD-XXXXX correctement genere
 #
 # Quand le lancer:
@@ -481,11 +483,16 @@ call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_A" '{"status":"shipped"}'
 expect_status "43d" 200 "$CODE" "$RESP"
 
 # --- 44) Cancel par le CUSTOMER d'une commande EXPEDIEE -> 200 -------------
+# Motif FACULTATIF cote client: on annule ici sans motif (doit passer).
 call PATCH "/api/orders/${CMD3_REF}/status" "$TOKEN_C" '{"status":"cancelled"}'
 expect_status 44 200 "$CODE" "$RESP"
 CANCELLED_AT3="$(echo "$RESP" | jq -r '.data.order.cancelledAt')"
 if [ "$CANCELLED_AT3" = "null" ] || [ -z "$CANCELLED_AT3" ]; then
   echo "KO 44: cancelledAt devrait etre set"; cleanup_and_exit 1
+fi
+CANCELLED_BY3="$(echo "$RESP" | jq -r '.data.order.cancelledBy')"
+if [ "$CANCELLED_BY3" != "customer" ]; then
+  echo "KO 44: cancelledBy attendu 'customer', recu '${CANCELLED_BY3}'"; cleanup_and_exit 1
 fi
 
 # --- 45) Stock restitue apres le cancel client post-expedition -------------
@@ -513,12 +520,30 @@ expect_status "46c" 200 "$CODE" "$RESP"
 call PATCH "/api/orders/${CMD4_REF}/status" "$TOKEN_A" '{"status":"shipped"}'
 expect_status "46d" 200 "$CODE" "$RESP"
 
+# Sans motif, le vendeur est refuse (422): le client doit comprendre.
 call PATCH "/api/orders/${CMD4_REF}/status" "$TOKEN_A" '{"status":"cancelled"}'
-expect_status "46e" 200 "$CODE" "$RESP"
+expect_status "46e" 422 "$CODE" "$RESP"
+
+# Avec motif -> 200, motif et acteur enregistres.
+call PATCH "/api/orders/${CMD4_REF}/status" "$TOKEN_A" '{"status":"cancelled","cancellationReason":"Fortes pluies, route impraticable"}'
+expect_status "46f" 200 "$CODE" "$RESP"
 CANCELLED_AT4="$(echo "$RESP" | jq -r '.data.order.cancelledAt')"
 if [ "$CANCELLED_AT4" = "null" ] || [ -z "$CANCELLED_AT4" ]; then
-  echo "KO 46e: cancelledAt devrait etre set"; cleanup_and_exit 1
+  echo "KO 46f: cancelledAt devrait etre set"; cleanup_and_exit 1
 fi
+CANCELLED_BY4="$(echo "$RESP" | jq -r '.data.order.cancelledBy')"
+REASON4="$(echo "$RESP" | jq -r '.data.order.cancellationReason')"
+if [ "$CANCELLED_BY4" != "seller" ]; then
+  echo "KO 46f: cancelledBy attendu 'seller', recu '${CANCELLED_BY4}'"; cleanup_and_exit 1
+fi
+if [ "$REASON4" != "Fortes pluies, route impraticable" ]; then
+  echo "KO 46f: motif non enregistre (recu '${REASON4}')"; cleanup_and_exit 1
+fi
+echo "       (annulation vendeur: by=${CANCELLED_BY4}, motif enregistre)"
+
+# --- 46g) cancelledBy fourni par le client -> 422 (derive du JWT) ----------
+call PATCH "/api/orders/${CMD1_REF}/status" "$TOKEN_A" '{"status":"cancelled","cancelledBy":"admin"}'
+expect_status "46g" 422 "$CODE" "$RESP"
 
 # --- 47) Stock restitue apres le cancel vendeur post-expedition ------------
 STOCK_AFTER_CANCEL4="$(run_mongo "

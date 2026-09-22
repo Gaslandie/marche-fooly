@@ -66,7 +66,12 @@
  *   (changement d'avis) ET le vendeur aussi (probleme de logistique,
  *   intemperies, livreur indisponible...). Seul "delivered" verrouille.
  *
- *   A l'annulation: restituer le stock decremente.
+ *   A l'annulation: restituer le stock decremente, enregistrer
+ *   cancelledBy (derive du JWT via determineActor, jamais du body) et
+ *   cancellationReason. Le motif est OBLIGATOIRE quand l'acteur est le
+ *   vendeur (422 sinon): le client doit comprendre pourquoi sa commande
+ *   n'arrivera pas. Il est facultatif pour le client et l'admin, et il
+ *   est repris dans les notifications des deux parties.
  *
  *   Visibilite GET /:reference: customer-owner | seller-owner | admin.
  *   Non-autorise -> 404 (pas 403) pour ne pas reveler l'existence d'une
@@ -141,6 +146,8 @@ const toPublicOrder = (doc) => ({
   placedAt: doc.placedAt,
   deliveredAt: doc.deliveredAt,
   cancelledAt: doc.cancelledAt,
+  cancelledBy: doc.cancelledBy || "",
+  cancellationReason: doc.cancellationReason || "",
   createdAt: doc.createdAt,
   updatedAt: doc.updatedAt,
 });
@@ -577,6 +584,20 @@ const updateStatus = async (req, res, next) => {
 
     // Effets de bord metier
     if (target === "cancelled") {
+      const reason = String(req.body.cancellationReason || "").trim();
+
+      // Motif OBLIGATOIRE quand le vendeur annule: le client doit
+      // comprendre pourquoi sa commande n'arrivera pas (decision cliente
+      // du 22/09/2026). Facultatif pour le client et l'admin.
+      if (actor === "seller" && !reason) {
+        return res.status(422).json({
+          success: false,
+          message:
+            "Merci d'indiquer le motif de l'annulation: il sera transmis au client.",
+          data: { field: "cancellationReason" },
+        });
+      }
+
       await restoreStock(
         order.items.map((it) => ({
           product: it.product,
@@ -584,6 +605,9 @@ const updateStatus = async (req, res, next) => {
         })),
       );
       order.cancelledAt = new Date();
+      // Acteur derive du JWT (determineActor), jamais du body.
+      order.cancelledBy = actor;
+      order.cancellationReason = reason;
     }
     if (target === "delivered") {
       order.deliveredAt = new Date();

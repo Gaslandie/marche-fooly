@@ -86,6 +86,25 @@ export function getSellerStatusTransitions(
   return SELLER_TRANSITIONS[status] ?? [];
 }
 
+/**
+ * Statuts depuis lesquels un ACHETEUR peut encore annuler sa commande.
+ * Miroir de la machine d'état backend (customer -> cancelled) : décision
+ * cliente du 22/09/2026, l'acheteur peut annuler tant qu'il n'a pas reçu
+ * sa commande — donc tout statut avant "delivered", expédition comprise.
+ * Le backend revérifie et reste juge final.
+ */
+const CUSTOMER_CANCELLABLE_STATUSES = new Set([
+  "pending",
+  "confirmed",
+  "preparing",
+  "shipped",
+]);
+
+/** Vrai si l'acheteur peut encore annuler une commande à ce statut. PURE. */
+export function isCustomerCancellable(status: string): boolean {
+  return CUSTOMER_CANCELLABLE_STATUSES.has(status);
+}
+
 /** Libellés français des 6 statuts backend. */
 export const ORDER_STATUS_LABEL: Record<string, string> = {
   pending: "En attente",

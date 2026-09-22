@@ -36,6 +36,8 @@ type Props = {
   max?: number;
   value?: number;
   onChange?: (next: number) => void;
+  /** Variante réduite pour les cartes produit (boutons 34px au lieu de 44px). */
+  compact?: boolean;
 };
 
 function clamp(n: number, min: number, max: number) {
@@ -48,6 +50,7 @@ export default function QuantitySelector({
   max = 99,
   value,
   onChange,
+  compact = false,
 }: Props) {
   const isControlled = value !== undefined && onChange !== undefined;
   const [internal, setInternal] = useState(initial);
@@ -63,7 +66,11 @@ export default function QuantitySelector({
   }
 
   return (
-    <div className={styles.quantityBox}>
+    <div
+      className={
+        compact ? `${styles.quantityBox} ${styles.quantityBoxCompact}` : styles.quantityBox
+      }
+    >
       <button
         type="button"
         className={styles.btn}

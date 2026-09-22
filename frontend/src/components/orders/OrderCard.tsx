@@ -23,6 +23,7 @@
  */
 
 import Link from "next/link";
+import CancelOrderButton from "@/components/orders/CancelOrderButton";
 import type { PublicOrder } from "@/lib/orders";
 import {
   buildOrderTimeline,
@@ -132,7 +133,7 @@ export default function OrderCard({ order }: Props) {
             {formatPrice(order.totalAmount, order.currency)}
           </span>
         </div>
-        <div className="d-flex gap-2">
+        <div className="d-flex flex-wrap gap-2">
           <Link
             href={`/commande/${order.reference}`}
             className="btn btn-warning fw-bold btn-sm"
@@ -140,6 +141,13 @@ export default function OrderCard({ order }: Props) {
             <i className="bi bi-eye me-1" aria-hidden="true"></i>
             Voir le détail
           </Link>
+          {/* Annulation acheteur : rendu null par le composant lui-même
+              quand le statut ne le permet plus (delivered/cancelled). */}
+          <CancelOrderButton
+            reference={order.reference}
+            status={order.status}
+            className="btn btn-outline-danger btn-sm"
+          />
         </div>
       </div>
     </article>

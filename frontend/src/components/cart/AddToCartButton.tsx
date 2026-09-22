@@ -23,6 +23,13 @@
  *   - `variant="buy-now"` ajoute au panier ET redirige vers /panier.
  *   - `quantity` est passée par le parent (ProductBuyBox la synchronise
  *     avec QuantitySelector). Par défaut 1.
+ *   - Après un ajout réussi, le bouton lui-même affiche « Ajouté » en vert
+ *     (retour visuel demandé par la cliente) — plus d'alerte verte séparée
+ *     pour ce cas ; les alertes restent pour les erreurs et le conflit
+ *     mono-vendeur.
+ *   - `quantityControls` (cartes produit) : quand le produit est déjà au
+ *     panier, le bouton laisse place à un compteur −/+ branché sur
+ *     updateQuantity ; à 0, l'article est retiré et le bouton revient.
  */
 
 "use client";
@@ -31,6 +38,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/cart/CartProvider";
+import QuantitySelector from "@/components/product/QuantitySelector";
 import type { ProductItem } from "@/types/catalog";
 
 type Variant = "default" | "buy-now";
@@ -40,21 +48,27 @@ type Props = {
   quantity?: number;
   variant?: Variant;
   className?: string;
+  /** Affiche un compteur −/+ sur place quand le produit est déjà au panier. */
+  quantityControls?: boolean;
 };
 
 type Feedback = { kind: "success" | "error"; message: string };
 
 const SUCCESS_RESET_MS = 3000;
+/** Durée d'affichage de l'état « Ajouté » sur le bouton après un ajout. */
+const ADDED_RESET_MS = 1600;
 
 export default function AddToCartButton({
   product,
   quantity = 1,
   variant = "default",
   className,
+  quantityControls = false,
 }: Props) {
-  const { addItem, replaceCartWith, lines } = useCart();
+  const { addItem, replaceCartWith, updateQuantity, lines } = useCart();
   const router = useRouter();
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [justAdded, setJustAdded] = useState(false);
 
   const canAdd = !!product.productId && !!product.sellerSlug && product.inStock;
   const isBuyNow = variant === "buy-now";
@@ -72,21 +86,37 @@ export default function AddToCartButton({
       ? "btn btn-dark fw-bold w-100"
       : "btn btn-warning fw-bold w-100");
 
+  // État « Ajouté » : même bouton, couleur succès (on garde la taille
+  // venant de className — ex. btn-sm sur les cartes).
+  const addedClass = baseClass.replace(/btn-(warning|dark)\b/, "btn-success");
+
   const label = !canAdd
     ? product.inStock
       ? "Indisponible"
       : "Rupture de stock"
-    : isBuyNow
-      ? "Acheter maintenant"
-      : "Ajouter au panier";
+    : justAdded
+      ? "Ajouté"
+      : isBuyNow
+        ? "Acheter maintenant"
+        : "Ajouter au panier";
 
-  const icon = isBuyNow ? "bi bi-bag-check me-1" : "bi bi-cart-plus me-1";
+  const icon = justAdded
+    ? "bi bi-check-lg me-1"
+    : isBuyNow
+      ? "bi bi-bag-check me-1"
+      : "bi bi-cart-plus me-1";
 
   function showFeedback(kind: Feedback["kind"], message: string) {
     setFeedback({ kind, message });
     if (kind === "success") {
       window.setTimeout(() => setFeedback(null), SUCCESS_RESET_MS);
     }
+  }
+
+  /** Fait passer le bouton en « Ajouté » (vert) pendant un court instant. */
+  function markAdded() {
+    setJustAdded(true);
+    window.setTimeout(() => setJustAdded(false), ADDED_RESET_MS);
   }
 
   function handleClick() {
@@ -113,6 +143,9 @@ export default function AddToCartButton({
       );
       if (confirmed) {
         replaceCartWith(input);
+        markAdded();
+        // Alerte conservée ici : le remplacement du panier est une info
+        // importante que le seul état « Ajouté » ne raconte pas.
         showFeedback(
           "success",
           `${product.name} ajouté · panier précédent remplacé.`,
@@ -129,22 +162,47 @@ export default function AddToCartButton({
       return;
     }
 
-    showFeedback("success", `${product.name} ajouté au panier.`);
+    // Ajout simple : le retour visuel est porté par le bouton lui-même
+    // (« Ajouté » en vert), pas par une alerte.
+    markAdded();
     if (isBuyNow) router.push("/panier");
   }
 
+  // Compteur −/+ à la place du bouton : uniquement en mode
+  // quantityControls, quand le produit est déjà au panier et hors du
+  // court instant « Ajouté » (le temps que l'utilisateur voie le retour).
+  const showStepper = quantityControls && !justAdded && inCartQty > 0;
+
   return (
     <div className="d-flex flex-column gap-2">
-      <button
-        type="button"
-        className={baseClass}
-        onClick={handleClick}
-        disabled={!canAdd}
-        aria-label={`${label} : ${product.name}`}
-      >
-        <i className={icon} aria-hidden="true"></i>
-        {label}
-      </button>
+      {showStepper ? (
+        <div className="d-flex align-items-center flex-wrap gap-2">
+          <QuantitySelector
+            compact
+            value={inCartQty}
+            min={0}
+            max={99}
+            onChange={(next) =>
+              updateQuantity(product.productId as string, next)
+            }
+          />
+          <span className="small fw-semibold text-success">
+            <i className="bi bi-check-circle-fill me-1" aria-hidden="true"></i>
+            Dans le panier
+          </span>
+        </div>
+      ) : (
+        <button
+          type="button"
+          className={justAdded ? addedClass : baseClass}
+          onClick={handleClick}
+          disabled={!canAdd}
+          aria-label={`${label} : ${product.name}`}
+        >
+          <i className={icon} aria-hidden="true"></i>
+          {label}
+        </button>
+      )}
       {feedback && (
         <div
           className={`alert ${
@@ -157,8 +215,9 @@ export default function AddToCartButton({
       )}
       {/* Indication persistante : ce produit est déjà dans le panier.
           Affichée uniquement sur le bouton principal (pas sur « Acheter
-          maintenant ») pour éviter un doublon sur la fiche produit. */}
-      {!isBuyNow && inCartQty > 0 && (
+          maintenant »), et pas en mode quantityControls (le compteur −/+
+          porte déjà cette information). */}
+      {!isBuyNow && !quantityControls && inCartQty > 0 && (
         <Link
           href="/panier"
           className="d-inline-flex align-items-center gap-1 small fw-semibold text-success text-decoration-none"

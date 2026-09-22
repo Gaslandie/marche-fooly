@@ -16,8 +16,9 @@
  *   - Le backend reste la SOURCE DE VÉRITÉ : il revérifie l'ownership et
  *     la transition. On masque juste les transitions interdites (UX) et
  *     on relaie ses erreurs (422/403/404/409).
- *   - L'annulation demande une confirmation explicite (le backend
- *     restaure le stock).
+ *   - L'annulation demande une confirmation explicite via ConfirmDialog
+ *     (dialogue dans la page, pas window.confirm) — le backend restaure
+ *     le stock.
  *   - 409 (conflit de version) -> message dédié + router.refresh().
  *
  * Note pour GitHub Copilot :
@@ -30,6 +31,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import {
   getSellerStatusTransitions,
   type SellerStatusTransition,
@@ -47,6 +49,9 @@ export default function OrderStatusActions({ reference, status }: Props) {
   const transitions = getSellerStatusTransitions(status);
   const [pendingTarget, setPendingTarget] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  // Transition « annuler » en attente de confirmation dans le dialogue.
+  const [confirmCancel, setConfirmCancel] =
+    useState<SellerStatusTransition | null>(null);
 
   if (transitions.length === 0) {
     return (
@@ -57,14 +62,18 @@ export default function OrderStatusActions({ reference, status }: Props) {
     );
   }
 
-  async function applyTransition(transition: SellerStatusTransition) {
+  /** Clic sur un bouton : l'annulation passe d'abord par le dialogue. */
+  function handleTransitionClick(transition: SellerStatusTransition) {
     if (transition.intent === "cancel") {
-      const confirmed = window.confirm(
-        "Annuler cette commande ?\n\nLe stock des articles sera restauré. Cette action est définitive.",
-      );
-      if (!confirmed) return;
+      setConfirmCancel(transition);
+      return;
     }
+    void applyTransition(transition);
+  }
 
+  /** Lancé directement (avance) ou après confirmation (annulation). */
+  async function applyTransition(transition: SellerStatusTransition) {
+    setConfirmCancel(null);
     setPendingTarget(transition.target);
     setFeedback(null);
 
@@ -126,7 +135,7 @@ export default function OrderStatusActions({ reference, status }: Props) {
               key={transition.target}
               type="button"
               className={className}
-              onClick={() => applyTransition(transition)}
+              onClick={() => handleTransitionClick(transition)}
               disabled={busy}
             >
               {isPending ? (
@@ -164,6 +173,21 @@ export default function OrderStatusActions({ reference, status }: Props) {
           {feedback.message}
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmCancel !== null}
+        title="Annuler cette commande ?"
+        message={
+          "Le client sera prévenu et le stock des articles sera restauré. " +
+          "Cette action est définitive."
+        }
+        confirmLabel="Oui, annuler la commande"
+        cancelLabel="Retour"
+        onConfirm={() => {
+          if (confirmCancel) void applyTransition(confirmCancel);
+        }}
+        onClose={() => setConfirmCancel(null)}
+      />
     </div>
   );
 }

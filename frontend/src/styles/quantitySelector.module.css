@@ -39,3 +39,13 @@
   color: var(--mf-dark);
   flex: 0 0 auto;
 }
+
+/* Variante compacte (cartes produit) : mêmes commandes, encombrement
+   réduit pour tenir dans la carte à côté du bouton « Voir », y compris
+   sur mobile. */
+.quantityBoxCompact .btn,
+.quantityBoxCompact .qty {
+  width: 36px;
+  height: 36px;
+  font-size: 0.95rem;
+}

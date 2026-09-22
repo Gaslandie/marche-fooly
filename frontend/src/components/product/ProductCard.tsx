@@ -44,9 +44,13 @@ export default function ProductCard({ product, view = "grid" }: ProductCardProps
         <div className={styles.productPrice}>{formatPrice(product.price, product.currency)}</div>
 
         <div className={styles.productActions}>
+          {/* quantityControls : une fois le produit ajouté, le bouton laisse
+              place à un compteur −/+ directement sur la carte (demande
+              cliente — assez de place, même sur téléphone). */}
           <AddToCartButton
             product={product}
             className="btn btn-warning btn-sm"
+            quantityControls
           />
           <Link
             href={`/produit/${encodeURIComponent(product.slug)}`}

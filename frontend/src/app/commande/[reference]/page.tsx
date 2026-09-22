@@ -25,6 +25,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import CancelOrderButton from "@/components/orders/CancelOrderButton";
 import { getCurrentUser } from "@/lib/auth";
 import { getOrderByReference } from "@/lib/orders";
 import { formatPrice } from "@/utils/formatPrice";
@@ -247,6 +248,13 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
               <Link href="/boutique" className="btn btn-outline-dark">
                 Retour à la boutique
               </Link>
+              {/* Annulation acheteur : masqué automatiquement dès que la
+                  commande est livrée ou déjà annulée. */}
+              <CancelOrderButton
+                reference={order.reference}
+                status={order.status}
+                className="btn btn-outline-danger w-100"
+              />
             </div>
           </div>
         </div>

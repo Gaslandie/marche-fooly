@@ -2,9 +2,10 @@
  * Composant: CheckoutForm (Client Component)
  *
  * Rôle du fichier :
- *   Formulaire de checkout en 3 étapes (Infos / Livraison / Paiement)
- *   qui soumet réellement la commande au backend via le Route Handler
- *   interne POST /api/orders (BFF). Le JWT reste dans le cookie httpOnly.
+ *   Formulaire de checkout en 3 étapes (Infos / Réception & paiement /
+ *   Livraison ou Confirmation) qui soumet réellement la commande au
+ *   backend via le Route Handler interne POST /api/orders (BFF). Le JWT
+ *   reste dans le cookie httpOnly.
  *
  * Où il est utilisé :
  *   - app/checkout/page.tsx
@@ -19,12 +20,18 @@
  *     serveur : le navigateur n'a jamais accès au token.
  *
  * Règles métier :
+ *   - Ordre des étapes : Informations → Réception & paiement → Livraison
+ *     (ou Confirmation si retrait). Le mode se choisit AVANT l'adresse :
+ *     ainsi l'étape adresse peut exiger adresse + ville quand on est en
+ *     livraison à domicile, au lieu de laisser passer et d'échouer à la
+ *     toute fin (retour cliente du 22/09/2026).
  *   - Mapping UI → backend :
  *       « Livraison à domicile »  -> cash_on_delivery + home_delivery
  *       « Retrait en boutique »   -> pay_on_pickup + seller_pickup
  *     (Mobile Money : retiré de l'UI — pas de fausse promesse tant que
  *      le paiement mobile n'est pas réellement branché.)
  *   - shippingAddress n'est envoyée QUE pour la livraison à domicile.
+ *     Le backend revérifie (422 si home_delivery sans adresse/ville).
  *   - Sur succès : `clearCart()` puis redirection vers la page de
  *     confirmation `/commande/[reference]`.
  *
@@ -44,13 +51,21 @@ import { useCart } from "@/components/cart/CartProvider";
 import type { AuthUser } from "@/types/auth";
 import styles from "@/styles/checkout.module.css";
 
-const STEPS = [
-  { icon: "bi bi-person", label: "Informations" },
-  { icon: "bi bi-truck", label: "Livraison" },
-  { icon: "bi bi-credit-card", label: "Paiement" },
-];
-
 type Mode = "delivery" | "pickup";
+
+/**
+ * Barre d'étapes : le libellé de la 3e étape suit le mode choisi à la 2e
+ * (adresse requise en livraison, simple confirmation en retrait).
+ */
+function buildSteps(mode: Mode) {
+  return [
+    { icon: "bi bi-person", label: "Informations" },
+    { icon: "bi bi-credit-card", label: "Réception" },
+    mode === "pickup"
+      ? { icon: "bi bi-bag-check", label: "Confirmation" }
+      : { icon: "bi bi-truck", label: "Livraison" },
+  ];
+}
 
 type Props = {
   user: AuthUser;
@@ -78,6 +93,8 @@ export default function CheckoutForm({ user }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const steps = buildSteps(mode);
+
   /* ── État panier vide ──────────────────────────────────────────── */
   if (lines.length === 0) {
     return (
@@ -100,10 +117,13 @@ export default function CheckoutForm({ user }: Props) {
       if (!phone.trim()) return "Téléphone requis.";
       return null;
     }
-    if (currentStep === 1) {
-      // Adresse optionnelle ici (selon le mode choisi à l'étape 2).
-      // On valide juste la longueur si non vide.
-      return null;
+    // Étape 1 : choix du mode (toujours valide, un mode est toujours coché).
+    // Étape 2 : l'adresse est BLOQUANTE dès qu'on est en livraison à
+    // domicile — c'est tout l'intérêt de choisir le mode avant l'adresse.
+    if (currentStep === 2 && mode === "delivery") {
+      if (!street.trim() || !city.trim()) {
+        return "Adresse et ville requises pour une livraison à domicile.";
+      }
     }
     return null;
   }
@@ -152,7 +172,7 @@ export default function CheckoutForm({ user }: Props) {
       return;
     }
     if (mode === "delivery" && (!street.trim() || !city.trim())) {
-      setStep(1);
+      setStep(2);
       setErrorMessage("Adresse et ville requises pour une livraison à domicile.");
       return;
     }
@@ -196,7 +216,7 @@ export default function CheckoutForm({ user }: Props) {
       return;
     }
     setErrorMessage(null);
-    if (step < STEPS.length - 1) {
+    if (step < steps.length - 1) {
       setStep((s) => s + 1);
     } else {
       void submitOrder();
@@ -208,7 +228,7 @@ export default function CheckoutForm({ user }: Props) {
     <>
       {/* Barre d'étapes */}
       <div className={styles.stepsBar}>
-        {STEPS.map((s, i) => {
+        {steps.map((s, i) => {
           const cls =
             i < step ? styles.stepDone : i === step ? styles.stepActive : "";
           return (
@@ -257,18 +277,20 @@ export default function CheckoutForm({ user }: Props) {
           </div>
         )}
 
-        {/* Étape 1 — Adresse de livraison */}
-        {step === 1 && (
+        {/* Étape 2 (livraison à domicile) — Adresse, REQUISE.
+            Le mode a été choisi à l'étape précédente : on peut donc exiger
+            adresse + ville ici, au lieu de laisser passer. */}
+        {step === 2 && mode === "delivery" && (
           <div className={styles.formCard}>
             <h2 className={styles.sectionTitle}>Adresse de livraison</h2>
             <p className="text-secondary small mb-4">
-              Optionnelle si vous choisissez le retrait en boutique à l&apos;étape
-              suivante. Sinon, remplissez au moins l&apos;adresse et la ville.
+              L&apos;adresse et la ville sont <strong>requises</strong> pour la
+              livraison à domicile.
             </p>
             <div className="row g-3">
               <div className="col-12">
                 <label className={styles.inputLabel} htmlFor="adresse">
-                  Adresse
+                  Adresse&nbsp;<span className="text-danger">*</span>
                 </label>
                 <input
                   id="adresse"
@@ -277,12 +299,13 @@ export default function CheckoutForm({ user }: Props) {
                   placeholder="Quartier, rue…"
                   value={street}
                   onChange={(e) => setStreet(e.target.value)}
+                  required
                   disabled={submitting}
                 />
               </div>
               <div className="col-sm-6">
                 <label className={styles.inputLabel} htmlFor="ville">
-                  Ville
+                  Ville&nbsp;<span className="text-danger">*</span>
                 </label>
                 <input
                   id="ville"
@@ -290,6 +313,7 @@ export default function CheckoutForm({ user }: Props) {
                   type="text"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
+                  required
                   disabled={submitting}
                 />
               </div>
@@ -332,28 +356,50 @@ export default function CheckoutForm({ user }: Props) {
                   disabled={submitting}
                 />
               </div>
-              <div className="col-12">
-                <label className={styles.inputLabel} htmlFor="note">
-                  Note pour le vendeur (optionnel)
-                </label>
-                <textarea
-                  id="note"
-                  className={styles.inputField}
-                  placeholder="Instructions particulières pour la livraison…"
-                  rows={3}
-                  style={{ resize: "none" }}
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  maxLength={800}
-                  disabled={submitting}
-                />
-              </div>
             </div>
           </div>
         )}
 
-        {/* Étape 2 — Mode de réception + paiement */}
+        {/* Étape 2 (retrait en boutique) — Simple confirmation, aucune
+            adresse nécessaire. */}
+        {step === 2 && mode === "pickup" && (
+          <div className={styles.formCard}>
+            <h2 className={styles.sectionTitle}>Récapitulatif du retrait</h2>
+            <p className="text-secondary mb-0">
+              <i className="bi bi-shop me-2" aria-hidden="true"></i>
+              Vous retirez votre commande directement chez le vendeur et payez
+              sur place. Aucune adresse de livraison n&apos;est nécessaire.
+            </p>
+          </div>
+        )}
+
+        {/* Étape 2 (les deux modes) — Note pour le vendeur (optionnelle). */}
         {step === 2 && (
+          <div className={styles.formCard}>
+            <label className={styles.inputLabel} htmlFor="note">
+              Note pour le vendeur (optionnel)
+            </label>
+            <textarea
+              id="note"
+              className={styles.inputField}
+              placeholder={
+                mode === "delivery"
+                  ? "Instructions particulières pour la livraison…"
+                  : "Instructions particulières pour le retrait…"
+              }
+              rows={3}
+              style={{ resize: "none" }}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              maxLength={800}
+              disabled={submitting}
+            />
+          </div>
+        )}
+
+        {/* Étape 1 — Mode de réception + paiement (AVANT l'adresse, pour
+            pouvoir exiger celle-ci à l'étape suivante si livraison). */}
+        {step === 1 && (
           <div className={styles.formCard}>
             <h2 className={styles.sectionTitle}>Mode de réception et paiement</h2>
 
@@ -439,7 +485,7 @@ export default function CheckoutForm({ user }: Props) {
                 ></span>
                 Envoi de la commande…
               </>
-            ) : step < STEPS.length - 1 ? (
+            ) : step < steps.length - 1 ? (
               <>
                 Continuer
                 <i className="bi bi-arrow-right ms-1" aria-hidden="true"></i>

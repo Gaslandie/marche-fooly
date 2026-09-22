@@ -23,6 +23,14 @@
  *   - `variant="buy-now"` ajoute au panier ET redirige vers /panier.
  *   - `quantity` est passée par le parent (ProductBuyBox la synchronise
  *     avec QuantitySelector). Par défaut 1.
+ *   - `mode` décide de la sémantique de `quantity` :
+ *       "add" (défaut, cartes catalogue) : AJOUTE au panier.
+ *       "set" (fiche produit)            : FIXE la quantité totale.
+ *     Sur la fiche produit, le sélecteur affiche déjà ce qui est au
+ *     panier : valider « 4 » doit donner 4, pas 1 + 4 (bug signalé le
+ *     22/09/2026).
+ *   - Après un ajout réussi, le panneau panier latéral s'ouvre
+ *     (openDrawer), sauf pour "buy-now" qui navigue vers /panier.
  *   - Après un ajout réussi, le bouton lui-même affiche « Ajouté » en vert
  *     (retour visuel demandé par la cliente) — plus d'alerte verte séparée
  *     pour ce cas ; les alertes restent pour les erreurs et le conflit
@@ -43,6 +51,9 @@ import type { ProductItem } from "@/types/catalog";
 
 type Variant = "default" | "buy-now";
 
+/** "add" : ajoute au panier. "set" : fixe la quantité totale. */
+type Mode = "add" | "set";
+
 type Props = {
   product: ProductItem;
   quantity?: number;
@@ -50,6 +61,9 @@ type Props = {
   className?: string;
   /** Affiche un compteur −/+ sur place quand le produit est déjà au panier. */
   quantityControls?: boolean;
+  mode?: Mode;
+  /** Appelé après un ajout réussi (la fiche produit y resynchronise son sélecteur). */
+  onAdded?: () => void;
 };
 
 type Feedback = { kind: "success" | "error"; message: string };
@@ -64,8 +78,17 @@ export default function AddToCartButton({
   variant = "default",
   className,
   quantityControls = false,
+  mode = "add",
+  onAdded,
 }: Props) {
-  const { addItem, replaceCartWith, updateQuantity, lines } = useCart();
+  const {
+    addItem,
+    setItemQuantity,
+    replaceCartWith,
+    updateQuantity,
+    openDrawer,
+    lines,
+  } = useCart();
   const router = useRouter();
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [justAdded, setJustAdded] = useState(false);
@@ -90,15 +113,23 @@ export default function AddToCartButton({
   // venant de className — ex. btn-sm sur les cartes).
   const addedClass = baseClass.replace(/btn-(warning|dark)\b/, "btn-success");
 
+  // En mode "set", si le produit est déjà au panier, on ne « rajoute »
+  // pas : on met à jour. Le libellé doit le dire.
+  const isUpdating = mode === "set" && !isBuyNow && inCartQty > 0;
+
   const label = !canAdd
     ? product.inStock
       ? "Indisponible"
       : "Rupture de stock"
     : justAdded
-      ? "Ajouté"
+      ? isUpdating
+        ? "Panier mis à jour"
+        : "Ajouté"
       : isBuyNow
         ? "Acheter maintenant"
-        : "Ajouter au panier";
+        : isUpdating
+          ? "Mettre à jour le panier"
+          : "Ajouter au panier";
 
   const icon = justAdded
     ? "bi bi-check-lg me-1"
@@ -129,12 +160,16 @@ export default function AddToCartButton({
       name: product.name,
       vendor: product.vendor,
       icon: product.icon,
+      imageUrl: product.coverThumbUrl || product.coverImageUrl || "",
       price: product.price,
       currency: product.currency,
       quantity,
     };
 
-    const result = addItem(input);
+    // "set" : la quantité affichée par la fiche produit devient la
+    // quantité du panier. "add" : on ajoute à l'existant.
+    const result =
+      mode === "set" ? setItemQuantity(input, quantity) : addItem(input);
 
     if (!result.ok && result.reason === "seller-conflict") {
       const confirmed = window.confirm(
@@ -144,6 +179,7 @@ export default function AddToCartButton({
       if (confirmed) {
         replaceCartWith(input);
         markAdded();
+        onAdded?.();
         // Alerte conservée ici : le remplacement du panier est une info
         // importante que le seul état « Ajouté » ne raconte pas.
         showFeedback(
@@ -151,6 +187,7 @@ export default function AddToCartButton({
           `${product.name} ajouté · panier précédent remplacé.`,
         );
         if (isBuyNow) router.push("/panier");
+        else openDrawer();
       } else {
         showFeedback("error", "Ajout annulé. Panier précédent conservé.");
       }
@@ -163,9 +200,11 @@ export default function AddToCartButton({
     }
 
     // Ajout simple : le retour visuel est porté par le bouton lui-même
-    // (« Ajouté » en vert), pas par une alerte.
+    // (« Ajouté » en vert) et par le panneau panier qui s'ouvre.
     markAdded();
+    onAdded?.();
     if (isBuyNow) router.push("/panier");
+    else openDrawer();
   }
 
   // Compteur −/+ à la place du bouton : uniquement en mode

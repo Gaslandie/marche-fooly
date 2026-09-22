@@ -12,12 +12,22 @@
  *
  *   API exposée via le hook `useCart()` :
  *     - lines, sellerSlug, totalQuantity, subtotalDisplay (lecture)
- *     - addItem(input)       : mono-vendeur strict, renvoie un résultat
- *                              structuré en cas de conflit.
+ *     - addItem(input)       : AJOUTE la quantité à celle déjà au panier
+ *                              (bouton des cartes catalogue). Mono-vendeur
+ *                              strict, renvoie un résultat structuré en
+ *                              cas de conflit.
+ *     - setItemQuantity(in, qty) : FIXE la quantité totale de la ligne
+ *                              (fiche produit : le sélecteur affiche ce
+ *                              qui est au panier, donc « 4 » doit donner
+ *                              4 et non 1 + 4). Crée la ligne si absente.
  *     - replaceCartWith(in)  : appelé après confirmation utilisateur
  *                              pour « vider et remplacer » en cas de
  *                              conflit vendeur.
  *     - removeItem(productId), updateQuantity(id, qty), clearCart().
+ *     - drawerOpen / openDrawer() / closeDrawer() : panneau panier
+ *       latéral, ouvert automatiquement après un ajout. C'est de l'état
+ *       d'INTERFACE (non persisté), d'où un useState React plutôt que le
+ *       store de module.
  *
  * Où il est utilisé :
  *   - app/layout.tsx : enveloppe l'arbre (`<CartProvider>{children}`).
@@ -48,6 +58,7 @@ import {
   useCallback,
   useContext,
   useMemo,
+  useState,
   useSyncExternalStore,
 } from "react";
 import type { ReactNode } from "react";
@@ -121,6 +132,7 @@ function buildLine(input: AddCartInput, quantity: number): CartLine {
     name: input.name,
     vendor: input.vendor,
     icon: input.icon,
+    ...(input.imageUrl ? { imageUrl: input.imageUrl } : {}),
     price: input.price,
     currency: input.currency,
     quantity,
@@ -157,6 +169,48 @@ function addItemStore(input: AddCartInput): AddResult {
       ...existing,
       quantity: clampQuantity(existing.quantity + qty),
     };
+    commit({ lines: nextLines });
+    return { ok: true };
+  }
+
+  if (cartState.lines.length >= CART_MAX_LINES) {
+    return { ok: false, reason: "max-lines" };
+  }
+
+  commit({ lines: [...cartState.lines, buildLine(input, qty)] });
+  return { ok: true };
+}
+
+/**
+ * Fixe la quantité TOTALE d'une ligne (au lieu de l'ajouter).
+ * Utilisé par la fiche produit : le sélecteur y affiche la quantité déjà
+ * au panier, donc valider « 4 » doit laisser 4 au panier.
+ * Crée la ligne si le produit n'y est pas encore.
+ */
+function setItemQuantityStore(
+  input: AddCartInput,
+  quantity: number,
+): AddResult {
+  getSnapshot();
+  const qty = clampQuantity(quantity);
+  const current = getCurrentSellerSlug(cartState);
+
+  if (current && current !== input.sellerSlug) {
+    return {
+      ok: false,
+      reason: "seller-conflict",
+      currentSeller: current,
+      newSeller: input.sellerSlug,
+    };
+  }
+
+  const existingIndex = cartState.lines.findIndex(
+    (l) => l.productId === input.productId,
+  );
+
+  if (existingIndex !== -1) {
+    const nextLines = [...cartState.lines];
+    nextLines[existingIndex] = { ...nextLines[existingIndex], quantity: qty };
     commit({ lines: nextLines });
     return { ok: true };
   }
@@ -211,10 +265,15 @@ type CartContextValue = {
   /** Sous-total d'AFFICHAGE (NE PAS envoyer au backend — recalcul serveur). */
   subtotalDisplay: number;
   addItem(input: AddCartInput): AddResult;
+  setItemQuantity(input: AddCartInput, quantity: number): AddResult;
   replaceCartWith(input: AddCartInput): void;
   removeItem(productId: string): void;
   updateQuantity(productId: string, quantity: number): void;
   clearCart(): void;
+  /** Panneau panier latéral (état d'interface, non persisté). */
+  drawerOpen: boolean;
+  openDrawer(): void;
+  closeDrawer(): void;
 };
 
 const CartContext = createContext<CartContextValue | null>(null);
@@ -230,8 +289,17 @@ export function useCart(): CartContextValue {
 
 export default function CartProvider({ children }: { children: ReactNode }) {
   const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+
+  const openDrawer = useCallback(() => setDrawerOpen(true), []);
+  const closeDrawer = useCallback(() => setDrawerOpen(false), []);
 
   const addItem = useCallback((input: AddCartInput) => addItemStore(input), []);
+  const setItemQuantity = useCallback(
+    (input: AddCartInput, quantity: number) =>
+      setItemQuantityStore(input, quantity),
+    [],
+  );
   const replaceCartWith = useCallback(
     (input: AddCartInput) => replaceCartWithStore(input),
     [],
@@ -259,12 +327,27 @@ export default function CartProvider({ children }: { children: ReactNode }) {
       totalQuantity,
       subtotalDisplay,
       addItem,
+      setItemQuantity,
       replaceCartWith,
       removeItem,
       updateQuantity,
       clearCart,
+      drawerOpen,
+      openDrawer,
+      closeDrawer,
     };
-  }, [state, addItem, replaceCartWith, removeItem, updateQuantity, clearCart]);
+  }, [
+    state,
+    addItem,
+    setItemQuantity,
+    replaceCartWith,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    drawerOpen,
+    openDrawer,
+    closeDrawer,
+  ]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

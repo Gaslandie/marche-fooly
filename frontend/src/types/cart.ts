@@ -38,6 +38,12 @@ export type CartLine = {
   name: string;
   vendor: string;
   icon: string;
+  /**
+   * Vignette du produit, pour l'aperçu du panneau panier latéral.
+   * OPTIONNELLE : les paniers déjà enregistrés dans le navigateur des
+   * clients n'en ont pas — on retombe alors sur `icon`.
+   */
+  imageUrl?: string;
   price: number;
   currency: CurrencyCode;
   quantity: number;

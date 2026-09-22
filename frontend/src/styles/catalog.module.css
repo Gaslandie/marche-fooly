@@ -756,6 +756,20 @@
     flex-direction: column;
   }
 
+  /* Carte produit sur mobile : les deux actions doivent faire la MEME
+     largeur. `stretch` est indispensable car le bloc « Ajouter au panier »
+     est un conteneur, pas un `.btn` : avec `flex-start` (le reglage
+     desktop) il se collait a son texte pendant que « Voir » prenait toute
+     la ligne, d'ou deux boutons de largeurs differentes. */
+  .productActions {
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .productActions > * {
+    width: 100%;
+  }
+
   .viewButtons {
     justify-content: flex-start;
   }
@@ -763,6 +777,14 @@
   .productActions :global(.btn),
   .newsletterForm :global(.btn) {
     width: 100%;
+  }
+
+  /* Cibles tactiles confortables (44px = minimum recommande au doigt) et
+     coins accordes au rayon de la carte (24px). */
+  .productActions :global(.btn) {
+    min-height: 44px;
+    border-radius: 14px;
+    font-weight: 700;
   }
 
   .categoryRow {

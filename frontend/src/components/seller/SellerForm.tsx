@@ -36,8 +36,8 @@ export default function SellerForm({ user }: SellerFormProps) {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (sending || !e.currentTarget.reportValidity()) return;
     setError(null);
-    setSending(true);
 
     const form = new FormData(e.currentTarget);
     const sellerPhone = String(form.get("sellerPhone") || "").trim();
@@ -55,6 +55,19 @@ export default function SellerForm({ user }: SellerFormProps) {
       .filter(Boolean)
       .join("\n");
 
+    if (storeName.length < 2) {
+      setError("Le nom de boutique doit contenir au moins 2 caractères, hors espaces.");
+      return;
+    }
+    if (!/^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/.test(sellerPhone)) {
+      setError("Saisissez un numéro de téléphone valide pour la boutique.");
+      return;
+    }
+    if (description.length > 1500) {
+      setError("Votre présentation est trop longue. Raccourcissez le message pour rester dans la limite de 1 500 caractères, catégorie et nombre de produits compris.");
+      return;
+    }
+    setSending(true);
     try {
       const res = await fetch("/api/sellers/apply", {
         method: "POST",
@@ -141,6 +154,7 @@ export default function SellerForm({ user }: SellerFormProps) {
           <input
             id="sellerPhone"
             name="sellerPhone"
+            maxLength={20}
             className={styles.inputField}
             type="tel"
             placeholder="+224 6XX XX XX XX"
@@ -158,6 +172,8 @@ export default function SellerForm({ user }: SellerFormProps) {
           <input
             id="shopName"
             name="storeName"
+            minLength={2}
+            maxLength={120}
             className={styles.inputField}
             type="text"
             placeholder="Ex : Boutique Diallo"
@@ -193,6 +209,7 @@ export default function SellerForm({ user }: SellerFormProps) {
           <input
             id="sellerLocation"
             name="sellerLocation"
+            maxLength={80}
             className={styles.inputField}
             type="text"
             placeholder="Ex : Sangarédi centre"
@@ -223,6 +240,7 @@ export default function SellerForm({ user }: SellerFormProps) {
           <textarea
             id="sellerMessage"
             name="sellerMessage"
+            maxLength={1500}
             className={styles.inputField}
             placeholder="Présentez rapidement vos produits ou votre boutique..."
             rows={4}

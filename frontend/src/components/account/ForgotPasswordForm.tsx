@@ -35,6 +35,7 @@ export default function ForgotPasswordForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading || !event.currentTarget.reportValidity()) return;
     setStatus("loading");
     setMessage("");
 
@@ -99,6 +100,7 @@ export default function ForgotPasswordForm() {
               id="forgot-email"
               name="email"
               type="email"
+              maxLength={160}
               autoComplete="email"
               className={styles.formInput}
               placeholder="vous@exemple.com"

@@ -53,7 +53,7 @@ const {
   FULFILLMENT_METHODS,
 } = require("../models/shared/constants");
 
-const PHONE_REGEX = /^\+?[0-9\s\-()]{8,20}$/;
+const PHONE_REGEX = /^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/;
 const ORDER_REFERENCE_REGEX = /^ORD-\d{8}-[A-Z2-9]{5}$/;
 
 // Champs jamais acceptes en entree client (refus 422 explicite).

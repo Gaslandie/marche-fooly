@@ -9,6 +9,7 @@ import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import TopBar from "@/components/layout/TopBar";
 import { siteConfig } from "@/config/site";
+import { getCategories } from "@/lib/api";
 import { getUnreadNotificationCount } from "@/lib/notifications";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
 
@@ -32,8 +33,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { user, sellerStatus, showSellerEntry } =
-    await getSellerNavigationState();
+  const [{ user, sellerStatus, showSellerEntry }, categories] = await Promise.all([
+    getSellerNavigationState(),
+    getCategories().catch(() => []),
+  ]);
   const unreadNotifications = user ? await getUnreadNotificationCount() : 0;
 
   return (
@@ -46,13 +49,18 @@ export default async function RootLayout({
         <CartProvider>
           <TopBar sellerStatus={sellerStatus} showSellerEntry={showSellerEntry} />
           <Header
+            categories={categories}
             user={user}
             sellerStatus={sellerStatus}
             showSellerEntry={showSellerEntry}
             unreadNotifications={unreadNotifications}
           />
           <main>{children}</main>
-          <Footer sellerStatus={sellerStatus} showSellerEntry={showSellerEntry} />
+          <Footer
+            isAuthenticated={Boolean(user)}
+            sellerStatus={sellerStatus}
+            showSellerEntry={showSellerEntry}
+          />
           {/* Panneau panier latéral : monté une seule fois, ouvert par
               AddToCartButton après un ajout. Ne rend rien tant qu'il est
               fermé. */}

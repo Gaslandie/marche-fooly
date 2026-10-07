@@ -66,6 +66,7 @@ export default function ProductSort({ total, summary, sort, view }: ProductSortP
               className={[styles.viewButton, view === "grid" ? styles.viewButtonActive : ""].filter(Boolean).join(" ")}
               onClick={() => updateParam("view", "grid")}
               aria-label="Vue grille"
+              aria-pressed={view === "grid"}
             >
               <i className="bi bi-grid-3x3-gap" aria-hidden="true"></i>
             </button>
@@ -74,6 +75,7 @@ export default function ProductSort({ total, summary, sort, view }: ProductSortP
               className={[styles.viewButton, view === "list" ? styles.viewButtonActive : ""].filter(Boolean).join(" ")}
               onClick={() => updateParam("view", "list")}
               aria-label="Vue liste"
+              aria-pressed={view === "list"}
             >
               <i className="bi bi-list-ul" aria-hidden="true"></i>
             </button>

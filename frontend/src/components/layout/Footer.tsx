@@ -18,18 +18,20 @@ const accountLinks = [
 ] as const;
 
 type FooterProps = {
+  isAuthenticated: boolean;
   sellerStatus: SellerCtaStatus;
   showSellerEntry: boolean;
 };
 
 export default function Footer({
+  isAuthenticated,
   sellerStatus,
   showSellerEntry,
 }: FooterProps) {
   const sellerCta = getSellerCta(sellerStatus);
 
   return (
-    <footer className="mf-footer mt-auto">
+    <footer className="mf-footer mt-auto text-center text-md-start">
       <div className="container py-5">
         <div className="row g-4">
           <div className="col-md-4">
@@ -43,7 +45,15 @@ export default function Footer({
             <ul className="list-unstyled d-grid gap-2 mb-0">
               {shopLinks.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href}>{item.label}</Link>
+                  <Link
+                    href={
+                      item.href === "/favoris" && !isAuthenticated
+                        ? "/mon-compte?retour=/favoris"
+                        : item.href
+                    }
+                  >
+                    {item.label}
+                  </Link>
                 </li>
               ))}
               {showSellerEntry && (
@@ -68,15 +78,18 @@ export default function Footer({
 
         <hr className="my-4" />
 
-        <div className="d-flex flex-wrap justify-content-between gap-2 small">
-          <div className="d-flex flex-wrap gap-3">
+        <div className="d-flex flex-column flex-md-row flex-wrap align-items-center align-items-md-start justify-content-md-between gap-2 small">
+          <div className="d-flex flex-column flex-md-row flex-wrap align-items-center align-items-md-start gap-3">
             <a href={siteConfig.phoneHref}>{siteConfig.phone}</a>
             <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
             <a href={siteConfig.whatsappHref} target="_blank" rel="noopener noreferrer">
               WhatsApp
             </a>
           </div>
-          <p className="mb-0">© {new Date().getFullYear()} {siteConfig.name}</p>
+          <div className="text-md-end">
+            <p className="mb-0">© {new Date().getFullYear()} {siteConfig.name}</p>
+            <p className="mb-0 mt-1">Site réalisé par GassTech Solutions</p>
+          </div>
         </div>
       </div>
     </footer>

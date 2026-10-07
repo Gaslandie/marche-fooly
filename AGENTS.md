@@ -47,7 +47,8 @@ Objectif actuel :
 
 - Lire ce fichier avant toute modification.
 - Comprendre la tache avant d'agir.
-- Pour toute question, probleme, bug ou demande ambigue, discuter d'abord avec l'utilisateur avant de modifier le code.
+- Demander une clarification seulement si une ambiguite empeche d'agir correctement dans le perimetre autorise.
+- Preference de Gassama, 7 octobre 2026 : corriger directement les problemes rencontres dans le perimetre du travail et les valider, sans demander une confirmation ni les laisser comme simple prochaine etape proposee. Expliquer ensuite les corrections et les resultats. Les accords requis pour les actions destructives et les donnees de production restent obligatoires.
 - Avant de coder, expliquer en un paragraphe simple :
   - ce qui se passe ;
   - ce qu'on va faire ;
@@ -354,7 +355,7 @@ Apres push :
 ## Communication attendue
 
 Avant chaque tache :
-- discuter d'abord avec l'utilisateur s'il y a une question, un probleme, un bug ou une ambiguite ;
+- clarifier seulement les ambiguïtés bloquantes ; corriger directement les problèmes dans le périmètre autorisé ;
 - expliquer clairement ce qui se passe ;
 - expliquer le plan d'action avant de modifier le code ;
 - utiliser si possible une explication technique puis une analogie simple de la vie reelle.
@@ -369,9 +370,9 @@ Apres chaque tache, l'agent doit fournir :
 - signalement clair de toute modification connexe importante.
 
 A la fin d'une tache :
-- proposer eventuellement des pistes pour aller plus loin ;
-- ne pas appliquer ces ameliorations automatiquement ;
-- laisser l'utilisateur decider s'il veut continuer ou non.
+- terminer et valider les corrections des problèmes rencontrés dans le périmètre autorisé ;
+- réserver les propositions facultatives aux évolutions distinctes de la demande ;
+- laisser l'utilisateur décider de ces nouvelles évolutions, sans bloquer les corrections déjà autorisées.
 
 ## Regle globale
 
@@ -607,3 +608,26 @@ Pour fixer la cible :
 > semaine sont mauvais ? »
 
 <!-- END:socle-gasstech -->
+
+
+## CRITICAL RULE — SCAFFOLDING POLICY
+
+Consigne permanente de Gassama — 7 octobre 2026. Cette règle prime sur les anciennes consignes imposant des fichiers, plans, audits ou documents de suivi non indispensables à la tâche demandée. Elle ne réduit aucune exigence de sécurité.
+
+You must only create scaffolding (extra files, folders, plans, audits, verification scripts, certification machinery, evidence gathering, process documentation, or any supporting structure) when it is strictly and immediately necessary to complete the requested task.
+
+Default behavior:
+
+- Prefer the simplest, most direct solution.
+- Do the actual work first.
+- Avoid creating any extra structure, process, or files unless the task cannot be completed without them.
+- If you are about to create scaffolding, stop and ask yourself: “Is this absolutely required right now to finish the user’s request?” If the answer is no, do not create it.
+- Never expand scope into process, architecture, audits, or “best practices” unless explicitly asked.
+
+When scaffolding is truly required:
+
+- Keep it minimal.
+- Explain briefly why it is necessary.
+- Remove or clean it up if it is no longer needed.
+
+Violating this rule (creating unnecessary scaffolding) is considered a failure to follow instructions.

@@ -75,9 +75,9 @@ export default function CartView() {
           {/* Colonne gauche : liste des articles */}
           <div className="col-lg-8">
             <div className={styles.cartCard}>
-              <div className="d-flex flex-column flex-md-row justify-content-between gap-3 mb-2">
+              <div className="mf-heading-group mb-3">
                 <div>
-                  <span className="fw-bold" style={{ color: "var(--mf-orange)" }}>
+                  <span className="fw-bold mf-heading-label" style={{ color: "var(--mf-orange)" }}>
                     Articles sélectionnés
                   </span>
                   <h2 className="h3 fw-bold mb-0">

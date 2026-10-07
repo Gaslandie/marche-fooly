@@ -86,6 +86,7 @@
 }
 
 .wishlistRemove {
+  font-size: 1rem;
   position: absolute;
   top: 12px;
   right: 12px;

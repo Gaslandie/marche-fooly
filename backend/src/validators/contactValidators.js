@@ -37,7 +37,7 @@
 
 const { body } = require("express-validator");
 
-const PHONE_REGEX = /^\+?[0-9\s\-()]{8,20}$/;
+const PHONE_REGEX = /^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/;
 
 const FORBIDDEN_AT_CREATE = [
   "status",

@@ -182,13 +182,13 @@ const sendNotificationEmail = async ({
   const info = await deliverEmail(config, {
     to,
     subject: subject || title,
-    text: `${title}\n\n${message}\n\nVoir sur Marche Fooly: ${actionUrl}`,
+    text: `${title}\n\n${message}\n\nVoir sur Marché Fooly : ${actionUrl}`,
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111827">
         <h1 style="font-size:20px;margin:0 0 12px">${safeTitle}</h1>
         <p style="margin:0 0 18px">${safeMessage}</p>
         <a href="${escapeHtml(actionUrl)}" style="display:inline-block;background:#ff6b00;color:#fff;text-decoration:none;padding:10px 14px;border-radius:8px;font-weight:700">
-          Voir sur Marche Fooly
+          Voir sur Marché Fooly
         </a>
       </div>
     `,
@@ -221,25 +221,25 @@ const sendPasswordResetEmail = async ({ to, resetPath }) => {
 
   const info = await deliverEmail(config, {
     to,
-    subject: "Reinitialisation de votre mot de passe - Marche Fooly",
+    subject: "Réinitialisation de votre mot de passe - Marché Fooly",
     text:
-      "Vous avez demande la reinitialisation de votre mot de passe Marche Fooly.\n\n" +
+      "Vous avez demandé la réinitialisation de votre mot de passe Marché Fooly.\n\n" +
       `Ouvrez ce lien pour choisir un nouveau mot de passe (valable 1 heure) :\n${resetUrl}\n\n` +
-      "Si vous n'etes pas a l'origine de cette demande, ignorez cet email : " +
-      "votre mot de passe actuel reste inchange.",
+      "Si vous n’êtes pas à l’origine de cette demande, ignorez cet email : " +
+      "votre mot de passe actuel reste inchangé.",
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111827">
-        <h1 style="font-size:20px;margin:0 0 12px">Reinitialisation de votre mot de passe</h1>
+        <h1 style="font-size:20px;margin:0 0 12px">Réinitialisation de votre mot de passe</h1>
         <p style="margin:0 0 18px">
-          Vous avez demande la reinitialisation de votre mot de passe Marche Fooly.
+          Vous avez demandé la réinitialisation de votre mot de passe Marché Fooly.
           Ce lien est valable <strong>1 heure</strong>.
         </p>
         <a href="${safeUrl}" style="display:inline-block;background:#ff6b00;color:#fff;text-decoration:none;padding:10px 14px;border-radius:8px;font-weight:700">
           Choisir un nouveau mot de passe
         </a>
         <p style="margin:18px 0 0;color:#6b7280;font-size:13px">
-          Si vous n'etes pas a l'origine de cette demande, ignorez cet email :
-          votre mot de passe actuel reste inchange.
+          Si vous n’êtes pas à l’origine de cette demande, ignorez cet email :
+          votre mot de passe actuel reste inchangé.
         </p>
       </div>
     `,

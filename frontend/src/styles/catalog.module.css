@@ -22,8 +22,13 @@
 }
 
 .heroBadge {
-  display: inline-flex;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
   align-items: center;
+  justify-content: center;
+  margin-inline: auto;
+  text-align: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
   padding: 0.65rem 1rem;
@@ -156,6 +161,13 @@
   position: absolute;
   border-radius: 50%;
   background: rgba(255, 122, 0, 0.32);
+  pointer-events: none;
+}
+
+.dealStrip > *,
+.categoryBanner > * {
+  position: relative;
+  z-index: 1;
 }
 
 .dealStrip::after {
@@ -373,7 +385,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 13rem;
+  min-height: 0;
+  aspect-ratio: 4 / 3;
+  flex-shrink: 0;
   background:
     radial-gradient(circle at top left, rgba(255, 122, 0, 0.2), transparent 32%),
     linear-gradient(135deg, #151922 0%, #2b3446 100%);
@@ -393,6 +407,15 @@
 .productMediaList {
   width: 16rem;
   min-height: auto;
+  aspect-ratio: auto;
+}
+
+.productMedia.productMediaEmpty {
+  aspect-ratio: auto;
+  min-height: 132px;
+  background: var(--mf-light);
+  color: var(--mf-muted);
+  font-size: 2.4rem;
 }
 
 .productBadge {
@@ -402,7 +425,9 @@
   z-index: 1;
   padding: 0.45rem 0.7rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
+  background: #ffffff;
+  color: var(--mf-orange-dark);
+  box-shadow: 0 2px 12px rgba(21, 25, 34, 0.12);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -413,7 +438,8 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 1.25rem;
+  min-width: 0;
+  padding: 1.1rem;
 }
 
 .stockPill {
@@ -430,7 +456,27 @@
   font-weight: 900;
 }
 
+.stockUnavailable {
+  background: #fff1f2;
+  color: #b42318;
+}
+
+.productStock {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  z-index: 1;
+  margin: 0;
+  background: #e8f7ef;
+}
+
+.productStock.stockUnavailable {
+  background: #fff1f2;
+}
+
 .productTitle {
+  line-height: 1.35;
+  overflow-wrap: anywhere;
   margin-bottom: 0.45rem;
   font-size: 1.1rem;
   font-weight: 850;
@@ -438,7 +484,10 @@
 }
 
 .productVendor {
-  margin-bottom: 0.55rem;
+  line-height: 1.4;
+  text-align: left;
+  overflow-wrap: anywhere;
+  margin-bottom: 0.85rem;
   font-size: 0.84rem;
   font-weight: 700;
 }
@@ -456,28 +505,49 @@
   font-size: 0.9rem;
 }
 
-.productPrice {
+.productFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin-top: auto;
-  margin-bottom: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--mf-border);
+}
+
+.productPrice {
+  color: var(--mf-orange-dark);
   font-size: 1.1rem;
   font-weight: 900;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  flex: 1 1 7rem;
 }
 
 .productActions {
   display: flex;
-  flex-wrap: wrap;
-  /* flex-start : le bouton « Voir » garde sa hauteur naturelle (texte centré)
-     même quand le feedback « ajouté au panier » agrandit le bloc voisin. */
   align-items: flex-start;
-  gap: 0.75rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 100%;
 }
 
-/* Le bloc « Ajouter au panier » (1er enfant) absorbe la largeur disponible :
-   le feedback s'affiche dans SA colonne sans déplacer le bouton « Voir »,
-   qui reste calé à droite de la carte. */
 .productActions > :first-child {
-  flex: 1 1 auto;
   min-width: 0;
+  max-width: 100%;
+}
+
+.productIconButton {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  box-shadow: none;
 }
 
 .emptyState {
@@ -653,11 +723,19 @@
 }
 
 .sectionHeadingSplit {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  justify-content: space-between;
+  display: grid;
+  justify-items: center;
   gap: 1rem;
+}
+
+.sectionHeadingSplit > div {
+  width: 100%;
+  text-align: center;
+}
+
+.sectionHeading p {
+  max-width: 44rem;
+  margin-inline: auto;
 }
 
 .sectionHeadingCentered {
@@ -668,6 +746,9 @@
 }
 
 .eyebrow {
+  display: flex;
+  justify-content: center;
+  text-align: center;
   color: var(--mf-orange-dark);
   font-weight: 800;
 }
@@ -726,7 +807,8 @@
 
   .productMediaList {
     width: auto;
-    min-height: 13rem;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
   }
 }
 
@@ -751,40 +833,16 @@
   }
 
   .sortWrapper,
-  .productActions,
   .newsletterForm {
     flex-direction: column;
-  }
-
-  /* Carte produit sur mobile : les deux actions doivent faire la MEME
-     largeur. `stretch` est indispensable car le bloc « Ajouter au panier »
-     est un conteneur, pas un `.btn` : avec `flex-start` (le reglage
-     desktop) il se collait a son texte pendant que « Voir » prenait toute
-     la ligne, d'ou deux boutons de largeurs differentes. */
-  .productActions {
-    align-items: stretch;
-    gap: 0.5rem;
-  }
-
-  .productActions > * {
-    width: 100%;
   }
 
   .viewButtons {
     justify-content: flex-start;
   }
 
-  .productActions :global(.btn),
   .newsletterForm :global(.btn) {
     width: 100%;
-  }
-
-  /* Cibles tactiles confortables (44px = minimum recommande au doigt) et
-     coins accordes au rayon de la carte (24px). */
-  .productActions :global(.btn) {
-    min-height: 44px;
-    border-radius: 14px;
-    font-weight: 700;
   }
 
   .categoryRow {

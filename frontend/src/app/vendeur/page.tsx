@@ -191,10 +191,10 @@ export default async function VendeurPage() {
         </ol>
       </nav>
 
-      <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+      <div className="mf-heading-group mb-4">
         <div>
           <span
-            className="fw-bold"
+            className="fw-bold mf-heading-label"
             style={{ color: "var(--mf-orange)", fontSize: "0.875rem" }}
           >
             <i className="bi bi-shop me-1" aria-hidden="true"></i>

@@ -70,7 +70,12 @@
   border-radius: 50%;
   background: rgba(255, 122, 0, 0.34);
 }
-@media (max-width: 991.98px) { .sidepanel { position: static; } }
+@media (max-width: 991.98px) {
+  .sidepanel {
+    position: relative;
+    top: auto;
+  }
+}
 
 .sideInfoItem {
   display: flex;

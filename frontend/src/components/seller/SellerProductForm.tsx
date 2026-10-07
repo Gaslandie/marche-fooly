@@ -151,13 +151,14 @@ export default function SellerProductForm({
   }
 
   async function handleImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
-    const files = Array.from(event.target.files ?? []);
+    const input = event.currentTarget;
+    const files = Array.from(input.files ?? []);
     if (!files.length) return;
 
     const remainingSlots = MAX_PRODUCT_IMAGES - values.images.length;
     if (remainingSlots <= 0 || files.length > remainingSlots) {
       setError("Maximum 3 photos par produit.");
-      event.currentTarget.value = "";
+      input.value = "";
       return;
     }
 
@@ -175,6 +176,8 @@ export default function SellerProductForm({
           throw new Error("Image trop lourde. Taille maximum : 4 Mo.");
         }
 
+      }
+      for (const file of files) {
         const formData = new FormData();
         formData.append("image", file);
 
@@ -196,7 +199,7 @@ export default function SellerProductForm({
           !uploaded.thumbFileId ||
           !uploaded.version
         ) {
-          throw new Error(body?.message ?? "Upload image impossible.");
+          throw new Error(body?.message ?? "Impossible d’envoyer l’image. Réessayez.");
         }
 
         uploadedImages.push({
@@ -207,18 +210,18 @@ export default function SellerProductForm({
           thumbUrl: uploaded.thumbUrl || previewUrl,
           altText: values.name.trim(),
         });
+        // Conserver chaque photo reçue même si l’envoi de la suivante échoue.
+        applyImages([...values.images, ...uploadedImages]);
       }
-
-      applyImages([...values.images, ...uploadedImages]);
     } catch (uploadError) {
       setError(
         uploadError instanceof Error
           ? uploadError.message
-          : "Service d'upload indisponible. Réessayez plus tard.",
+          : "L’envoi des images est indisponible. Réessayez plus tard.",
       );
     } finally {
       setUploadingImage(false);
-      event.currentTarget.value = "";
+      input.value = "";
     }
   }
 
@@ -232,14 +235,17 @@ export default function SellerProductForm({
     if (!values.category) {
       return "Veuillez choisir une catégorie.";
     }
-    if (values.price === "" || Number(values.price) < 0) {
-      return "Le prix doit être un nombre positif.";
+    if (values.price === "" || !Number.isSafeInteger(Number(values.price)) || Number(values.price) < 0) {
+      return "Le prix doit être un nombre entier supérieur ou égal à zéro.";
     }
-    if (values.stockQuantity === "" || Number(values.stockQuantity) < 0) {
-      return "Le stock doit être un nombre positif.";
+    if (values.stockQuantity === "" || !Number.isSafeInteger(Number(values.stockQuantity)) || Number(values.stockQuantity) < 0) {
+      return "Le stock doit être un nombre entier supérieur ou égal à zéro.";
+    }
+    if (!values.isFreeDelivery && (!Number.isSafeInteger(Number(values.deliveryFee || 0)) || Number(values.deliveryFee || 0) < 0)) {
+      return "Les frais de livraison doivent être un nombre entier supérieur ou égal à zéro.";
     }
     if (uploadingImage) {
-      return "Veuillez attendre la fin de l'upload image.";
+      return "Veuillez attendre la fin de l’envoi des images.";
     }
     return null;
   }
@@ -252,7 +258,7 @@ export default function SellerProductForm({
       description: values.description.trim(),
       price: Number(values.price),
       stockQuantity: Number(values.stockQuantity),
-      deliveryFee: Number(values.deliveryFee || 0),
+      deliveryFee: values.isFreeDelivery ? 0 : Number(values.deliveryFee || 0),
       isFreeDelivery: values.isFreeDelivery,
       status: values.status,
       category: values.category,
@@ -283,11 +289,13 @@ export default function SellerProductForm({
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting) return;
     const validationError = validate();
     if (validationError) {
       setError(validationError);
       return;
     }
+    if (!event.currentTarget.reportValidity()) return;
     setError(null);
     setSubmitting(true);
 
@@ -487,7 +495,7 @@ export default function SellerProductForm({
                 role="status"
                 aria-hidden="true"
               ></span>
-              Upload de l&apos;image en cours…
+              Envoi des images en cours…
             </div>
           )}
           {values.images.length > 0 && (

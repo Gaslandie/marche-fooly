@@ -27,7 +27,7 @@ const BENEFITS = [
   {
     icon: "bi bi-phone",
     title: "Simple à utiliser",
-    text: "Une expérience claire, mobile first, adaptée aux commerçants locaux.",
+    text: "Une boutique facile à gérer sur téléphone, adaptée aux commerçants locaux.",
   },
   {
     icon: "bi bi-megaphone",
@@ -36,8 +36,8 @@ const BENEFITS = [
   },
   {
     icon: "bi bi-graph-up-arrow",
-    title: "Croissance business",
-    text: "Développez vos ventes avec une présence digitale professionnelle.",
+    title: "Développez vos ventes",
+    text: "Présentez votre boutique et vos produits en ligne.",
   },
 ];
 
@@ -50,27 +50,27 @@ const HOW_STEPS = [
   {
     n: "2",
     title: "Ajoutez vos produits",
-    text: "Présentez vos articles avec prix, descriptions, catégories et photos.",
+    text: "Après validation de votre boutique, ajoutez vos articles avec leurs prix, descriptions et photos.",
   },
   {
     n: "3",
     title: "Recevez des commandes",
-    text: "Les clients découvrent vos produits et vous contactent ou commandent en ligne.",
+    text: "Les clients découvrent vos produits et passent commande sur le site.",
   },
 ];
 
 const PROOF_STATS = [
   { value: "Local", label: "Sangarédi" },
-  { value: "Compte", label: "Rattaché" },
-  { value: "Validation", label: "Back office" },
+  { value: "Compte", label: "Votre boutique" },
+  { value: "Validation", label: "Équipe FOOLY" },
   { value: "Suivi", label: "Espace vendeur" },
 ];
 
 const FAQ_ITEMS = [
   {
-    question: "Est-ce que la création de boutique est déjà fonctionnelle ?",
+    question: "Comment ouvrir ma boutique ?",
     answer:
-      "Oui. Connectez-vous, soumettez votre demande via ce formulaire et l'équipe FOOLY validera votre boutique depuis le back office.",
+      "Connectez-vous et envoyez votre demande avec ce formulaire. L'équipe FOOLY l'examinera. Après approbation, vous pourrez publier vos produits.",
   },
   {
     question: "Quels vendeurs peuvent rejoindre Marché Fooly ?",
@@ -78,14 +78,14 @@ const FAQ_ITEMS = [
       "Commerçants locaux, vendeurs indépendants, boutiques physiques, particuliers et petites entreprises de Sangarédi ou des villes voisines.",
   },
   {
-    question: "Comment les clients vont-ils commander ?",
+    question: "Comment les clients passent-ils commande ?",
     answer:
-      "Marché Fooly propose un parcours complet : boutique, détail produit, panier et checkout. Les commandes sont transmises au vendeur pour traitement et livraison.",
+      "Les clients choisissent leurs produits, les ajoutent au panier et confirment leur commande. Vous retrouvez les commandes dans votre espace vendeur pour préparer la livraison ou le retrait.",
   },
   {
-    question: "Est-ce qu'il y aura un paiement en ligne ?",
+    question: "Comment les clients paient-ils ?",
     answer:
-      "Marché Fooly propose le paiement à la livraison et le retrait en boutique. Le paiement en ligne peut être proposé selon les options disponibles.",
+      "Les clients paient à la livraison ou lors du retrait auprès du vendeur. Le paiement en ligne n’est pas disponible.",
   },
 ];
 
@@ -205,7 +205,7 @@ export default async function DevenirVendeurPage() {
                       <i className="bi bi-shield-check" aria-hidden="true"></i>
                     </div>
                     <div className="flex-grow-1">
-                      <strong className="d-block">Validation admin</strong>
+                      <strong className="d-block">Validation par FOOLY</strong>
                       <span className="text-secondary small">L&apos;équipe FOOLY approuve la boutique avant publication.</span>
                     </div>
                   </div>
@@ -250,7 +250,7 @@ export default async function DevenirVendeurPage() {
             <span className={catalogStyles.eyebrow}>Méthode simple</span>
             <h2 className={catalogStyles.sectionTitle}>Comment ça marche ?</h2>
             <p className={catalogStyles.sectionDescription}>
-              Trois étapes pour passer d&apos;une boutique physique à une vitrine digitale locale.
+              Trois étapes pour présenter vos produits et vendre en ligne.
             </p>
           </div>
 
@@ -274,13 +274,13 @@ export default async function DevenirVendeurPage() {
           <div className={styles.proofSection}>
             <div className="row align-items-center g-4">
               <div className="col-lg-6">
-                <span className="badge bg-warning text-dark rounded-pill mb-3">Objectif local</span>
+                <span className="badge bg-warning text-dark rounded-pill mb-3 mf-heading-label">Commerce local</span>
                 <h2 className="display-6 fw-bold mb-3">
-                  FOOLY peut devenir le Jumia local de Sangarédi
+                  Votre boutique au cœur du commerce de Sangarédi
                 </h2>
                 <p style={{ color: "rgba(255,255,255,0.55)" }} className="mb-0">
-                  L&apos;idée est simple : regrouper les vendeurs locaux dans une plateforme moderne,
-                  rassurante et facile à utiliser pour les acheteurs.
+                  Marché Fooly réunit les vendeurs locaux pour permettre aux acheteurs de découvrir
+                  leurs produits et de commander simplement.
                 </p>
               </div>
               <div className="col-lg-6">

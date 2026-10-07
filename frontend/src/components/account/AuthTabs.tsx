@@ -72,7 +72,10 @@ export default function AuthTabs() {
   const registerLoading = registerStatus === "loading";
   const requestedReturn = searchParams.get("retour");
   const returnPath =
-    requestedReturn?.startsWith("/") && !requestedReturn.startsWith("//")
+    requestedReturn?.startsWith("/") &&
+    !requestedReturn.startsWith("//") &&
+    !requestedReturn.includes("\\") &&
+    !Array.from(requestedReturn).some((character) => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)
       ? requestedReturn
       : "/mon-compte";
 
@@ -84,6 +87,7 @@ export default function AuthTabs() {
 
   async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loginLoading || !event.currentTarget.reportValidity()) return;
     setLoginStatus("loading");
     setLoginMessage("");
 
@@ -112,6 +116,17 @@ export default function AuthTabs() {
 
   async function handleRegister(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (registerLoading || !event.currentTarget.reportValidity()) return;
+    if (registerData.firstName.trim().length < 2 || registerData.lastName.trim().length < 2) {
+      setRegisterStatus("error");
+      setRegisterMessage("Le prénom et le nom doivent contenir au moins 2 caractères, hors espaces.");
+      return;
+    }
+    if (!/^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/.test(registerData.phone.trim())) {
+      setRegisterStatus("error");
+      setRegisterMessage("Saisissez un numéro de téléphone valide, par exemple +224 6XX XX XX XX.");
+      return;
+    }
     setRegisterStatus("loading");
     setRegisterMessage("");
 
@@ -179,6 +194,7 @@ export default function AuthTabs() {
               id="login-email"
               name="email"
               type="email"
+              maxLength={160}
               autoComplete="email"
               className={styles.formInput}
               placeholder="vous@exemple.com"
@@ -301,6 +317,7 @@ export default function AuthTabs() {
                   }
                   required
                   minLength={2}
+                  maxLength={80}
                   disabled={registerLoading}
                 />
               </div>
@@ -321,6 +338,7 @@ export default function AuthTabs() {
                   }
                   required
                   minLength={2}
+                  maxLength={80}
                   disabled={registerLoading}
                 />
               </div>
@@ -333,6 +351,7 @@ export default function AuthTabs() {
               id="reg-email"
               name="email"
               type="email"
+              maxLength={160}
               autoComplete="email"
               className={styles.formInput}
               placeholder="vous@exemple.com"
@@ -351,9 +370,10 @@ export default function AuthTabs() {
               id="reg-tel"
               name="phone"
               type="tel"
+              maxLength={20}
               autoComplete="tel"
               className={styles.formInput}
-              placeholder="+224 6XX XXX XXX"
+              placeholder="+224 6XX XX XX XX"
               value={registerData.phone}
               onChange={(e) =>
                 setRegisterData({ ...registerData, phone: e.target.value })
@@ -379,6 +399,7 @@ export default function AuthTabs() {
                 }
                 required
                 minLength={8}
+                maxLength={128}
                 disabled={registerLoading}
               />
               <button

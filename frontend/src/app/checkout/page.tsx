@@ -65,7 +65,7 @@ export default async function CheckoutPage() {
             </ol>
           </nav>
 
-          <div className="row align-items-center g-4">
+          <div className="row align-items-center g-4 mf-page-heading">
             <div className="col-lg-8">
               <span className={catalogStyles.heroBadge}>
                 <i className="bi bi-bag-check" aria-hidden="true"></i>
@@ -78,7 +78,7 @@ export default async function CheckoutPage() {
                 Renseignez vos informations et confirmez votre commande auprès des vendeurs locaux.
               </p>
             </div>
-            <div className="col-lg-4 text-lg-end">
+            <div className="col-lg-4 text-center">
               <Link href="/panier" className="btn btn-outline-light">
                 <i className="bi bi-arrow-left me-1" aria-hidden="true"></i>
                 Retour au panier

@@ -35,7 +35,17 @@
   text-transform: uppercase;
 }
 
+.eyebrow {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
 .heroBadge {
+  display: flex;
+  width: fit-content;
+  margin-inline: auto;
+  text-align: center;
   margin-bottom: 1.25rem;
   padding: 0.65rem 1rem;
   border: 1px solid rgba(255, 122, 0, 0.18);
@@ -46,6 +56,7 @@
 
 .heroTitle {
   max-width: 12ch;
+  margin-inline: auto;
   margin-bottom: 1.25rem;
   font-size: clamp(2.4rem, 5vw, 4.5rem);
   font-weight: 800;
@@ -70,6 +81,7 @@
 
 .heroText {
   max-width: 34rem;
+  margin-inline: auto;
   margin-bottom: 1.75rem;
   font-size: 1.05rem;
   line-height: 1.75;
@@ -103,6 +115,11 @@
 
 .heroCard {
   min-height: 30rem;
+}
+
+.heroImage {
+  object-fit: cover;
+  object-position: 30% center;
 }
 
 .coverImage {
@@ -150,15 +167,18 @@
 }
 
 .sectionHeader {
+  text-align: center;
   margin-bottom: 2rem;
 }
 
 .sectionHeaderSplit {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  justify-content: space-between;
+  display: grid;
+  justify-items: center;
   gap: 1rem;
+}
+
+.sectionHeaderSplit > div {
+  width: 100%;
 }
 
 .sectionHeaderCentered {
@@ -185,7 +205,7 @@
 
 .sectionSubtitle {
   max-width: 42rem;
-  margin: 0;
+  margin: 0 auto;
   font-size: 1rem;
   line-height: 1.75;
 }
@@ -531,6 +551,11 @@
   .trustCardContent {
     position: static;
     margin: 1rem;
+  }
+
+  .heroOverlay {
+    position: absolute;
+    margin: 0;
   }
 
   .heroOverlay,

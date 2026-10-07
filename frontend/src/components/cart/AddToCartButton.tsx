@@ -61,6 +61,8 @@ type Props = {
   className?: string;
   /** Affiche un compteur −/+ sur place quand le produit est déjà au panier. */
   quantityControls?: boolean;
+  /** Carte compacte : icône visible, libellé conservé pour l’accessibilité. */
+  iconOnly?: boolean;
   mode?: Mode;
   /** Appelé après un ajout réussi (la fiche produit y resynchronise son sélecteur). */
   onAdded?: () => void;
@@ -78,6 +80,7 @@ export default function AddToCartButton({
   variant = "default",
   className,
   quantityControls = false,
+  iconOnly = false,
   mode = "add",
   onAdded,
 }: Props) {
@@ -225,7 +228,7 @@ export default function AddToCartButton({
               updateQuantity(product.productId as string, next)
             }
           />
-          <span className="small fw-semibold text-success">
+          <span className={iconOnly ? "visually-hidden" : "small fw-semibold text-success"}>
             <i className="bi bi-check-circle-fill me-1" aria-hidden="true"></i>
             Dans le panier
           </span>
@@ -237,9 +240,10 @@ export default function AddToCartButton({
           onClick={handleClick}
           disabled={!canAdd}
           aria-label={`${label} : ${product.name}`}
+          title={iconOnly ? `${label} : ${product.name}` : undefined}
         >
-          <i className={icon} aria-hidden="true"></i>
-          {label}
+          <i className={iconOnly ? icon.replace(" me-1", "") : icon} aria-hidden="true"></i>
+          <span className={iconOnly ? "visually-hidden" : undefined}>{label}</span>
         </button>
       )}
       {feedback && (

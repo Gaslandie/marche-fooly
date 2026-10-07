@@ -49,10 +49,23 @@ function DrawerContent({ onClose }: { onClose: () => void }) {
   const { lines, totalQuantity, subtotalDisplay, updateQuantity, removeItem } =
     useCart();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const previousFocus = document.activeElement;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
+      if (event.key === "Tab") {
+        const elements = Array.from(drawerRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
+        ) ?? []).filter((element) => element.getClientRects().length > 0);
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (first && (event.shiftKey ? document.activeElement === first : document.activeElement === last)) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+        }
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     const previousOverflow = document.body.style.overflow;
@@ -61,6 +74,7 @@ function DrawerContent({ onClose }: { onClose: () => void }) {
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
     };
   }, [onClose]);
 
@@ -71,6 +85,7 @@ function DrawerContent({ onClose }: { onClose: () => void }) {
     <>
       <div className={styles.backdrop} onClick={onClose} aria-hidden="true"></div>
       <aside
+        ref={drawerRef}
         className={styles.drawer}
         role="dialog"
         aria-modal="true"
@@ -153,7 +168,7 @@ function DrawerContent({ onClose }: { onClose: () => void }) {
               </>
             )}
             <button type="button" className="btn btn-link" onClick={onClose}>
-              Continuer mes achats
+              {isEmpty ? "Fermer le panier" : "Continuer mes achats"}
             </button>
           </div>
         </div>

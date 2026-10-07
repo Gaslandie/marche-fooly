@@ -30,6 +30,59 @@ body {
 
 main {
   flex: 1;
+  text-align: left;
+}
+
+/* Même lecture sur toutes les pages ; le footer garde son alignement mobile. */
+main :is(h1, h2, h3, h4, h5, h6) {
+  text-align: center;
+}
+
+main p {
+  text-align: left;
+}
+
+/* En-têtes de page et de section : un axe commun pour les titres et actions. */
+.mf-heading-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mf-heading-group > :first-child {
+  width: 100%;
+  text-align: center;
+}
+
+.mf-heading-group > .d-flex {
+  justify-content: center;
+}
+
+.mf-heading-group p {
+  max-width: 48rem;
+  margin-inline: auto;
+}
+
+.mf-heading-label {
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.mf-page-heading {
+  justify-content: center;
+}
+
+.mf-page-heading > [class*="col-lg-"] {
+  flex: 0 0 100%;
+  width: 100%;
+  max-width: 52rem;
+  text-align: center;
 }
 
 *,
@@ -74,6 +127,20 @@ a:hover {
 }
 
 /* ── Search bar ────────────────────────────────────────────── */
+.mf-header-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.mf-brand-name {
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+}
+
 .mf-header-search {
   width: min(100%, 400px);
 }
@@ -139,6 +206,46 @@ a:hover {
 }
 
 /* ── Icon links (panier, favoris, compte) ──────────────────── */
+.mf-category-nav {
+  border-top: 1px solid var(--mf-border);
+}
+
+.mf-category-nav ul {
+  display: flex;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.mf-category-nav li {
+  flex-shrink: 0;
+}
+
+.mf-category-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mf-category-nav a:hover,
+.mf-category-nav a:focus-visible {
+  color: var(--mf-orange-dark);
+  background: #fff5e9;
+}
+
+.mf-category-nav a:focus-visible {
+  outline: 2px solid var(--mf-orange);
+  outline-offset: -2px;
+}
+
 .mf-icon-link {
   position: relative;
   display: inline-flex;
@@ -306,8 +413,45 @@ a:hover {
 
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 991.98px) {
+  .mf-header-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .mf-header-brand {
+    min-width: 0;
+  }
+
+  .mf-header-brand .mf-logo-mark {
+    flex-shrink: 0;
+  }
+
   .mf-topbar {
     display: none;
+  }
+}
+
+@media (max-width: 359.98px) {
+  .mf-brand-name {
+    font-size: 1rem;
+  }
+
+  .mf-header-brand .small {
+    font-size: 0.7rem;
+  }
+
+  .mf-header-brand .mf-logo-mark img {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Les grandes gouttières horizontales dépassent le conteneur sur téléphone. */
+@media (max-width: 575.98px) {
+  .row.g-5 {
+    --bs-gutter-x: 1.5rem;
   }
 }
 

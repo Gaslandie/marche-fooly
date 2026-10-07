@@ -115,6 +115,7 @@ export default function CheckoutForm({ user }: Props) {
   function validateStep(currentStep: number): string | null {
     if (currentStep === 0) {
       if (!phone.trim()) return "Téléphone requis.";
+      if (!/^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/.test(phone.trim())) return "Saisissez un numéro de téléphone valide.";
       return null;
     }
     // Étape 1 : choix du mode (toujours valide, un mode est toujours coché).
@@ -210,11 +211,13 @@ export default function CheckoutForm({ user }: Props) {
   /* ── Soumission du formulaire (Continuer / Confirmer) ──────────── */
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (submitting) return;
     const error = validateStep(step);
     if (error) {
       setErrorMessage(error);
       return;
     }
+    if (!event.currentTarget.reportValidity()) return;
     setErrorMessage(null);
     if (step < steps.length - 1) {
       setStep((s) => s + 1);
@@ -262,11 +265,12 @@ export default function CheckoutForm({ user }: Props) {
                 </label>
                 <input
                   id="telephone"
+                  maxLength={20}
                   name="customerPhone"
                   className={styles.inputField}
                   type="tel"
                   autoComplete="tel"
-                  placeholder="+224 6XX XXX XXX"
+                  placeholder="+224 6XX XX XX XX"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
@@ -294,6 +298,7 @@ export default function CheckoutForm({ user }: Props) {
                 </label>
                 <input
                   id="adresse"
+                  maxLength={180}
                   className={styles.inputField}
                   type="text"
                   placeholder="Quartier, rue…"
@@ -309,6 +314,7 @@ export default function CheckoutForm({ user }: Props) {
                 </label>
                 <input
                   id="ville"
+                  maxLength={80}
                   className={styles.inputField}
                   type="text"
                   value={city}
@@ -323,6 +329,7 @@ export default function CheckoutForm({ user }: Props) {
                 </label>
                 <input
                   id="region"
+                  maxLength={80}
                   className={styles.inputField}
                   type="text"
                   value={region}
@@ -336,6 +343,7 @@ export default function CheckoutForm({ user }: Props) {
                 </label>
                 <input
                   id="country"
+                  maxLength={80}
                   className={styles.inputField}
                   type="text"
                   value={country}
@@ -349,6 +357,7 @@ export default function CheckoutForm({ user }: Props) {
                 </label>
                 <input
                   id="postalCode"
+                  maxLength={20}
                   className={styles.inputField}
                   type="text"
                   value={postalCode}
@@ -406,10 +415,16 @@ export default function CheckoutForm({ user }: Props) {
             {/* Option 1 : Livraison + paiement à la livraison */}
             <div
               role="button"
+              aria-pressed={mode === "delivery"}
               tabIndex={0}
               className={`${styles.paymentOption} ${mode === "delivery" ? styles.paymentOptionSelected : ""}`}
               onClick={() => setMode("delivery")}
-              onKeyDown={(e) => e.key === "Enter" && setMode("delivery")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setMode("delivery");
+                }
+              }}
             >
               <div className={styles.paymentIcon}>
                 <i className="bi bi-cash-stack" aria-hidden="true"></i>
@@ -428,10 +443,16 @@ export default function CheckoutForm({ user }: Props) {
             {/* Option 2 : Retrait boutique + paiement au retrait */}
             <div
               role="button"
+              aria-pressed={mode === "pickup"}
               tabIndex={0}
               className={`${styles.paymentOption} ${mode === "pickup" ? styles.paymentOptionSelected : ""}`}
               onClick={() => setMode("pickup")}
-              onKeyDown={(e) => e.key === "Enter" && setMode("pickup")}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setMode("pickup");
+                }
+              }}
             >
               <div className={styles.paymentIcon}>
                 <i className="bi bi-shop" aria-hidden="true"></i>

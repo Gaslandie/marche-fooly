@@ -55,7 +55,7 @@ export default async function VendeurCommandesPage() {
         </ol>
       </nav>
 
-      <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+      <div className="mf-heading-group mb-4">
         <h1 className="h3 fw-bold mb-0">Commandes reçues</h1>
         <Link href="/vendeur" className="btn btn-outline-dark">
           <i className="bi bi-arrow-left me-1" aria-hidden="true"></i>

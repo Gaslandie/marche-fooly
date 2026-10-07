@@ -90,7 +90,7 @@ export default async function CommandesPage() {
             </ol>
           </nav>
 
-          <div className="row align-items-center g-4">
+          <div className="row align-items-center g-4 mf-page-heading">
             <div className="col-lg-8">
               <span className={catalogStyles.heroBadge}>
                 <i className="bi bi-bag" aria-hidden="true"></i>
@@ -101,7 +101,7 @@ export default async function CommandesPage() {
                 Suivez l&apos;état de vos commandes et retrouvez vos achats passés auprès des vendeurs locaux.
               </p>
             </div>
-            <div className="col-lg-4 text-lg-end">
+            <div className="col-lg-4 text-center">
               <Link href="/boutique" className="btn btn-outline-light">
                 <i className="bi bi-bag-plus me-1" aria-hidden="true"></i>
                 Nouvelle commande

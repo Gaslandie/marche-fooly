@@ -25,7 +25,7 @@
 
 const { body, param, query } = require("express-validator");
 
-const PHONE_REGEX = /^\+?[0-9\s\-()]{8,20}$/;
+const PHONE_REGEX = /^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/;
 const HTTP_URL_REGEX = /^https?:\/\/.+/i;
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 

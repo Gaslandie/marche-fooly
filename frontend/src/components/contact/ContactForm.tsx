@@ -19,19 +19,59 @@ type ContactFormProps = {
 export default function ContactForm({ hasSellerStatus = false }: ContactFormProps) {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
   const subjects = hasSellerStatus
     ? SUBJECTS.map((subject) =>
         subject === "Devenir vendeur" ? "Support vendeur" : subject,
       )
     : SUBJECTS;
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (sending || !e.currentTarget.reportValidity()) return;
+    const data = new FormData(e.currentTarget);
+    const fullName = String(data.get("fullName") ?? "").trim();
+    const phone = String(data.get("phone") ?? "").trim();
+    const message = String(data.get("message") ?? "").trim();
+    if (fullName.length < 2 || message.length < 10) {
+      setError("Indiquez un nom d’au moins 2 caractères et un message d’au moins 10 caractères, hors espaces.");
+      return;
+    }
+    if (phone && !/^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/.test(phone)) {
+      setError("Vérifiez le numéro de téléphone ou laissez ce champ vide.");
+      return;
+    }
     setSending(true);
-    setTimeout(() => {
-      setSending(false);
+    setError("");
+    try {
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000").replace(/\/+$/, "");
+      const res = await fetch(`${apiUrl}/api/contact`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName,
+          email: String(data.get("email") ?? "").trim(),
+          phone,
+          subject: String(data.get("subject") ?? "").trim(),
+          message,
+          sourcePage: "/contact",
+        }),
+      });
+      const body = await res.json();
+      if (!res.ok || !body?.success) {
+        setError(res.status === 429
+          ? "Trop de tentatives. Patientez quelques minutes avant de réessayer."
+          : res.status === 422
+            ? "Vérifiez vos coordonnées et votre message, puis réessayez."
+            : "Votre message n’a pas pu être envoyé. Réessayez dans quelques instants.");
+        return;
+      }
       setSent(true);
-    }, 800);
+    } catch {
+      setError("Connexion interrompue. Votre texte est conservé dans le formulaire ; réessayez.");
+    } finally {
+      setSending(false);
+    }
   }
 
   if (sent) {
@@ -66,7 +106,7 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
   return (
     <form className={styles.formCard} onSubmit={handleSubmit}>
       <div className="mb-4">
-        <span className="fw-bold" style={{ color: "var(--mf-orange)" }}>
+        <span className="fw-bold mf-heading-label" style={{ color: "var(--mf-orange)" }}>
           Envoyer un message
         </span>
         <h2 className="h2 fw-bold mb-2">Comment pouvons-nous vous aider ?</h2>
@@ -82,6 +122,10 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
           </label>
           <input
             id="fullName"
+            name="fullName"
+            minLength={2}
+            maxLength={120}
+            disabled={sending}
             className={styles.inputField}
             type="text"
             placeholder="Votre nom"
@@ -95,6 +139,9 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
           </label>
           <input
             id="phone"
+            name="phone"
+            maxLength={20}
+            disabled={sending}
             className={styles.inputField}
             type="tel"
             placeholder="+224 6XX XX XX XX"
@@ -107,9 +154,12 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
           </label>
           <input
             id="email"
+            name="email"
+            maxLength={160}
+            disabled={sending}
             className={styles.inputField}
             type="email"
-            placeholder="votre@email.com"
+            placeholder="vous@exemple.com"
             required
           />
         </div>
@@ -120,6 +170,8 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
           </label>
           <select
             id="subject"
+            name="subject"
+            disabled={sending}
             className={styles.inputField}
             defaultValue=""
             required
@@ -140,6 +192,10 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
           </label>
           <textarea
             id="message"
+            name="message"
+            minLength={10}
+            maxLength={3000}
+            disabled={sending}
             className={styles.inputField}
             placeholder="Expliquez votre demande..."
             rows={5}
@@ -153,6 +209,7 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
               className="form-check-input"
               type="checkbox"
               id="contactAgree"
+              disabled={sending}
               required
             />
             <label className="form-check-label text-secondary small" htmlFor="contactAgree">
@@ -162,6 +219,7 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
         </div>
 
         <div className="col-12">
+          {error && <p className="alert alert-danger" role="alert">{error}</p>}
           <button
             className="btn btn-warning fw-bold w-100"
             type="submit"

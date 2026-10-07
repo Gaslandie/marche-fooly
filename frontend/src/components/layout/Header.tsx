@@ -2,11 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import CartIcon from "@/components/cart/CartIcon";
 import SearchBar from "@/components/common/SearchBar";
+import MobileNavigation from "@/components/layout/MobileNavigation";
 import { siteConfig } from "@/config/site";
 import { hasBackOfficeAccess } from "@/lib/admin";
 import { getSellerCta } from "@/lib/sellerCta";
 import type { SellerCtaStatus } from "@/lib/sellerCta";
 import type { AuthUser } from "@/types/auth";
+import type { CategoryItem } from "@/types/catalog";
 
 const navLinks = [
   { href: "/", label: "Accueil" },
@@ -16,6 +18,7 @@ const navLinks = [
 ] as const;
 
 type HeaderProps = {
+  categories: CategoryItem[];
   user: AuthUser | null;
   sellerStatus: SellerCtaStatus;
   showSellerEntry: boolean;
@@ -23,6 +26,7 @@ type HeaderProps = {
 };
 
 export default function Header({
+  categories,
   user,
   sellerStatus,
   showSellerEntry,
@@ -34,8 +38,8 @@ export default function Header({
   return (
     <header className="mf-header">
       <div className="container py-3">
-        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
-          <Link href="/" className="d-inline-flex align-items-center gap-2">
+        <div className="mf-header-row">
+          <Link href="/" className="mf-header-brand d-inline-flex align-items-center gap-2">
             <span className="mf-logo-mark">
               <Image
                 src="/images/logo/marche-fooly-logo.jpeg"
@@ -47,7 +51,7 @@ export default function Header({
               />
             </span>
             <div>
-              <strong className="d-block lh-1" style={{ fontSize: "1.15rem", letterSpacing: "-0.03em" }}>
+              <strong className="mf-brand-name d-block lh-1">
                 {siteConfig.name}
               </strong>
               <span className="small" style={{ color: "var(--mf-muted)", fontWeight: 700 }}>
@@ -56,11 +60,11 @@ export default function Header({
             </div>
           </Link>
 
-          <div className="mf-header-search">
+          <div className="mf-header-search d-none d-lg-block">
             <SearchBar />
           </div>
 
-          <div className="d-flex align-items-center gap-3">
+          <div className="d-none d-lg-flex align-items-center gap-3">
             {user && (
               <Link
                 href="/notifications"
@@ -79,7 +83,11 @@ export default function Header({
                 )}
               </Link>
             )}
-            <Link href="/favoris" className="mf-icon-link" aria-label="Mes favoris">
+            <Link
+              href={user ? "/favoris" : "/mon-compte?retour=/favoris"}
+              className="mf-icon-link"
+              aria-label="Mes favoris"
+            >
               <i className="bi bi-heart" aria-hidden="true"></i>
             </Link>
             <CartIcon />
@@ -87,9 +95,16 @@ export default function Header({
               <i className="bi bi-person-circle" aria-hidden="true"></i>
             </Link>
           </div>
+          <MobileNavigation
+            categories={categories.map(({ slug, name, icon }) => ({ slug, name, icon }))}
+            isAuthenticated={Boolean(user)}
+            hasAdminAccess={hasAdminAccess}
+            sellerCta={showSellerEntry ? sellerCta : null}
+            unreadNotifications={unreadNotifications}
+          />
         </div>
 
-        <nav className="mf-nav" aria-label="Navigation principale">
+        <nav className="mf-nav d-none d-lg-block" aria-label="Navigation principale">
           <ul className="d-flex flex-wrap list-unstyled mb-0" style={{ gap: "0.25rem" }}>
             {navLinks.map((item) => (
               <li key={item.href}>
@@ -112,6 +127,23 @@ export default function Header({
                 </Link>
               </li>
             )}
+          </ul>
+        </nav>
+        <nav className="mf-category-nav d-none d-lg-block" aria-label="Rayons du catalogue">
+          <ul>
+            <li>
+              <Link href="/categories">
+                <i className="bi bi-grid me-2" aria-hidden="true" />
+                Toutes les catégories
+              </Link>
+            </li>
+            {categories.map((category) => (
+              <li key={category.slug}>
+                <Link href={`/boutique?category=${encodeURIComponent(category.slug)}`}>
+                  {category.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
       </div>

@@ -24,6 +24,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import AuthTabs from "@/components/account/AuthTabs";
 import AccountSidebar from "@/components/account/AccountSidebar";
+import CartNotEmpty from "@/components/cart/CartNotEmpty";
 import { getCurrentUser } from "@/lib/auth";
 import { getMyFavoriteCount } from "@/lib/favorites";
 import { getMyOrderStats } from "@/lib/orders";
@@ -79,7 +80,7 @@ export default async function MonComptePage() {
             </ol>
           </nav>
 
-          <div className="row align-items-center g-4">
+          <div className="row align-items-center g-4 mf-page-heading">
             <div className="col-lg-8">
               <span className={catalogStyles.heroBadge}>
                 <i className="bi bi-person-circle" aria-hidden="true"></i>
@@ -94,12 +95,14 @@ export default async function MonComptePage() {
                   : "Connectez-vous ou créez un compte pour suivre vos commandes et vos favoris."}
               </p>
             </div>
-            <div className="col-lg-4 text-lg-end">
-              <Link href="/boutique" className="btn btn-outline-light">
-                <i className="bi bi-bag me-1" aria-hidden="true"></i>
-                Continuer mes achats
-              </Link>
-            </div>
+            <CartNotEmpty>
+              <div className="col-lg-4 text-center">
+                <Link href="/boutique" className="btn btn-outline-light">
+                  <i className="bi bi-bag me-1" aria-hidden="true"></i>
+                  Continuer mes achats
+                </Link>
+              </div>
+            </CartNotEmpty>
           </div>
         </div>
       </section>

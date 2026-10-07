@@ -6,4 +6,5 @@ export const siteConfig = {
   whatsappHref: "https://wa.me/224614851515",
   email: "contact@marchefooly.com",
   location: "Sangarédi, Guinée",
+  supportHours: "Du lundi au samedi, de 8 h à 18 h",
 } as const;

@@ -68,12 +68,12 @@ const SELL_STEPS = [
   {
     n: "1",
     title: "Créez votre boutique",
-    text: "Présentez votre activité, votre localisation et vos produits.",
+    text: "Connectez-vous et envoyez votre demande avec les informations de votre boutique.",
   },
   {
     n: "2",
     title: "Publiez vos articles",
-    text: "Ajoutez les prix, descriptions, catégories et informations utiles.",
+    text: "Après approbation de votre boutique, ajoutez vos produits avec leurs prix, descriptions et photos.",
   },
   {
     n: "3",
@@ -86,7 +86,7 @@ const FAQ_ITEMS = [
   {
     question: "Comment rechercher un produit sur Marché Fooly ?",
     answer:
-      "Utilisez la barre de recherche en haut du site ou cliquez sur une catégorie. Vous pouvez ensuite filtrer les résultats par catégorie, prix, disponibilité ou vendeur local.",
+      "Utilisez la barre de recherche en haut du site ou cliquez sur une catégorie. Vous pouvez ensuite filtrer les résultats par catégorie, prix ou disponibilité.",
   },
   {
     question: "Comment suivre ma commande ?",
@@ -96,12 +96,12 @@ const FAQ_ITEMS = [
   {
     question: "Comment contacter un vendeur ?",
     answer:
-      "Depuis une fiche produit ou une commande, utilisez les boutons de contact disponibles pour demander plus d'informations ou organiser la réception.",
+      "Pour une question concernant un vendeur, contactez l'équipe FOOLY depuis la page Contact. Indiquez le nom du produit ou la référence de votre commande.",
   },
   {
     question: "Comment devenir vendeur ?",
     answer:
-      "Cliquez sur Devenir vendeur, remplissez vos informations de boutique, votre catégorie principale, votre localisation et le nombre de produits que vous souhaitez proposer.",
+      "Connectez-vous, ouvrez la page Devenir vendeur et remplissez les informations de votre boutique. L'équipe FOOLY examinera votre demande avant la publication de vos produits.",
   },
   {
     question: "Quels produits peut-on vendre sur Marché Fooly ?",
@@ -125,11 +125,15 @@ const POPULAR_LINKS = [
 const QUICK_ACCESS = [
   { icon: "bi bi-bag", title: "Boutique", text: "Parcourir tous les produits disponibles.", href: "/boutique" },
   { icon: "bi bi-grid", title: "Catégories", text: "Trouver un produit par rayon.", href: "/categories" },
-  { icon: "bi bi-person", title: "Mon compte", text: "Gérer vos informations et achats.", href: "/mon-compte" },
+  { icon: "bi bi-person", title: "Mon compte", text: "Consulter vos informations et vos achats.", href: "/mon-compte" },
   { icon: "bi bi-heart", title: "Favoris", text: "Retrouver vos produits sauvegardés.", href: "/favoris" },
 ];
 
-export default async function AidePage() {
+export default async function AidePage({ searchParams }: {
+  searchParams: Promise<{ q?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const query = (Array.isArray(params.q) ? params.q[0] : params.q)?.trim() ?? "";
   const { sellerStatus, showSellerEntry } = await getSellerNavigationState();
   const sellerCta = getSellerCta(sellerStatus, {
     defaultLabel: "Créer ma boutique",
@@ -191,6 +195,13 @@ export default async function AidePage() {
       )
     : FAQ_ITEMS;
 
+  const normalize = (text: string) => text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("fr");
+  const terms = normalize(query).split(/\s+/).filter(Boolean);
+  const matchingFaq = faqItems.filter((item) => {
+    const text = normalize(`${item.question} ${item.answer}`);
+    return terms.every((term) => text.includes(term));
+  });
+
   return (
     <>
       {/* ── Hero ──────────────────────────────────────────────────── */}
@@ -223,11 +234,12 @@ export default async function AidePage() {
             <div className="col-lg-5">
               <div className={styles.searchCard}>
                 <h2 className="h4 fw-bold mb-3">Rechercher une réponse</h2>
-                <form action="/aide" method="get" className="d-flex flex-column flex-sm-row gap-2">
+                <form action="/aide#faq" method="get" className="d-flex flex-column flex-sm-row gap-2">
                   <input
                     className={styles.searchInput}
                     type="search"
                     name="q"
+                    defaultValue={query}
                     placeholder="Ex : livraison, vendeur, commande…"
                     aria-label="Rechercher dans l'aide"
                   />
@@ -344,7 +356,17 @@ export default async function AidePage() {
               <div className={styles.faqPanel}>
                 <span className={catalogStyles.eyebrow}>FAQ</span>
                 <h2 className={catalogStyles.sectionTitle}>Questions fréquentes</h2>
-                <AccordionFaq items={faqItems} />
+                {query && (
+                  <p role="status">
+                    {matchingFaq.length} réponse{matchingFaq.length > 1 ? "s" : ""} pour « {query} ».
+                    {" "}<Link href="/aide#faq">Effacer la recherche</Link>
+                  </p>
+                )}
+                {matchingFaq.length > 0 ? (
+                  <AccordionFaq key={query} items={matchingFaq} />
+                ) : (
+                  <p>Aucune réponse trouvée. Essayez un autre mot ou <Link href="/contact">contactez-nous</Link>.</p>
+                )}
               </div>
             </div>
 
@@ -364,7 +386,7 @@ export default async function AidePage() {
               </div>
 
               <div className={`${styles.contactHelpCard} mt-4`}>
-                <span className="badge bg-warning text-dark rounded-pill mb-3">
+                <span className="badge bg-warning text-dark rounded-pill mb-3 mf-heading-label">
                   Support direct
                 </span>
                 <h2 className="h4 fw-bold mb-3">Besoin d&apos;une aide personnalisée ?</h2>

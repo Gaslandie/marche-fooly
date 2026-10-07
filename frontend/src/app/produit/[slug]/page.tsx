@@ -117,7 +117,7 @@ export default async function ProduitPage({ params }: PageProps) {
       {similar.length > 0 && (
         <section className={styles.similarSection}>
           <div className="container">
-            <div className="d-flex flex-column flex-lg-row align-items-lg-end justify-content-between gap-3 mb-4">
+            <div className="mf-heading-group mb-4">
               <div>
                 <span className={catalogStyles.eyebrow}>Produits similaires</span>
                 <h2 className={catalogStyles.sectionTitle}>Vous aimerez aussi</h2>

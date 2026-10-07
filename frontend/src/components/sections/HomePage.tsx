@@ -50,12 +50,12 @@ const sellerFeatures: Feature[] = [
   },
   {
     icon: "bi bi-phone",
-    title: "Mobile first",
+    title: "Sur téléphone",
     description: "Une boutique facile à gérer depuis un téléphone.",
   },
   {
     icon: "bi bi-graph-up-arrow",
-    title: "Croissance business",
+    title: "Développez vos ventes",
     description: "Plus de visibilité pour générer plus de commandes.",
   },
 ];
@@ -69,7 +69,7 @@ const steps: Step[] = [
   {
     number: "2",
     title: "Ajoutez vos produits",
-    description: "Présentez vos articles avec prix, photos et description claire pour inspirer confiance.",
+    description: "Demandez votre boutique, puis ajoutez vos articles après son approbation par l’équipe FOOLY.",
   },
   {
     number: "3",
@@ -167,7 +167,6 @@ export default function HomePage({
     defaultLabel: "Créer ma boutique",
   });
   const hasSellerStatus = hasSellerProfileStatus(sellerStatus);
-  const visibleCategories = categories.slice(0, 12);
   const visibleProducts = products.slice(0, 6);
   const totalProducts = categories.reduce(
     (total, category) => total + category.productCount,
@@ -191,7 +190,7 @@ export default function HomePage({
                 rapidement ce qu&apos;il vous faut ou développez votre commerce avec FOOLY.
               </p>
 
-              <div className="d-flex flex-wrap gap-3">
+              <div className="d-flex flex-wrap justify-content-center gap-3">
                 <Link href="/boutique" className="btn btn-warning btn-lg">
                   Acheter maintenant <i className="bi bi-arrow-right ms-1" aria-hidden="true"></i>
                 </Link>
@@ -227,11 +226,10 @@ export default function HomePage({
             <div className="col-lg-6">
               <div className={styles.heroCard}>
                 <Image
-                  src="/images/banners/home-hero-marketplace.jpg"
+                  src="/images/banners/home-hero-marketplace-complete.jpg"
                   alt="Marché local avec vendeurs et produits disponibles sur Marché Fooly"
-                  width={1200}
-                  height={900}
-                  className={styles.coverImage}
+                  fill
+                  className={styles.heroImage}
                   priority
                   sizes="(max-width: 991px) 100vw, 50vw"
                 />
@@ -247,33 +245,6 @@ export default function HomePage({
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      <section className={styles.sectionBlock}>
-        <div className="container">
-          <SectionHeading
-            eyebrow="Catégories"
-            title="Trouvez vite ce que vous cherchez"
-            description="Une organisation claire pour acheter rapidement dans les rayons les plus demandés."
-            action={{ href: "/categories", label: "Voir toutes les catégories" }}
-          />
-
-          {visibleCategories.length > 0 ? (
-            <div className="row g-3">
-              {visibleCategories.map((category) => (
-                <div key={category.slug} className="col-6 col-md-4 col-lg-3">
-                  <Link href={`/boutique?category=${category.slug}`} className={styles.categoryCard}>
-                    <span className={styles.categoryIcon}>
-                      <i className={category.icon} aria-hidden="true"></i>
-                    </span>
-                    <h3>{category.name}</h3>
-                    <p>{category.shortDescription || category.description}</p>
-                  </Link>
-                </div>
-              ))}
-            </div>
-          ) : null}
         </div>
       </section>
 
@@ -302,7 +273,7 @@ export default function HomePage({
         <div className="container">
           <div className={styles.sellerPanel}>
             <div className="row align-items-center g-5">
-              <div className="col-lg-6">
+              <div className="col-lg-6 text-center">
                 <span className={styles.eyebrow}>Vendeurs locaux</span>
                 <h2 className={styles.sectionTitle}>
                   {hasSellerStatus
@@ -312,10 +283,10 @@ export default function HomePage({
                 <p className={styles.sectionSubtitle}>
                   {hasSellerStatus
                     ? "Retrouvez l'état de votre demande, vos produits et vos commandes dans votre espace vendeur."
-                    : "Créez votre boutique et commencez à vendre partout à Sangarédi avec une présence digitale crédible et simple à gérer."}
+                    : "Créez votre boutique et commencez à vendre partout à Sangarédi avec une boutique en ligne simple à gérer."}
                 </p>
                 {showSellerEntry && (
-                  <Link href={panelSellerCta.href} className="btn btn-warning btn-lg mt-2">
+                  <Link href={panelSellerCta.href} className="btn btn-warning btn-lg mt-3">
                     {panelSellerCta.label}
                   </Link>
                 )}
@@ -357,7 +328,7 @@ export default function HomePage({
           <SectionHeading
             eyebrow="Comment ça marche"
             title="Trois étapes simples"
-            description="Une expérience claire pour les acheteurs comme pour les vendeurs."
+            description="Ouvrez votre boutique et proposez vos produits aux acheteurs locaux."
             centered
           />
 
@@ -380,7 +351,7 @@ export default function HomePage({
           <SectionHeading
             eyebrow="Pourquoi FOOLY ?"
             title="Une marketplace pensée pour la confiance"
-            description="L'objectif est de rassurer les visiteurs dès les premières secondes et de valoriser les vendeurs locaux."
+            description="Découvrez les boutiques locales, consultez les produits et choisissez la livraison ou le retrait auprès du vendeur."
             centered
           />
 

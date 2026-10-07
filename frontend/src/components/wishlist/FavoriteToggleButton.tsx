@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 type Props = {
   productId?: string;
@@ -10,12 +10,15 @@ type Props = {
 
 export default function FavoriteToggleButton({ productId, className }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   async function handleAdd() {
     if (!productId || loading) return;
     setLoading(true);
+    setError("");
     try {
       const res = await fetch("/api/favorites", {
         method: "POST",
@@ -23,19 +26,24 @@ export default function FavoriteToggleButton({ productId, className }: Props) {
         body: JSON.stringify({ productId }),
       });
       if (res.status === 401) {
-        router.push("/mon-compte");
+        router.push(`/mon-compte?retour=${encodeURIComponent(pathname)}`);
         return;
       }
       if (res.ok) {
         setSaved(true);
         router.refresh();
+      } else {
+        setError("Impossible d’ajouter ce favori. Réessayez.");
       }
+    } catch {
+      setError("Connexion interrompue. Réessayez pour ajouter ce favori.");
     } finally {
       setLoading(false);
     }
   }
 
   return (
+    <>
     <button
       type="button"
       className={className ?? "btn btn-outline-dark"}
@@ -48,5 +56,7 @@ export default function FavoriteToggleButton({ productId, className }: Props) {
       ></i>
       {loading ? "Ajout..." : saved ? "Dans mes favoris" : "Ajouter aux favoris"}
     </button>
+    {error && <p className="text-danger small mb-0" role="alert">{error}</p>}
+    </>
   );
 }

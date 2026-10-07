@@ -56,7 +56,7 @@ export default async function NouveauProduitPage() {
 
       <h1 className="h3 fw-bold mb-4">Ajouter un produit</h1>
 
-      <div className="row">
+      <div className="row justify-content-center">
         <div className="col-lg-8">
           <SellerProductForm mode="create" categories={categories} />
         </div>

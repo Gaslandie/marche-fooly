@@ -132,7 +132,7 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
           {/* Récap principal */}
           <div className="col-lg-8">
             <div className="bg-white rounded-3 shadow-sm p-4 mb-4">
-              <div className="d-flex flex-wrap justify-content-between gap-3 mb-3">
+              <div className="mf-heading-group mb-3">
                 <h2 className="h5 fw-bold mb-0">Articles commandés</h2>
                 <span className="badge bg-warning text-dark align-self-start">
                   {statusLabel}

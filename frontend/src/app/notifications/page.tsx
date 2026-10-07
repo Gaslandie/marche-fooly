@@ -75,9 +75,9 @@ export default async function NotificationsPage() {
     <>
       <section className="py-4 py-lg-5" style={{ background: "var(--mf-light)" }}>
         <div className="container">
-          <div className="d-flex flex-wrap justify-content-between align-items-end gap-3">
+          <div className="mf-heading-group mb-4">
             <div>
-              <span className="badge text-bg-warning mb-3">Compte</span>
+              <span className="badge text-bg-warning mb-3 mf-heading-label">Compte</span>
               <h1 className="fw-black mb-2" style={{ fontWeight: 900 }}>
                 Notifications
               </h1>

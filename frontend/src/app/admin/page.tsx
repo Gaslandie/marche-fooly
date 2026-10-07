@@ -103,9 +103,9 @@ export default async function AdminPage() {
         </ol>
       </nav>
 
-      <div className="mb-4">
+      <div className="mf-heading-group mb-4">
         <span
-          className="fw-bold"
+          className="fw-bold mf-heading-label"
           style={{ color: "var(--mf-orange)", fontSize: "0.875rem" }}
         >
           <i className="bi bi-shield-lock me-1" aria-hidden="true"></i>

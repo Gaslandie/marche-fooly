@@ -145,7 +145,7 @@ export default async function ModifierProduitPage({ params }: PageProps) {
 
       <h1 className="h3 fw-bold mb-4">Modifier « {product.name} »</h1>
 
-      <div className="row">
+      <div className="row justify-content-center">
         <div className="col-lg-8">
           <SellerProductForm
             mode="edit"

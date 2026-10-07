@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 const HERO_CARDS = [
-  { icon: "bi bi-clock", title: "Réponse rapide", text: "Support client et vendeur prévu pour accompagner les utilisateurs." },
+  { icon: "bi bi-clock", title: "À votre écoute", text: "Une assistance pour vos achats, vos ventes et vos commandes." },
   { icon: "bi bi-geo-alt", title: "Basé localement", text: "Marketplace pensée pour Sangarédi et ses environs." },
   { icon: "bi bi-shop", title: "Aide vendeurs", text: "Accompagnement pour rejoindre la marketplace." },
   { icon: "bi bi-bag-check", title: "Aide achats", text: "Informations produits, panier et suivi de commandes." },
@@ -41,14 +41,14 @@ const SUPPORT_CARDS = [
   {
     icon: "bi bi-truck",
     title: "Commandes",
-    text: "Aide pour panier, checkout, suivi et livraison.",
+    text: "Aide pour le panier, la commande, le suivi et la livraison.",
     linkLabel: "Mes commandes",
     href: "/commandes",
   },
   {
     icon: "bi bi-briefcase",
     title: "Partenariat",
-    text: "Collaboration, communication, business local et opportunités.",
+    text: "Collaboration, communication et commerce local.",
     linkLabel: "Nous écrire",
     href: "/contact",
   },
@@ -58,12 +58,12 @@ const FAQ_ITEMS = [
   {
     question: "Est-ce que Marché Fooly vend directement les produits ?",
     answer:
-      "Marché Fooly est pensé comme une marketplace locale : plusieurs vendeurs peuvent proposer leurs produits sur la plateforme.",
+      "Marché Fooly est une plateforme de vente locale : les produits sont proposés par les vendeurs présents sur le site.",
   },
   {
-    question: "Le paiement en ligne est-il déjà actif ?",
+    question: "Puis-je payer en ligne ?",
     answer:
-      "Marché Fooly propose le paiement à la livraison et le retrait en boutique.",
+      "Non. Vous payez à la livraison ou lors du retrait auprès du vendeur.",
   },
   {
     question: "Comment devenir vendeur ?",
@@ -73,7 +73,7 @@ const FAQ_ITEMS = [
   {
     question: "Marché Fooly est-il uniquement pour Sangarédi ?",
     answer:
-      "La marketplace est d'abord positionnée sur Sangarédi, avec une ouverture possible vers les villes voisines.",
+      "Marché Fooly est une plateforme locale basée à Sangarédi. Vérifiez les modalités de livraison ou de retrait au moment de votre commande.",
   },
 ];
 
@@ -131,7 +131,7 @@ export default async function ContactPage() {
                 Une question sur un produit, une commande, une boutique vendeur ou un partenariat ?
                 Marché Fooly vous accompagne pour acheter et vendre plus facilement à Sangarédi.
               </p>
-              <div className="d-flex flex-wrap gap-3">
+              <div className="d-flex flex-wrap justify-content-center gap-3">
                 <a className="btn btn-warning fw-bold" href={siteConfig.phoneHref}>
                   <i className="bi bi-telephone me-1" aria-hidden="true"></i>
                   Appeler maintenant
@@ -170,7 +170,7 @@ export default async function ContactPage() {
             <div className="col-lg-4 order-lg-1">
               <aside className={styles.sidepanel}>
                 <div className="position-relative">
-                  <span className="badge bg-warning text-dark rounded-pill mb-3">Coordonnées</span>
+                  <span className="badge bg-warning text-dark rounded-pill mb-3 mf-heading-label">Coordonnées</span>
                   <h2 className="h3 fw-bold mb-3 text-white">Marché Fooly</h2>
                   <p style={{ color: "rgba(255,255,255,0.55)" }} className="mb-4">
                     Marketplace locale basée à Sangarédi, Guinée.
@@ -179,8 +179,8 @@ export default async function ContactPage() {
                   {[
                     {
                       icon: "bi bi-geo-alt",
-                      label: "Adresse",
-                      value: "Sangarédi, Guinée",
+                      label: "Localisation",
+                      value: siteConfig.location,
                       href: undefined,
                     },
                     {
@@ -197,8 +197,8 @@ export default async function ContactPage() {
                     },
                     {
                       icon: "bi bi-clock",
-                      label: "Horaires",
-                      value: "Lun - Sam : 8h00 - 18h00",
+                      label: "Horaires de l’assistance",
+                      value: siteConfig.supportHours,
                       href: undefined,
                     },
                   ].map(({ icon, label, value, href }) => (
@@ -239,13 +239,13 @@ export default async function ContactPage() {
                   <div className="col-lg-8">
                     <h3 className="h4 fw-bold mb-2">
                       <i className="bi bi-whatsapp text-success me-2" aria-hidden="true"></i>
-                      Besoin d&apos;une réponse rapide ?
+                      Vous préférez WhatsApp ?
                     </h3>
                     <p className="text-secondary mb-0">
-                      Contactez Marché Fooly directement sur WhatsApp pour les demandes urgentes.
+                      Écrivez à l’équipe Marché Fooly sur WhatsApp pendant les horaires de l’assistance.
                     </p>
                   </div>
-                  <div className="col-lg-4 text-lg-end">
+                  <div className="col-lg-4 text-center">
                     <a className="btn btn-success fw-bold" href={siteConfig.whatsappHref}>
                       Écrire sur WhatsApp
                     </a>
@@ -299,7 +299,7 @@ export default async function ContactPage() {
                     <div className={styles.mapMarker}>
                       <i className="bi bi-geo-alt-fill" aria-hidden="true"></i>
                     </div>
-                    <h2 className="h3 fw-bold">Sangarédi, Guinée</h2>
+                    <h2 className="h3 fw-bold">{siteConfig.location}</h2>
                     <p className="text-secondary mb-0">
                       Localisation de la marketplace locale à Sangarédi.
                     </p>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import CartNotEmpty from "@/components/cart/CartNotEmpty";
 import CartView from "@/components/cart/CartView";
 import styles from "@/styles/cart.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
@@ -55,7 +56,7 @@ export default function PanierPage() {
             </ol>
           </nav>
 
-          <div className="row align-items-center g-4">
+          <div className="row align-items-center g-4 mf-page-heading">
             <div className="col-lg-8">
               <span className={catalogStyles.heroBadge}>
                 <i className="bi bi-cart-check" aria-hidden="true"></i>
@@ -67,12 +68,14 @@ export default function PanierPage() {
                 auprès des vendeurs locaux.
               </p>
             </div>
-            <div className="col-lg-4 text-lg-end">
-              <Link href="/boutique" className="btn btn-outline-dark">
-                <i className="bi bi-arrow-left me-1" aria-hidden="true"></i>
-                Continuer mes achats
-              </Link>
-            </div>
+            <CartNotEmpty>
+              <div className="col-lg-4 text-center">
+                <Link href="/boutique" className="btn btn-outline-dark">
+                  <i className="bi bi-arrow-left me-1" aria-hidden="true"></i>
+                  Continuer mes achats
+                </Link>
+              </div>
+            </CartNotEmpty>
           </div>
         </div>
       </section>

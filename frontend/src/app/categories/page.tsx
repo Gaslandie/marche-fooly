@@ -183,14 +183,14 @@ export default async function CategoriesPage() {
               <div className={styles.categoryBanner}>
                 <div className="row align-items-center g-4 position-relative">
                   <div className="col-lg-8">
-                    <span className="badge rounded-pill bg-warning text-dark mb-3">Vendeurs locaux</span>
+                    <span className="badge rounded-pill bg-warning text-dark mb-3 mf-heading-label">Vendeurs locaux</span>
                     <h2 className="display-6 fw-bold mb-3">Votre catégorie n&apos;est pas encore bien remplie ?</h2>
                     <p className={styles.bannerText}>
                       Marché Fooly peut accueillir de nouveaux vendeurs dans chaque rayon :
                       alimentation, mode, maison, téléphone, électroménager, services et plus.
                     </p>
                   </div>
-                  <div className="col-lg-4 text-lg-end">
+                  <div className="col-lg-4 text-center">
                     {sellerNavigation.showSellerEntry && (
                       <Link href={sellerCta.href} className="btn btn-light fw-bold me-2 mb-2">
                         {sellerCta.label}
@@ -211,8 +211,8 @@ export default async function CategoriesPage() {
             <div className={styles.emptyState}>
               <h2>Aucune catégorie disponible pour le moment</h2>
               <p>
-                Les rayons de Marché Fooly seront bientôt en ligne. Revenez d&apos;ici peu
-                ou explorez directement la boutique pour découvrir les produits locaux.
+                Aucune catégorie n’est affichée actuellement. Consultez la boutique
+                pour voir les produits disponibles.
               </p>
               <Link href="/boutique" className="btn btn-outline-dark mt-3">
                 Voir la boutique

@@ -174,14 +174,14 @@ export default async function BoutiquePage({ searchParams }: PageProps) {
 
           <div className={styles.dealStrip}>
             <div className="row align-items-center g-3 position-relative">
-              <div className="col-lg-8">
+              <div className="col-lg-8 text-center">
                 <span className="badge rounded-pill bg-warning text-dark mb-2">Catalogue local</span>
                 <h2 className="h3 fw-bold mb-1">Découvrez les produits disponibles</h2>
                 <p className={styles.bannerText}>
                   Parcourez les offres publiées par les vendeurs validés sur Marché Fooly.
                 </p>
               </div>
-              <div className="col-lg-4 text-lg-end">
+              <div className="col-lg-4 text-center text-lg-end">
                 <Link href="/categories" className="btn btn-light fw-bold">
                   Explorer les catégories
                 </Link>

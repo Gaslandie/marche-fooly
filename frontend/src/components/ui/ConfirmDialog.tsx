@@ -90,6 +90,7 @@ function DialogContent({
   const messageId = useId();
   const reasonId = useId();
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [reasonValue, setReasonValue] = useState("");
 
   const trimmedReason = reasonValue.trim();
@@ -97,8 +98,20 @@ function DialogContent({
 
   // Échap ferme + scroll de page gelé tant que le dialogue est monté.
   useEffect(() => {
+    const previousFocus = document.activeElement;
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
+      if (event.key === "Tab") {
+        const elements = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex="0"]',
+        ) ?? []).filter((element) => element.getClientRects().length > 0);
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (first && (event.shiftKey ? document.activeElement === first : document.activeElement === last)) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+        }
+      }
     };
     document.addEventListener("keydown", onKeyDown);
     const previousOverflow = document.body.style.overflow;
@@ -107,6 +120,7 @@ function DialogContent({
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
+      if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
     };
   }, [onClose]);
 
@@ -127,17 +141,18 @@ function DialogContent({
       >
         <div
           className="modal-dialog modal-dialog-centered"
+          ref={dialogRef}
           // Le clic DANS la boîte ne doit pas fermer (seul le fond ferme).
           onClick={(event) => event.stopPropagation()}
         >
           <div className="modal-content rounded-3 shadow">
-            <div className="modal-header border-0 pb-0">
-              <h2 className="modal-title h5 fw-bold" id={titleId}>
+            <div className="modal-header border-0 pb-0 position-relative">
+              <h2 className="modal-title h5 fw-bold w-100 text-center px-4" id={titleId}>
                 {title}
               </h2>
               <button
                 type="button"
-                className="btn-close"
+                className="btn-close position-absolute end-0 me-3"
                 onClick={onClose}
                 aria-label="Fermer"
               ></button>

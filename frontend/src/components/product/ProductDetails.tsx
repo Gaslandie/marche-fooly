@@ -24,7 +24,7 @@ const TRUST_ITEMS = [
   {
     icon: "bi bi-credit-card",
     title: "Paiement à la livraison",
-    text: "Paiement à la livraison ou retrait auprès du vendeur.",
+    text: "Payez à la livraison ou lors du retrait auprès du vendeur.",
   },
 ];
 
@@ -89,11 +89,11 @@ export default function ProductDetails({ product }: Props) {
             <div className="d-flex flex-wrap gap-2">
               <Link href="/contact" className="btn btn-outline-dark btn-sm">
                 <i className="bi bi-chat-dots me-1" aria-hidden="true"></i>
-                Contacter
+                Contacter FOOLY
               </Link>
               <Link href="/boutique" className="btn btn-light btn-sm fw-bold">
                 <i className="bi bi-grid me-1" aria-hidden="true"></i>
-                Voir la boutique
+                Voir tous les produits
               </Link>
             </div>
           </div>

@@ -59,6 +59,7 @@ export default function ResetPasswordForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading || !event.currentTarget.reportValidity()) return;
 
     if (password.length < 8) {
       setStatus("error");
@@ -132,6 +133,7 @@ export default function ResetPasswordForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
+                maxLength={128}
                 disabled={loading}
               />
               <button
@@ -167,6 +169,7 @@ export default function ResetPasswordForm() {
               onChange={(e) => setConfirm(e.target.value)}
               required
               minLength={8}
+                maxLength={128}
               disabled={loading}
             />
 

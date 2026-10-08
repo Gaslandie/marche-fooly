@@ -23,6 +23,12 @@ const PRODUCT_COUNTS = [
   "Plus de 100 produits",
 ];
 
+function normalizeGuineaPhone(value: string): string | null {
+  if (value.length > 32 || !/^[+0-9\s().-]+$/.test(value)) return null;
+  const national = value.replace(/[\s().-]/g, "").replace(/^(?:\+224|00224)/, "");
+  return /^[1-9][0-9]{8}$/.test(national) ? `+224${national}` : null;
+}
+
 type SellerFormProps = {
   user: AuthUser;
 };
@@ -41,6 +47,7 @@ export default function SellerForm({ user }: SellerFormProps) {
 
     const form = new FormData(e.currentTarget);
     const sellerPhone = String(form.get("sellerPhone") || "").trim();
+    const normalizedPhone = normalizeGuineaPhone(sellerPhone);
     const storeName = String(form.get("storeName") || "").trim();
     const shopCategory = String(form.get("shopCategory") || "").trim();
     const sellerLocation = String(form.get("sellerLocation") || "").trim();
@@ -59,8 +66,8 @@ export default function SellerForm({ user }: SellerFormProps) {
       setError("Le nom de boutique doit contenir au moins 2 caractères, hors espaces.");
       return;
     }
-    if (!/^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/.test(sellerPhone)) {
-      setError("Saisissez un numéro de téléphone valide pour la boutique.");
+    if (!normalizedPhone) {
+      setError("Saisissez les 9 chiffres du téléphone de la boutique, avec ou sans +224.");
       return;
     }
     if (description.length > 1500) {
@@ -75,7 +82,7 @@ export default function SellerForm({ user }: SellerFormProps) {
         body: JSON.stringify({
           storeName,
           description,
-          contactDetails: { phone: sellerPhone },
+          contactDetails: { phone: normalizedPhone },
           address: {
             city: sellerLocation,
             country: "Guinée",
@@ -154,14 +161,15 @@ export default function SellerForm({ user }: SellerFormProps) {
           <input
             id="sellerPhone"
             name="sellerPhone"
-            maxLength={20}
+            maxLength={32}
             className={styles.inputField}
             type="tel"
-            placeholder="+224 6XX XX XX XX"
+            inputMode="tel"
+            placeholder="612 34 56 78"
             required
           />
           <p className="form-text mb-0">
-            Numéro public de la boutique, différent du numéro personnel si besoin.
+            9 chiffres. +224 est facultatif. Ce numéro sera public pour la boutique.
           </p>
         </div>
 

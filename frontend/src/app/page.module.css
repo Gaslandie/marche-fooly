@@ -1,5 +1,12 @@
 .page {
   padding-bottom: 5rem;
+  text-align: center;
+}
+
+/* Garder les descriptions sur le même axe que les titres de l'accueil,
+   malgré l'alignement à gauche des paragraphes sur les autres pages. */
+.page p {
+  text-align: center;
 }
 
 .heroSection {

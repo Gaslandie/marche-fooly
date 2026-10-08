@@ -73,7 +73,9 @@
  *   n'arrivera pas. Il est facultatif pour le client et l'admin, et il
  *   est repris dans les notifications des deux parties.
  *
- *   Visibilite GET /:reference: customer-owner | seller-owner | admin.
+ *   Visibilite GET /:reference: customer-owner | seller-owner | owner/admin/staff.
+ *   Staff peut consulter une commande, mais ne peut pas la modifier pour
+ *   autrui. Ses propres achats conservent les droits normaux d'un client.
  *   Non-autorise -> 404 (pas 403) pour ne pas reveler l'existence d'une
  *   reference a un attaquant qui scrute.
  *
@@ -81,13 +83,13 @@
  *   - toPublicOrder() inclut le snapshot complet, populate seller (slug,
  *     storeName) pour la vue client; le seller voit aussi ses propres
  *     commandes via le meme shape.
- *   - determineActor(): factorise la decision admin/seller/customer/none.
+ *   - determineActor(): factorise la decision admin/staff/seller/customer/none.
  */
 
 const Product = require("../models/Product");
 const SellerProfile = require("../models/SellerProfile");
 const Order = require("../models/Order");
-const { BACKOFFICE_ROLES } = require("../models/shared/constants");
+const { ADMIN_OPERATION_ROLES } = require("../models/shared/constants");
 
 const {
   CREATE_ORDER_ALLOWED_FIELDS,
@@ -182,11 +184,13 @@ const computeDeliveryFee = (fulfillmentMethod, productsData) => {
   return Math.max(...paying.map((p) => p.deliveryFee || 0));
 };
 
-// Retourne l'acteur metier ("customer" | "seller" | "admin" | null)
+// Retourne l'acteur metier ("customer" | "seller" | "admin" | "staff" | null)
 // pour un order donne et un req.
 const determineActor = async (order, req) => {
-  if (BACKOFFICE_ROLES.includes(req.user.role)) return "admin";
+  if (ADMIN_OPERATION_ROLES.includes(req.user.role)) return "admin";
   if (order.customer.equals(req.user._id)) return "customer";
+  // Lecture back office uniquement : aucune transition n'autorise staff.
+  if (req.user.role === "staff") return "staff";
   // Sinon, verifier s'il est le vendeur owner via son sellerProfile.
   const sp = await SellerProfile.findOne({
     user: req.user._id,

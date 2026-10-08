@@ -1,22 +1,27 @@
 const { body } = require("express-validator");
 
-const PHONE_REGEX = /^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/;
+const { normalizePersonName, isPersonName, normalizeGuineaPhone } = require("../models/shared/validators");
+
+const nameValidator = (field, label, optional = false) => {
+  let rule = body(field);
+  if (optional) rule = rule.optional();
+  return rule.isString().withMessage(`${label} requis`).bail()
+    .customSanitizer(normalizePersonName)
+    .isLength({ min: 2, max: 80 }).withMessage(`${label} : entre 2 et 80 caractères`).bail()
+    .custom(isPersonName).withMessage(`${label} : utilisez des lettres, espaces, apostrophes ou traits d’union, sans chiffres.`);
+};
+const phoneValidator = (optional = false) => {
+  let rule = body("phone");
+  if (optional) rule = rule.optional();
+  return rule.isString().withMessage("Téléphone requis").bail()
+    .custom((value) => normalizeGuineaPhone(value) !== null)
+    .withMessage("Saisissez 9 chiffres, avec ou sans +224. Exemple : 612 34 56 78.")
+    .bail().customSanitizer(normalizeGuineaPhone);
+};
 
 const registerValidators = [
-  body("firstName")
-    .isString()
-    .withMessage("Prenom requis")
-    .bail()
-    .trim()
-    .isLength({ min: 2, max: 80 })
-    .withMessage("Prenom: entre 2 et 80 caracteres"),
-  body("lastName")
-    .isString()
-    .withMessage("Nom requis")
-    .bail()
-    .trim()
-    .isLength({ min: 2, max: 80 })
-    .withMessage("Nom: entre 2 et 80 caracteres"),
+  nameValidator("firstName", "Prénom"),
+  nameValidator("lastName", "Nom"),
   body("email")
     .isString()
     .withMessage("Email requis")
@@ -27,13 +32,7 @@ const registerValidators = [
     .withMessage("Adresse email invalide")
     .isLength({ max: 160 })
     .withMessage("Email trop long"),
-  body("phone")
-    .isString()
-    .withMessage("Telephone requis")
-    .bail()
-    .trim()
-    .matches(PHONE_REGEX)
-    .withMessage("Numero de telephone invalide"),
+  phoneValidator(),
   body("password")
     .isString()
     .withMessage("Mot de passe requis")
@@ -102,27 +101,9 @@ const UPDATE_ME_ALLOWED_FIELDS = [
 ];
 
 const updateMeValidators = [
-  body("firstName")
-    .optional()
-    .isString()
-    .bail()
-    .trim()
-    .isLength({ min: 2, max: 80 })
-    .withMessage("Prenom: entre 2 et 80 caracteres"),
-  body("lastName")
-    .optional()
-    .isString()
-    .bail()
-    .trim()
-    .isLength({ min: 2, max: 80 })
-    .withMessage("Nom: entre 2 et 80 caracteres"),
-  body("phone")
-    .optional()
-    .isString()
-    .bail()
-    .trim()
-    .matches(PHONE_REGEX)
-    .withMessage("Numero de telephone invalide"),
+  nameValidator("firstName", "Prénom", true),
+  nameValidator("lastName", "Nom", true),
+  phoneValidator(true),
   body("avatarUrl")
     .optional({ values: "falsy" })
     .isString()

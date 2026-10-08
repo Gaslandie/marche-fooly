@@ -106,7 +106,7 @@ export default async function AdminPage() {
       <div className="mf-heading-group mb-4">
         <span
           className="fw-bold mf-heading-label"
-          style={{ color: "var(--mf-orange)", fontSize: "0.875rem" }}
+          style={{ color: "var(--mf-orange-text)", fontSize: "0.875rem" }}
         >
           <i className="bi bi-shield-lock me-1" aria-hidden="true"></i>
           Supervision

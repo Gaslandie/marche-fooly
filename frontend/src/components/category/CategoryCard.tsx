@@ -13,10 +13,12 @@ export default function CategoryCard({ category, variant = "row" }: CategoryCard
   if (variant === "featured") {
     return (
       <Link href={href} className={styles.categoryFeatured}>
-        <span className={styles.categoryFeaturedIcon}>
-          <i className={category.icon} aria-hidden="true"></i>
-        </span>
-        <h2 className={styles.categoryFeaturedTitle}>{category.name}</h2>
+        <h2 className={`${styles.categoryFeaturedTitle} mf-card-heading`}>
+          <span className={styles.categoryFeaturedIcon} aria-hidden="true">
+            <i className={category.icon} aria-hidden="true"></i>
+          </span>
+          <span>{category.name}</span>
+        </h2>
         <p className={styles.categoryCardText}>{category.description}</p>
         <div className={styles.categoryFeaturedFooter}>
           <span className={styles.categoryMeta}>

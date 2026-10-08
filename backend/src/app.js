@@ -55,7 +55,9 @@ app.use("/api/media", mediaRoutes);
 
 app.use(express.json());
 
-// Rate limiting cible sur l'authentification (anti brute-force, 30/15min).
+// Rate limiting cible sur les tentatives sensibles d'authentification
+// (anti brute-force, 30/15min). GET /me et les actions deja authentifiees
+// sont ignorees par le limiteur pour ne pas casser une navigation normale.
 app.use("/api/auth", authRateLimiter);
 
 // Rate limiting general sur les routes API metier (anti-scraping, 300/15min).

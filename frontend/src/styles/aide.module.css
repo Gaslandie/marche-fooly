@@ -44,7 +44,7 @@
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 .searchInput:focus {
-  border-color: var(--mf-orange);
+  border-color: var(--mf-orange-text);
   box-shadow: 0 0 0 5px rgba(255, 122, 0, 0.1);
 }
 
@@ -94,12 +94,21 @@
   display: grid;
   place-items: center;
   background: #fff3e5;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 1.55rem;
   margin-bottom: 18px;
 }
 
-.categoryArrow { font-weight: 700; color: var(--mf-orange); }
+.categoryArrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: fit-content;
+  margin-inline: auto;
+  font-weight: 700;
+  color: var(--mf-orange-text);
+}
 
 /* ── Guide cards ───────────────────────────────────────────── */
 .guidesSection { background: var(--mf-light); padding: 4rem 0; }
@@ -122,7 +131,7 @@
   display: grid;
   place-items: center;
   background: #fff3e5;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 1.55rem;
   margin-bottom: 18px;
 }
@@ -172,7 +181,7 @@
   display: grid;
   place-items: center;
   background: #fff3e5;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 1.55rem;
   margin-bottom: 18px;
 }
@@ -190,7 +199,7 @@
   transition: color 0.18s ease;
 }
 .popularQuestion:last-child { border-bottom: 0; }
-.popularQuestion:hover { color: var(--mf-orange); }
+.popularQuestion:hover { color: var(--mf-orange-text); }
 
 .contactHelpCard {
   background: linear-gradient(135deg, #151922, #243044);
@@ -243,7 +252,7 @@
   display: grid;
   place-items: center;
   background: #fff3e5;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 1.55rem;
   margin-bottom: 18px;
 }

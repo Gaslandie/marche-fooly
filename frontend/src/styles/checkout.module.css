@@ -139,7 +139,7 @@
 }
 
 .inputField:focus {
-  border-color: var(--mf-orange);
+  border-color: var(--mf-orange-text);
   box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
 }
 
@@ -158,12 +158,12 @@
 }
 
 .paymentOption:hover {
-  border-color: var(--mf-orange);
+  border-color: var(--mf-orange-text);
   background: rgba(255, 107, 0, 0.04);
 }
 
 .paymentOptionSelected {
-  border-color: var(--mf-orange);
+  border-color: var(--mf-orange-text);
   background: rgba(255, 107, 0, 0.06);
 }
 
@@ -175,7 +175,7 @@
   display: grid;
   place-items: center;
   font-size: 1.3rem;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   flex-shrink: 0;
 }
 
@@ -221,7 +221,7 @@
   display: grid;
   place-items: center;
   font-size: 1.3rem;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   flex-shrink: 0;
 }
 
@@ -265,7 +265,7 @@
 .summaryTotalValue {
   font-weight: 900;
   font-size: 1.2rem;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
 }
 
 .securityRow {

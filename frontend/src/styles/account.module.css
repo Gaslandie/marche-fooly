@@ -90,13 +90,13 @@
 
 .sidebarLink:hover {
   background: var(--mf-light);
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
 }
 
 .sidebarLinkActive {
   background: rgba(255, 107, 0, 0.07);
-  color: var(--mf-orange);
-  border-left-color: var(--mf-orange);
+  color: var(--mf-orange-text);
+  border-left-color: var(--mf-orange-text);
 }
 
 .sidebarDivider {
@@ -161,8 +161,8 @@
 }
 
 .tabBtnActive {
-  color: var(--mf-orange);
-  border-bottom-color: var(--mf-orange);
+  color: var(--mf-orange-text);
+  border-bottom-color: var(--mf-orange-text);
 }
 
 .tabPanel {
@@ -191,8 +191,24 @@
 }
 
 .formInput:focus {
-  border-color: var(--mf-orange);
+  border-color: var(--mf-orange-text);
   box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
+}
+
+.formInput[aria-invalid="true"] {
+  border-color: #b42318;
+}
+
+.fieldError {
+  color: #b42318;
+  font-size: 0.875rem;
+  margin: -0.65rem 0 1.1rem;
+}
+
+.fieldHint {
+  color: #576475;
+  font-size: 0.8125rem;
+  margin: -0.65rem 0 1.1rem;
 }
 
 .passwordField {
@@ -225,7 +241,7 @@
 .passwordToggle:hover,
 .passwordToggle:focus-visible {
   background: rgba(255, 107, 0, 0.08);
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   outline: none;
 }
 
@@ -309,6 +325,7 @@
 }
 
 .notifLabel {
+  display: block;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--mf-dark);

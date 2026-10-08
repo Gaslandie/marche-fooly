@@ -113,7 +113,7 @@
   top: 12px;
   border-radius: 999px;
   padding: 6px 10px;
-  background: var(--mf-orange);
+  background: var(--mf-orange-dark);
   color: #ffffff;
   font-size: 0.76rem;
   font-weight: 950;
@@ -135,7 +135,7 @@
 }
 
 .wishlistPrice {
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 1.28rem;
   font-weight: 950;
   letter-spacing: -0.03em;
@@ -148,7 +148,7 @@
   border-radius: 999px;
   padding: 5px 9px;
   background: rgba(22, 163, 74, 0.1);
-  color: var(--mf-green);
+  color: #12713a;
   font-size: 0.75rem;
   font-weight: 900;
   margin-bottom: 8px;
@@ -231,7 +231,7 @@
 
 .collectionChip:hover,
 .collectionChipActive {
-  background: var(--mf-orange);
+  background: var(--mf-orange-dark);
   color: #ffffff;
   transform: translateY(-2px);
 }
@@ -251,7 +251,7 @@
   display: grid;
   place-items: center;
   background: #fff3e5;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 2.3rem;
   margin: 0 auto 18px;
 }

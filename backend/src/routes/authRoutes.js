@@ -23,8 +23,8 @@ const router = express.Router();
 
 router.post("/register", runValidators(registerValidators), register);
 router.post("/login", runValidators(loginValidators), login);
-// Mot de passe oublie (routes publiques, couvertes par authRateLimiter
-// applique a tout /api/auth dans app.js).
+// Mot de passe oublie (routes publiques sensibles, couvertes par
+// authRateLimiter dans app.js, comme register et login).
 router.post(
   "/forgot-password",
   runValidators(forgotPasswordValidators),

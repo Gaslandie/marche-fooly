@@ -195,7 +195,7 @@ export default async function VendeurPage() {
         <div>
           <span
             className="fw-bold mf-heading-label"
-            style={{ color: "var(--mf-orange)", fontSize: "0.875rem" }}
+            style={{ color: "var(--mf-orange-text)", fontSize: "0.875rem" }}
           >
             <i className="bi bi-shop me-1" aria-hidden="true"></i>
             {profile.storeName}

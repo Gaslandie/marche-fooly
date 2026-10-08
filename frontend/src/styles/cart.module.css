@@ -80,7 +80,7 @@
 }
 
 .cartProductPrice {
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-weight: 950;
   font-size: 1.2rem;
   white-space: nowrap;
@@ -136,7 +136,7 @@
 }
 
 .summaryTotalValue {
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 1.6rem;
   font-weight: 950;
   letter-spacing: -0.04em;
@@ -171,7 +171,7 @@
   display: grid;
   place-items: center;
   background: #fff3e5;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 1.4rem;
   margin-bottom: 14px;
 }
@@ -191,7 +191,7 @@
   display: grid;
   place-items: center;
   background: #fff3e5;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 2.3rem;
   margin: 0 auto 18px;
 }

@@ -1,12 +1,14 @@
 :root {
   --mf-orange: #ff7a00;
-  --mf-orange-dark: #e86800;
+  --mf-orange-dark: #ad4800;
+  --mf-orange-text: #ad4800;
   --mf-green: #16a34a;
   --mf-blue: #2563eb;
   --mf-dark: #151922;
   --mf-muted: #667085;
   --mf-light: #f6f7fb;
   --mf-border: #e7eaf0;
+  --mf-input-border: #788393;
   --mf-white: #ffffff;
   --mf-shadow: 0 18px 45px rgba(21, 25, 34, 0.08);
   --mf-radius: 22px;
@@ -33,6 +35,38 @@ main {
   text-align: left;
 }
 
+.mf-skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 1200;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: var(--mf-dark);
+  color: white;
+  transform: translateY(-200%);
+}
+
+.mf-skip-link:focus {
+  transform: translateY(0);
+  color: white;
+}
+
+/* Un repère intérieur reste visible même dans les cartes à overflow hidden. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--mf-blue) !important;
+  outline-offset: -3px;
+  box-shadow: inset 0 0 0 5px white !important;
+}
+
+.badge:is(.bg-warning, .bg-info) {
+  color: var(--mf-dark);
+}
+
+.text-secondary {
+  color: var(--mf-muted) !important;
+}
+
 /* Même lecture sur toutes les pages ; le footer garde son alignement mobile. */
 main :is(h1, h2, h3, h4, h5, h6) {
   text-align: center;
@@ -40,6 +74,36 @@ main :is(h1, h2, h3, h4, h5, h6) {
 
 main p {
   text-align: left;
+}
+
+/* Cartes d'information : l'icône accompagne le titre, même sur mobile. */
+main :is(h2, h3, strong).mf-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0;
+  margin-bottom: 0.65rem;
+  text-align: center;
+}
+
+main .mf-card-heading > [aria-hidden="true"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 2rem;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  border-radius: 0.65rem;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+main .mf-card-heading > span:not([aria-hidden]) {
+  min-width: 0;
+  font: inherit;
+  overflow-wrap: anywhere;
 }
 
 /* En-têtes de page et de section : un axe commun pour les titres et actions. */
@@ -147,7 +211,7 @@ a:hover {
 
 .mf-searchbar {
   display: flex;
-  border: 2px solid rgba(255, 122, 0, 0.18);
+  border: 2px solid var(--mf-input-border);
   background: #fffaf4;
   border-radius: 18px;
   overflow: hidden;
@@ -290,7 +354,7 @@ a:hover {
   color: rgba(255, 255, 255, 0.72);
 }
 
-.mf-footer h5 {
+.mf-footer h2 {
   color: #ffffff;
   font-weight: 900;
   margin-bottom: 1rem;
@@ -343,10 +407,21 @@ a:hover {
 
 /* ── Bootstrap overrides ───────────────────────────────────── */
 
+.btn-outline-warning {
+  --bs-btn-color: var(--mf-orange-text);
+  --bs-btn-border-color: var(--mf-orange-dark);
+  --bs-btn-hover-color: white;
+  --bs-btn-hover-bg: var(--mf-orange-dark);
+  --bs-btn-hover-border-color: var(--mf-orange-dark);
+  --bs-btn-active-color: white;
+  --bs-btn-active-bg: var(--mf-orange-dark);
+  --bs-btn-active-border-color: var(--mf-orange-dark);
+}
+
 /* btn-warning → orange primary CTA (était jaune Bootstrap) */
 .btn-warning {
-  background-color: var(--mf-orange) !important;
-  border-color: var(--mf-orange) !important;
+  background-color: var(--mf-orange-dark) !important;
+  border-color: var(--mf-orange-dark) !important;
   color: #ffffff !important;
   border-radius: 14px;
   font-weight: 800;
@@ -391,6 +466,10 @@ a:hover {
 }
 
 /* Focus ring orange sur tous les inputs */
+:is(.form-control, .form-select, input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="number"], input[type="search"], textarea, select):not([aria-invalid="true"]) {
+  border-color: var(--mf-input-border) !important;
+}
+
 .form-control:focus,
 .form-select:focus {
   border-color: var(--mf-orange);
@@ -398,9 +477,17 @@ a:hover {
 }
 
 /* Checkbox orange */
+.form-check-input {
+  border-color: var(--mf-input-border);
+}
+
 .form-check-input:checked {
-  background-color: var(--mf-orange);
-  border-color: var(--mf-orange);
+  background-color: var(--mf-orange-dark);
+  border-color: var(--mf-orange-dark);
+}
+
+.form-switch .form-check-input:not(:checked) {
+  --bs-form-switch-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23667085'/%3e%3c/svg%3e");
 }
 
 /* ── Logo mark glow ─────────────────────────────────────────── */

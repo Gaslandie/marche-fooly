@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import Link from "next/link";
 import styles from "@/styles/catalog.module.css";
 import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
@@ -37,6 +37,7 @@ export default function ProductFilters({
   sellerStatus,
   showSellerEntry,
 }: ProductFiltersProps) {
+  const filtersId = useId();
   const [isOpen, setIsOpen] = useState(false);
   const [rangeValue, setRangeValue] = useState(String(maxPrice));
   const sellerCta = getSellerCta(sellerStatus);
@@ -74,13 +75,14 @@ export default function ProductFilters({
         className={`btn btn-outline-dark d-lg-none ${styles.mobileFilterButton}`}
         onClick={() => setIsOpen((current) => !current)}
         aria-expanded={isOpen}
+        aria-controls={filtersId}
       >
         <i className="bi bi-sliders me-1" aria-hidden="true"></i>
         {isOpen ? "Masquer les filtres" : "Afficher les filtres"}
       </button>
 
-      <div className={isOpen ? "d-block" : "d-none d-lg-block"}>
-        <aside className={styles.filterPanel}>
+      <div id={filtersId} className={isOpen ? "d-block" : "d-none d-lg-block"}>
+        <section className={styles.filterPanel} aria-label="Filtres des produits">
           <div className={styles.filterHeader}>
             <h2 className={styles.filterTitle}>Filtres</h2>
             <Link href="/boutique" className="small fw-bold text-warning-emphasis">
@@ -143,6 +145,7 @@ export default function ProductFilters({
                     value={rangeValue}
                     onChange={(event) => setRangeValue(event.target.value)}
                     aria-label="Budget maximum"
+                    aria-valuetext={formatPrice(Number(rangeValue), "GNF")}
                   />
                 </div>
               </div>
@@ -167,8 +170,10 @@ export default function ProductFilters({
 
           {showSellerEntry && (
             <div className={styles.sellerMiniCard}>
-              <i className={sellerCta.icon} aria-hidden="true"></i>
-              <h3>{hasSellerStatus ? "Votre espace vendeur" : "Vous vendez aussi ?"}</h3>
+              <h3 className="mf-card-heading">
+                <i className={sellerCta.icon} aria-hidden="true"></i>
+                <span>{hasSellerStatus ? "Votre espace vendeur" : "Vous vendez aussi ?"}</span>
+              </h3>
               <p className={styles.filtersMeta}>
                 {hasSellerStatus
                   ? "Suivez votre boutique, votre demande ou vos commandes."
@@ -179,7 +184,7 @@ export default function ProductFilters({
               </Link>
             </div>
           )}
-        </aside>
+        </section>
       </div>
     </>
   );

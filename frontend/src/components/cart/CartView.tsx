@@ -77,7 +77,7 @@ export default function CartView() {
             <div className={styles.cartCard}>
               <div className="mf-heading-group mb-3">
                 <div>
-                  <span className="fw-bold mf-heading-label" style={{ color: "var(--mf-orange)" }}>
+                  <span className="fw-bold mf-heading-label" style={{ color: "var(--mf-orange-text)" }}>
                     Articles sélectionnés
                   </span>
                   <h2 className="h3 fw-bold mb-0">
@@ -87,7 +87,7 @@ export default function CartView() {
                 <button
                   type="button"
                   className="btn btn-link p-0 text-decoration-none fw-bold align-self-md-end"
-                  style={{ color: "var(--mf-orange)" }}
+                  style={{ color: "var(--mf-orange-text)" }}
                   onClick={() => clearCart()}
                 >
                   <i className="bi bi-trash me-1" aria-hidden="true"></i>
@@ -118,7 +118,7 @@ export default function CartView() {
 
           {/* Colonne droite : récapitulatif */}
           <div className="col-lg-4">
-            <aside className={styles.summaryCard}>
+            <section className={styles.summaryCard} aria-label="Récapitulatif du panier">
               <h2 className="h4 fw-bold mb-3">Résumé de commande</h2>
 
               <div className={styles.summaryLine}>
@@ -162,7 +162,7 @@ export default function CartView() {
                   <i
                     className="bi bi-truck"
                     aria-hidden="true"
-                    style={{ color: "var(--mf-orange)" }}
+                    style={{ color: "var(--mf-orange-text)" }}
                   ></i>
                   <span className="small text-secondary fw-semibold">
                     Livraison locale selon disponibilité
@@ -175,7 +175,7 @@ export default function CartView() {
                   </span>
                 </div>
               </div>
-            </aside>
+            </section>
           </div>
         </div>
       </div>

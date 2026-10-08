@@ -94,7 +94,7 @@
 
 .thumbItem:hover,
 .thumbItemActive {
-  border-color: var(--mf-orange);
+  border-color: var(--mf-orange-text);
   transform: translateY(-2px);
 }
 
@@ -124,7 +124,7 @@
 }
 
 .productPrice {
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: clamp(2rem, 3vw, 2.8rem);
   font-weight: 950;
   letter-spacing: -0.04em;
@@ -155,7 +155,7 @@
   border-radius: 999px;
   padding: 8px 12px;
   background: rgba(22, 163, 74, 0.1);
-  color: var(--mf-green);
+  color: #12713a;
   font-size: 0.82rem;
   font-weight: 900;
 }
@@ -167,7 +167,7 @@
   border-radius: 999px;
   padding: 8px 12px;
   background: #fff3e5;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 0.82rem;
   font-weight: 900;
 }
@@ -191,7 +191,7 @@
   display: grid;
   place-items: center;
   background: #fff3e5;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   font-size: 1.2rem;
   flex: 0 0 auto;
 }

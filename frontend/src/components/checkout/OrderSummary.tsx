@@ -33,7 +33,7 @@ export default function OrderSummary() {
 
   if (lines.length === 0) {
     return (
-      <aside className={styles.summaryCard}>
+      <section className={styles.summaryCard} aria-label="Récapitulatif de commande">
         <h2 className="h5 fw-bold mb-3">Résumé de commande</h2>
         <p className="text-secondary small mb-3">
           Votre panier est vide. Ajoutez des produits pour pouvoir commander.
@@ -42,12 +42,12 @@ export default function OrderSummary() {
           <i className="bi bi-arrow-left me-1" aria-hidden="true"></i>
           Retour au panier
         </Link>
-      </aside>
+      </section>
     );
   }
 
   return (
-    <aside className={styles.summaryCard}>
+    <section className={styles.summaryCard} aria-label="Récapitulatif de commande">
       <h2 className="h5 fw-bold mb-3">Résumé de commande</h2>
 
       <div className="mb-3">
@@ -93,6 +93,6 @@ export default function OrderSummary() {
         Le total final (incluant les frais de livraison éventuels) est calculé
         par le vendeur lors de la confirmation.
       </p>
-    </aside>
+    </section>
   );
 }

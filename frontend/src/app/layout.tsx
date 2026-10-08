@@ -42,6 +42,7 @@ export default async function RootLayout({
   return (
     <html lang="fr" className={inter.className}>
       <body>
+        <a className="mf-skip-link" href="#main-content">Aller au contenu principal</a>
         {/* CartProvider : Context panier disponible partout (Header, pages,
             checkout). Le Provider est un Client Component ; le layout reste
             un Server Component. Pas d'impact sur le rendu statique des pages
@@ -55,7 +56,7 @@ export default async function RootLayout({
             showSellerEntry={showSellerEntry}
             unreadNotifications={unreadNotifications}
           />
-          <main>{children}</main>
+          <main id="main-content" tabIndex={-1}>{children}</main>
           <Footer
             isAuthenticated={Boolean(user)}
             sellerStatus={sellerStatus}

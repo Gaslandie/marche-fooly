@@ -1,6 +1,7 @@
 const crypto = require("node:crypto");
 
 const User = require("../models/User");
+const { guineaPhoneMatch } = require("../models/shared/validators");
 const { hashPassword, comparePassword } = require("../utils/password");
 const { signAuthToken } = require("../utils/jwt");
 const {
@@ -49,7 +50,7 @@ const register = async (req, res, next) => {
   try {
     const { firstName, lastName, email, phone, password } = req.body;
 
-    const existing = await User.findOne({ $or: [{ email }, { phone }] })
+    const existing = await User.findOne({ $or: [{ email }, { phone: guineaPhoneMatch(phone) }] })
       .select("_id email phone")
       .lean();
 
@@ -303,6 +304,18 @@ const me = async (req, res) => {
 const updateMe = async (req, res, next) => {
   try {
     const user = req.user;
+
+    if (Object.prototype.hasOwnProperty.call(req.body, "phone")) {
+      const conflict = await User.exists({
+        _id: { $ne: user._id },
+        phone: guineaPhoneMatch(req.body.phone),
+      });
+      if (conflict) return res.status(409).json({
+        success: false,
+        message: "Un compte existe déjà avec ce numéro de téléphone",
+        data: { field: "phone" },
+      });
+    }
 
     // Whitelist stricte: tout champ hors UPDATE_ME_ALLOWED_FIELDS est
     // ignore. Cela bloque toute tentative de modifier role, status,

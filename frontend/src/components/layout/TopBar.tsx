@@ -15,7 +15,7 @@ export default function TopBar({
   const sellerCta = getSellerCta(sellerStatus);
 
   return (
-    <div className="mf-topbar">
+    <nav className="mf-topbar" aria-label="Contact et informations utiles">
       <div className="container d-flex flex-wrap justify-content-between align-items-center gap-2 py-2 small">
         <div className="d-flex flex-wrap gap-3">
           <a href={siteConfig.phoneHref}>
@@ -38,6 +38,6 @@ export default function TopBar({
           <Link href="/contact">Contact</Link>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

@@ -1,7 +1,10 @@
 const rateLimit = require("express-rate-limit");
 
 /**
- * Rate limiter applique sur toutes les routes /api/auth/*.
+ * Rate limiter applique aux actions publiques qui manipulent un secret ou
+ * creent un compte. Les lectures de session GET /me sont volontairement
+ * exclues : Next.js les appelle pendant la navigation et elles ne doivent
+ * jamais faire paraitre un acheteur deconnecte apres quelques pages.
  *
  * - windowMs: 15 minutes
  * - limit: 30 requetes par IP par fenetre
@@ -9,14 +12,30 @@ const rateLimit = require("express-rate-limit");
  * - standardHeaders: expose les headers RateLimit-* (IETF draft 7)
  * - legacyHeaders: false pour ne pas exposer les anciens X-RateLimit-*
  *
- * Note: 30/15min couvre largement un usage normal (register + login + me
- * + erreurs de saisie) tout en bloquant les tentatives de brute force.
+ * Note: 30/15min couvre largement un usage normal (register + login +
+ * recuperation de mot de passe + erreurs de saisie) tout en bloquant les
+ * tentatives de brute force.
  * Si on veut serrer davantage uniquement login/register, on pourra
  * empiler un second limiter plus strict sur ces deux routes.
  */
+const RATE_LIMITED_AUTH_REQUESTS = new Set([
+  "POST /register",
+  "POST /login",
+  "POST /forgot-password",
+  "POST /reset-password",
+]);
+
+const shouldSkipAuthRateLimit = (req) => {
+  // Express accepte la casse différente et le slash final par défaut.
+  // Ces variantes doivent garder la même protection que la route normale.
+  const path = req.path.toLowerCase().replace(/\/+$/, "");
+  return !RATE_LIMITED_AUTH_REQUESTS.has(`${req.method} ${path}`);
+};
+
 const authRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 30,
+  skip: shouldSkipAuthRateLimit,
   standardHeaders: "draft-7",
   legacyHeaders: false,
   handler: (req, res) => {
@@ -110,6 +129,7 @@ const publicFormRateLimiter = rateLimit({
 
 module.exports = {
   authRateLimiter,
+  shouldSkipAuthRateLimit,
   generalApiRateLimiter,
   publicFormRateLimiter,
   uploadRateLimiter,

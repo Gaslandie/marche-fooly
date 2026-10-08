@@ -27,17 +27,20 @@
  *     _id, id, createdAt, updatedAt. Ces champs sont gere par le serveur
  *     (status="new" force, handledBy/handledAt setes plus tard par admin).
  *   - email normalise: trim + lowercase + isEmail.
- *   - phone optionnel; si fourni, format PHONE_REGEX.
+ *   - phone optionnel; si fourni, numéro guinéen à 9 chiffres normalisé en +224.
  *   - sourcePage optionnel: tracking de provenance (decision R2).
  *
  * Notes pour GitHub Copilot / autocompletion:
- *   - PHONE_REGEX miroir des autres validators du backend.
+ *   - La normalisation téléphone est partagée avec les autres formulaires.
  *   - forbidValidators(): helper d'usage repete dans les autres modules.
  */
 
 const { body } = require("express-validator");
-
-const PHONE_REGEX = /^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/;
+const {
+  normalizePersonName,
+  isPersonName,
+  normalizeGuineaPhone,
+} = require("../models/shared/validators");
 
 const FORBIDDEN_AT_CREATE = [
   "status",
@@ -73,9 +76,12 @@ const createContactMessageValidators = [
     .isString()
     .withMessage("fullName requis")
     .bail()
-    .trim()
+    .customSanitizer(normalizePersonName)
     .isLength({ min: 2, max: 120 })
-    .withMessage("fullName: entre 2 et 120 caracteres"),
+    .withMessage("Nom complet : entre 2 et 120 caractères")
+    .bail()
+    .custom(isPersonName)
+    .withMessage("Nom complet : utilisez des lettres, espaces, apostrophes ou traits d’union, sans chiffres."),
   body("email")
     .isString()
     .withMessage("email requis")
@@ -90,9 +96,10 @@ const createContactMessageValidators = [
     .optional({ values: "falsy" })
     .isString()
     .bail()
-    .trim()
-    .matches(PHONE_REGEX)
-    .withMessage("phone: format invalide"),
+    .custom((value) => normalizeGuineaPhone(value) !== null)
+    .withMessage("Téléphone : saisissez 9 chiffres, avec ou sans +224.")
+    .bail()
+    .customSanitizer(normalizeGuineaPhone),
   body("subject")
     .isString()
     .withMessage("subject requis")

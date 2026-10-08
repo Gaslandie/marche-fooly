@@ -28,9 +28,9 @@
 
 .toggle:hover,
 .toggle[aria-expanded="true"] {
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   background: #fff5e9;
-  border-color: var(--mf-orange);
+  border-color: var(--mf-orange-dark);
 }
 
 .toggle:focus-visible,

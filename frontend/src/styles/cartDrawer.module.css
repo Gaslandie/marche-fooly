@@ -88,7 +88,7 @@
   display: grid;
   place-items: center;
   font-size: 1.4rem;
-  color: var(--mf-orange, #ff6b00);
+  color: var(--mf-orange-text, #ad4800);
   overflow: hidden;
 }
 
@@ -149,5 +149,5 @@
 .subtotalValue {
   font-size: 1.15rem;
   font-weight: 900;
-  color: var(--mf-orange, #ff6b00);
+  color: var(--mf-orange-text, #ad4800);
 }

@@ -12,6 +12,14 @@ const SUBJECTS = [
   "Autre demande",
 ];
 
+const PERSON_NAME_PATTERN = /^(?:\p{L}\p{M}*)+(?:[ ’'\-](?:\p{L}\p{M}*)+)*$/u;
+
+function normalizeGuineaPhone(value: string): string | null {
+  if (value.length > 32 || !/^[+0-9\s().-]+$/.test(value)) return null;
+  const national = value.replace(/[\s().-]/g, "").replace(/^(?:\+224|00224)/, "");
+  return /^[1-9][0-9]{8}$/.test(national) ? `+224${national}` : null;
+}
+
 type ContactFormProps = {
   hasSellerStatus?: boolean;
 };
@@ -32,13 +40,14 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
     const data = new FormData(e.currentTarget);
     const fullName = String(data.get("fullName") ?? "").trim();
     const phone = String(data.get("phone") ?? "").trim();
+    const normalizedPhone = phone ? normalizeGuineaPhone(phone) : "";
     const message = String(data.get("message") ?? "").trim();
-    if (fullName.length < 2 || message.length < 10) {
+    if (fullName.length < 2 || !PERSON_NAME_PATTERN.test(fullName) || message.length < 10) {
       setError("Indiquez un nom d’au moins 2 caractères et un message d’au moins 10 caractères, hors espaces.");
       return;
     }
-    if (phone && !/^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/.test(phone)) {
-      setError("Vérifiez le numéro de téléphone ou laissez ce champ vide.");
+    if (phone && !normalizedPhone) {
+      setError("Saisissez 9 chiffres, avec ou sans +224, ou laissez le téléphone vide.");
       return;
     }
     setSending(true);
@@ -51,7 +60,7 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
         body: JSON.stringify({
           fullName,
           email: String(data.get("email") ?? "").trim(),
-          phone,
+          phone: normalizedPhone,
           subject: String(data.get("subject") ?? "").trim(),
           message,
           sourcePage: "/contact",
@@ -106,7 +115,7 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
   return (
     <form className={styles.formCard} onSubmit={handleSubmit}>
       <div className="mb-4">
-        <span className="fw-bold mf-heading-label" style={{ color: "var(--mf-orange)" }}>
+        <span className="fw-bold mf-heading-label" style={{ color: "var(--mf-orange-text)" }}>
           Envoyer un message
         </span>
         <h2 className="h2 fw-bold mb-2">Comment pouvons-nous vous aider ?</h2>
@@ -140,12 +149,14 @@ export default function ContactForm({ hasSellerStatus = false }: ContactFormProp
           <input
             id="phone"
             name="phone"
-            maxLength={20}
+            maxLength={32}
             disabled={sending}
             className={styles.inputField}
             type="tel"
-            placeholder="+224 6XX XX XX XX"
+            inputMode="tel"
+            placeholder="612 34 56 78"
           />
+          <p className="form-text mb-0">9 chiffres. +224 est facultatif.</p>
         </div>
 
         <div className="col-md-6">

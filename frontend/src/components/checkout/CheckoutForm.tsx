@@ -44,7 +44,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/components/cart/CartProvider";
@@ -52,6 +52,12 @@ import type { AuthUser } from "@/types/auth";
 import styles from "@/styles/checkout.module.css";
 
 type Mode = "delivery" | "pickup";
+
+function normalizeGuineaPhone(value: string): string | null {
+  if (value.length > 32 || !/^[+0-9\s().-]+$/.test(value)) return null;
+  const national = value.replace(/[\s().-]/g, "").replace(/^(?:\+224|00224)/, "");
+  return /^[1-9][0-9]{8}$/.test(national) ? `+224${national}` : null;
+}
 
 /**
  * Barre d'étapes : le libellé de la 3e étape suit le mode choisi à la 2e
@@ -76,6 +82,12 @@ export default function CheckoutForm({ user }: Props) {
   const { lines, clearCart } = useCart();
 
   const [step, setStep] = useState(0);
+  const stepTitleRef = useRef<HTMLHeadingElement>(null);
+  const previousStep = useRef(step);
+  useEffect(() => {
+    if (previousStep.current !== step) stepTitleRef.current?.focus();
+    previousStep.current = step;
+  }, [step]);
 
   // Téléphone : pré-rempli, éditable (peut différer du téléphone du compte).
   const [phone, setPhone] = useState(user.phone ?? "");
@@ -115,7 +127,7 @@ export default function CheckoutForm({ user }: Props) {
   function validateStep(currentStep: number): string | null {
     if (currentStep === 0) {
       if (!phone.trim()) return "Téléphone requis.";
-      if (!/^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/.test(phone.trim())) return "Saisissez un numéro de téléphone valide.";
+      if (!normalizeGuineaPhone(phone.trim())) return "Saisissez 9 chiffres, avec ou sans +224.";
       return null;
     }
     // Étape 1 : choix du mode (toujours valide, un mode est toujours coché).
@@ -143,7 +155,7 @@ export default function CheckoutForm({ user }: Props) {
       })),
       paymentMethod,
       fulfillmentMethod,
-      customerPhone: phone.trim(),
+      customerPhone: normalizeGuineaPhone(phone.trim()),
     };
 
     if (mode === "delivery") {
@@ -235,7 +247,7 @@ export default function CheckoutForm({ user }: Props) {
           const cls =
             i < step ? styles.stepDone : i === step ? styles.stepActive : "";
           return (
-            <div key={s.label} className={`${styles.step} ${cls}`}>
+            <div key={s.label} className={`${styles.step} ${cls}`} aria-current={i === step ? "step" : undefined}>
               <div className={styles.stepIcon}>
                 <i className={s.icon} aria-hidden="true"></i>
               </div>
@@ -249,7 +261,7 @@ export default function CheckoutForm({ user }: Props) {
         {/* Étape 0 — Informations personnelles */}
         {step === 0 && (
           <div className={styles.formCard}>
-            <h2 className={styles.sectionTitle}>Vos informations</h2>
+            <h2 ref={stepTitleRef} tabIndex={-1} className={styles.sectionTitle}>Vos informations</h2>
             <p className="text-secondary small mb-4">
               Vous commandez en tant que <strong>{user.firstName} {user.lastName}</strong>
               {" · "}{user.email}. Pour modifier ces informations, rendez-vous dans{" "}
@@ -265,17 +277,19 @@ export default function CheckoutForm({ user }: Props) {
                 </label>
                 <input
                   id="telephone"
-                  maxLength={20}
+                  maxLength={32}
                   name="customerPhone"
                   className={styles.inputField}
                   type="tel"
                   autoComplete="tel"
-                  placeholder="+224 6XX XX XX XX"
+                  inputMode="tel"
+                  placeholder="612 34 56 78"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
                   disabled={submitting}
                 />
+                <p className="form-text mb-0">9 chiffres. +224 est facultatif.</p>
               </div>
             </div>
           </div>
@@ -286,7 +300,7 @@ export default function CheckoutForm({ user }: Props) {
             adresse + ville ici, au lieu de laisser passer. */}
         {step === 2 && mode === "delivery" && (
           <div className={styles.formCard}>
-            <h2 className={styles.sectionTitle}>Adresse de livraison</h2>
+            <h2 ref={stepTitleRef} tabIndex={-1} className={styles.sectionTitle}>Adresse de livraison</h2>
             <p className="text-secondary small mb-4">
               L&apos;adresse et la ville sont <strong>requises</strong> pour la
               livraison à domicile.
@@ -373,7 +387,7 @@ export default function CheckoutForm({ user }: Props) {
             adresse nécessaire. */}
         {step === 2 && mode === "pickup" && (
           <div className={styles.formCard}>
-            <h2 className={styles.sectionTitle}>Récapitulatif du retrait</h2>
+            <h2 ref={stepTitleRef} tabIndex={-1} className={styles.sectionTitle}>Récapitulatif du retrait</h2>
             <p className="text-secondary mb-0">
               <i className="bi bi-shop me-2" aria-hidden="true"></i>
               Vous retirez votre commande directement chez le vendeur et payez
@@ -410,7 +424,7 @@ export default function CheckoutForm({ user }: Props) {
             pouvoir exiger celle-ci à l'étape suivante si livraison). */}
         {step === 1 && (
           <div className={styles.formCard}>
-            <h2 className={styles.sectionTitle}>Mode de réception et paiement</h2>
+            <h2 ref={stepTitleRef} tabIndex={-1} className={styles.sectionTitle}>Mode de réception et paiement</h2>
 
             {/* Option 1 : Livraison + paiement à la livraison */}
             <div

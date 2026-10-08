@@ -245,9 +245,12 @@ expect_status 13 422 "$CODE" "$RESP"
 call POST "/api/products" "$TOKEN_A" '{"name":"ZZ Smoke Product '"${EPOCH}"' alt7","description":"Description suffisamment longue de test","price":100,"stockQuantity":1,"category":"'"${ACTIVE_CAT_ID}"'","currency":"USD"}'
 expect_status 14 422 "$CODE" "$RESP"
 
-# --- 15) POST avec status out_of_stock -> 422 (status derive uniquement) ----
+# --- 15) POST avec status out_of_stock -> 201 (choix disponible au vendeur) -
 call POST "/api/products" "$TOKEN_A" '{"name":"ZZ Smoke Product '"${EPOCH}"' alt8","description":"Description suffisamment longue de test","price":100,"stockQuantity":1,"category":"'"${ACTIVE_CAT_ID}"'","status":"out_of_stock"}'
-expect_status 15 422 "$CODE" "$RESP"
+expect_status 15 201 "$CODE" "$RESP"
+if [ "$(echo "$RESP" | jq -r '.data.product.status')" != "out_of_stock" ]; then
+  echo "KO 15: statut out_of_stock non conserve"; cleanup_and_exit 1
+fi
 
 # --- 16) POST avec category inactive -> 422 ---------------------------------
 call POST "/api/products" "$TOKEN_A" '{"name":"ZZ Smoke Product '"${EPOCH}"' alt9","description":"Description suffisamment longue de test","price":100,"stockQuantity":1,"category":"'"${INACTIVE_CAT_ID}"'"}'

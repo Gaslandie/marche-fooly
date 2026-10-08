@@ -176,7 +176,7 @@ export default async function OrderConfirmationPage({ params }: PageProps) {
               </div>
               <div className="d-flex justify-content-between border-top pt-3 mt-3">
                 <strong>Total</strong>
-                <strong style={{ color: "var(--mf-orange)", fontSize: "1.25rem" }}>
+                <strong style={{ color: "var(--mf-orange-text)", fontSize: "1.25rem" }}>
                   {formatPrice(order.totalAmount, order.currency)}
                 </strong>
               </div>

@@ -41,11 +41,12 @@
  *
  * Notes pour GitHub Copilot / autocompletion:
  *   - ORDER_REFERENCE_REGEX miroir de Order.js (match du champ reference).
- *   - PHONE_REGEX/SLUG_REGEX reprennent les conventions du backend.
+ *   - Le téléphone est validé et normalisé par le helper partagé du backend.
  */
 
 const { body, param, query } = require("express-validator");
 const mongoose = require("mongoose");
+const { normalizeGuineaPhone } = require("../models/shared/validators");
 
 const {
   ORDER_STATUSES,
@@ -53,7 +54,6 @@ const {
   FULFILLMENT_METHODS,
 } = require("../models/shared/constants");
 
-const PHONE_REGEX = /^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/;
 const ORDER_REFERENCE_REGEX = /^ORD-\d{8}-[A-Z2-9]{5}$/;
 
 // Champs jamais acceptes en entree client (refus 422 explicite).
@@ -152,9 +152,10 @@ const createOrderValidators = [
     .isString()
     .withMessage("customerPhone requis")
     .bail()
-    .trim()
-    .matches(PHONE_REGEX)
-    .withMessage("customerPhone: format invalide"),
+    .custom((value) => normalizeGuineaPhone(value) !== null)
+    .withMessage("Téléphone : saisissez 9 chiffres, avec ou sans +224.")
+    .bail()
+    .customSanitizer(normalizeGuineaPhone),
 
   body("notes")
     .optional({ values: "falsy" })

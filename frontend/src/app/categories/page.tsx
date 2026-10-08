@@ -79,7 +79,7 @@ export default async function CategoriesPage() {
                     placeholder="Ex : téléphone, meuble, robe..."
                     aria-label="Rechercher une catégorie"
                   />
-                  <button className="btn btn-warning px-3" type="submit">
+                  <button className="btn btn-warning px-3" type="submit" aria-label="Rechercher dans les catégories">
                     <i className="bi bi-search" aria-hidden="true"></i>
                   </button>
                 </form>

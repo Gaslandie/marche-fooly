@@ -13,7 +13,7 @@
     "admin:restore": "node src/scripts/restoreAdminUser.js",
     "images:cleanup": "node src/scripts/cleanupOrphanProductImages.js",
     "owner:promote": "node src/scripts/promoteOwner.js",
-    "test": "echo \"No tests configured\""
+    "test": "node --test tests/*.test.js"
   },
   "keywords": [],
   "author": "",

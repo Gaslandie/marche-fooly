@@ -308,9 +308,11 @@ export default function HomePage({
                   {sellerFeatures.map((feature) => (
                     <div key={feature.title} className="col-sm-6">
                       <div className={styles.sellerFeature}>
-                        <i className={feature.icon} aria-hidden="true"></i>
-                        <div>
-                          <strong>{feature.title}</strong>
+                        <div className="w-100">
+                          <strong className="mf-card-heading">
+                            <i className={feature.icon} aria-hidden="true"></i>
+                            <span>{feature.title}</span>
+                          </strong>
                           <p>{feature.description}</p>
                         </div>
                       </div>
@@ -387,9 +389,11 @@ export default function HomePage({
                   sizes="(max-width: 991px) 100vw, 42vw"
                 />
                 <div className={styles.trustCardContent}>
-                  <i className="bi bi-shield-check" aria-hidden="true"></i>
-                  <div>
-                    <strong>Confiance et livraison locale</strong>
+                  <div className="w-100">
+                    <strong className="mf-card-heading">
+                      <i className="bi bi-shield-check" aria-hidden="true"></i>
+                      <span>Confiance et livraison locale</span>
+                    </strong>
                     <span>Des commandes plus rassurantes avec des vendeurs identifiés.</span>
                   </div>
                 </div>
@@ -401,8 +405,10 @@ export default function HomePage({
             {reasons.map((reason) => (
               <div key={reason.title} className="col-md-6 col-xl-4">
                 <article className={styles.reasonCard}>
-                  <i className={`${reason.icon} ${reason.accentClass}`} aria-hidden="true"></i>
-                  <h3>{reason.title}</h3>
+                  <h3 className="mf-card-heading">
+                    <i className={`${reason.icon} ${reason.accentClass}`} aria-hidden="true"></i>
+                    <span>{reason.title}</span>
+                  </h3>
                   <p>{reason.description}</p>
                 </article>
               </div>

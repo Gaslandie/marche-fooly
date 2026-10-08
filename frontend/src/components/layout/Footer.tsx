@@ -35,13 +35,13 @@ export default function Footer({
       <div className="container py-5">
         <div className="row g-4">
           <div className="col-md-4">
-            <h5 className="mb-2">{siteConfig.name}</h5>
+            <h2 className="h5 mb-2">{siteConfig.name}</h2>
             <p className="text-muted mb-2">{siteConfig.slogan}</p>
             <p className="text-muted mb-0">{siteConfig.location}</p>
           </div>
 
           <div className="col-md-4">
-            <h5 className="mb-3">Marketplace</h5>
+            <h2 className="h5 mb-3">Marketplace</h2>
             <ul className="list-unstyled d-grid gap-2 mb-0">
               {shopLinks.map((item) => (
                 <li key={item.href}>
@@ -65,7 +65,7 @@ export default function Footer({
           </div>
 
           <div className="col-md-4">
-            <h5 className="mb-3">Mon espace</h5>
+            <h2 className="h5 mb-3">Mon espace</h2>
             <ul className="list-unstyled d-grid gap-2 mb-0">
               {accountLinks.map((item) => (
                 <li key={item.href}>

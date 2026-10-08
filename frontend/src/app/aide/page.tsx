@@ -274,10 +274,12 @@ export default async function AidePage({ searchParams }: {
             {helpCategories.map(({ icon, title, text, linkLabel, href }) => (
               <div key={title} className="col-md-6 col-lg-3">
                 <Link href={href} className={styles.categoryCard}>
-                  <div className={styles.categoryIcon}>
-                    <i className={icon} aria-hidden="true"></i>
-                  </div>
-                  <h3 className="h5 fw-bold">{title}</h3>
+                  <h3 className="h5 fw-bold mf-card-heading">
+                    <span className={styles.categoryIcon} aria-hidden="true">
+                      <i className={icon} aria-hidden="true"></i>
+                    </span>
+                    <span>{title}</span>
+                  </h3>
                   <p className="text-secondary mb-3">{text}</p>
                   <span className={styles.categoryArrow}>
                     {linkLabel} <i className="bi bi-arrow-right" aria-hidden="true"></i>
@@ -301,10 +303,12 @@ export default async function AidePage({ searchParams }: {
             {/* Buy guide */}
             <div className="col-lg-6">
               <div className={styles.guideCard}>
-                <div className={styles.guideIcon}>
-                  <i className="bi bi-bag-check" aria-hidden="true"></i>
-                </div>
-                <h3 className="h4 fw-bold mb-3">Acheter sur Marché Fooly</h3>
+                <h3 className="h4 fw-bold mb-3 mf-card-heading">
+                  <span className={styles.guideIcon} aria-hidden="true">
+                    <i className="bi bi-bag-check" aria-hidden="true"></i>
+                  </span>
+                  <span>Acheter sur Marché Fooly</span>
+                </h3>
                 {BUY_STEPS.map(({ n, title, text }) => (
                   <div key={n} className={styles.guideStep}>
                     <div className={styles.stepNumber}>{n}</div>
@@ -323,10 +327,12 @@ export default async function AidePage({ searchParams }: {
             {/* Sell guide */}
             <div id="vendeurs" className="col-lg-6">
               <div className={styles.guideCard}>
-                <div className={styles.guideIcon}>
-                  <i className="bi bi-shop" aria-hidden="true"></i>
-                </div>
-                <h3 className="h4 fw-bold mb-3">{sellGuideTitle}</h3>
+                <h3 className="h4 fw-bold mb-3 mf-card-heading">
+                  <span className={styles.guideIcon} aria-hidden="true">
+                    <i className="bi bi-shop" aria-hidden="true"></i>
+                  </span>
+                  <span>{sellGuideTitle}</span>
+                </h3>
                 {sellGuideSteps.map(({ n, title, text }) => (
                   <div key={n} className={styles.guideStep}>
                     <div className={styles.stepNumber}>{n}</div>
@@ -373,10 +379,12 @@ export default async function AidePage({ searchParams }: {
             {/* Sidebar */}
             <div className="col-lg-4">
               <div className={styles.quickCard}>
-                <div className={styles.quickIcon}>
-                  <i className="bi bi-lightning-charge" aria-hidden="true"></i>
-                </div>
-                <h2 className="h4 fw-bold mb-3">Questions populaires</h2>
+                <h2 className="h4 fw-bold mb-3 mf-card-heading">
+                  <span className={styles.quickIcon} aria-hidden="true">
+                    <i className="bi bi-lightning-charge" aria-hidden="true"></i>
+                  </span>
+                  <span>Questions populaires</span>
+                </h2>
                 {popularLinks.map(({ label, href }) => (
                   <Link key={label} href={href} className={styles.popularQuestion}>
                     <span>{label}</span>
@@ -419,10 +427,12 @@ export default async function AidePage({ searchParams }: {
             {QUICK_ACCESS.map(({ icon, title, text, href }) => (
               <div key={title} className="col-md-6 col-lg-3">
                 <Link href={href} className={styles.quickAccessCard}>
-                  <div className={styles.quickAccessIcon}>
-                    <i className={icon} aria-hidden="true"></i>
-                  </div>
-                  <h3 className="h5 fw-bold">{title}</h3>
+                  <h3 className="h5 fw-bold mf-card-heading">
+                    <span className={styles.quickAccessIcon} aria-hidden="true">
+                      <i className={icon} aria-hidden="true"></i>
+                    </span>
+                    <span>{title}</span>
+                  </h3>
                   <p className="text-secondary mb-0">{text}</p>
                 </Link>
               </div>

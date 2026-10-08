@@ -32,7 +32,7 @@ import {
 
 type BackendAuthBody = {
   message?: string;
-  data?: { user?: unknown; token?: string };
+  data?: { user?: unknown; token?: string; field?: string; errors?: { field: string; message: string }[] };
 };
 
 export async function POST(request: Request) {
@@ -73,6 +73,9 @@ export async function POST(request: Request) {
       {
         success: false,
         message: body?.message ?? "Inscription impossible",
+        errors: (body?.data?.errors ?? (body?.data?.field ? [{ field: body.data.field, message: body.message ?? "Valeur déjà utilisée" }] : []))
+          .filter((error) => ["firstName", "lastName", "email", "phone", "password"].includes(error.field))
+          .map(({ field, message }) => ({ field, message })),
         user: null,
       },
       { status: result.status },

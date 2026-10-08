@@ -196,12 +196,12 @@ SETUP_IDS="$(run_mongo "
   const spA = await SellerProfile.findOneAndUpdate(
     { storeName: '${STORE_A}' },
     { \$set: { status: 'approved', approvedAt: new Date() } },
-    { new: true },
+    { returnDocument: 'after' },
   );
   const spB = await SellerProfile.findOneAndUpdate(
     { storeName: '${STORE_B}' },
     { \$set: { status: 'approved', approvedAt: new Date() } },
-    { new: true },
+    { returnDocument: 'after' },
   );
   // Produits chez A
   const A1 = await Product.create({

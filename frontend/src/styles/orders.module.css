@@ -103,7 +103,7 @@
   display: grid;
   place-items: center;
   font-size: 1.5rem;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
 }
 
 .orderItemName {
@@ -220,7 +220,7 @@
 .orderTotalValue {
   font-weight: 900;
   font-size: 1.15rem;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
 }
 
 /* ── Sidebar stats ──────────────────────────────────────────── */
@@ -236,7 +236,7 @@
 .statValue {
   font-size: 1.75rem;
   font-weight: 900;
-  color: var(--mf-orange);
+  color: var(--mf-orange-text);
   display: block;
 }
 

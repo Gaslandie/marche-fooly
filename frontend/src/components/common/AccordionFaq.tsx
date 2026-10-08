@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 type FaqItem = {
   question: string;
@@ -13,6 +13,7 @@ type Props = {
 };
 
 export default function AccordionFaq({ items, defaultOpen = 0 }: Props) {
+  const faqId = useId();
   const [open, setOpen] = useState<number | null>(defaultOpen);
 
   return (
@@ -33,12 +34,14 @@ export default function AccordionFaq({ items, defaultOpen = 0 }: Props) {
               type="button"
               onClick={() => setOpen(isOpen ? null : i)}
               aria-expanded={isOpen}
+              id={`${faqId}-question-${i}`}
+              aria-controls={`${faqId}-answer-${i}`}
               style={{
                 width: "100%",
                 textAlign: "left",
                 padding: "1rem 1.25rem",
                 background: isOpen ? "#fff3e5" : "#ffffff",
-                color: isOpen ? "var(--mf-orange)" : "var(--mf-dark)",
+                color: isOpen ? "var(--mf-orange-text)" : "var(--mf-dark)",
                 border: "none",
                 fontWeight: 900,
                 fontSize: "0.9375rem",
@@ -57,8 +60,9 @@ export default function AccordionFaq({ items, defaultOpen = 0 }: Props) {
                 style={{ flexShrink: 0 }}
               ></i>
             </button>
-            {isOpen && (
               <div
+                id={`${faqId}-answer-${i}`}
+                hidden={!isOpen}
                 style={{
                   padding: "1rem 1.25rem",
                   background: "#ffffff",
@@ -69,7 +73,6 @@ export default function AccordionFaq({ items, defaultOpen = 0 }: Props) {
               >
                 {item.answer}
               </div>
-            )}
           </div>
         );
       })}

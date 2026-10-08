@@ -40,7 +40,7 @@ export default function OrdersToolbar({
 }: Props) {
   return (
     <div className={styles.toolbar}>
-      <span className="fw-bold" style={{ color: "var(--mf-orange)" }}>
+      <span className="fw-bold" style={{ color: "var(--mf-orange-text)" }}>
         {count} commande{count > 1 ? "s" : ""}
       </span>
 

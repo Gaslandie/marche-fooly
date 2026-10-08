@@ -148,10 +148,12 @@ export default async function ContactPage() {
                 {HERO_CARDS.map(({ icon, title, text }) => (
                   <div key={title} className="col-6">
                     <div className={styles.contactCard}>
-                      <div className={styles.contactIcon}>
-                        <i className={icon} aria-hidden="true"></i>
-                      </div>
-                      <h2 className="h6 fw-bold">{title}</h2>
+                      <h2 className="h6 fw-bold mf-card-heading">
+                        <span className={styles.contactIcon} aria-hidden="true">
+                          <i className={icon} aria-hidden="true"></i>
+                        </span>
+                        <span>{title}</span>
+                      </h2>
                       <p className="text-secondary small mb-0">{text}</p>
                     </div>
                   </div>
@@ -168,7 +170,7 @@ export default async function ContactPage() {
           <div className="row g-4 align-items-start">
             {/* Side panel */}
             <div className="col-lg-4 order-lg-1">
-              <aside className={styles.sidepanel}>
+              <section className={styles.sidepanel} aria-label="Informations de contact">
                 <div className="position-relative">
                   <span className="badge bg-warning text-dark rounded-pill mb-3 mf-heading-label">Coordonnées</span>
                   <h2 className="h3 fw-bold mb-3 text-white">Marché Fooly</h2>
@@ -226,7 +228,7 @@ export default async function ContactPage() {
                     )}
                   </div>
                 </div>
-              </aside>
+              </section>
             </div>
 
             {/* Contact form */}
@@ -272,10 +274,12 @@ export default async function ContactPage() {
             {supportCards.map(({ icon, title, text, linkLabel, href }) => (
               <div key={title} className="col-md-6 col-lg-3">
                 <div className={styles.supportCard}>
-                  <div className={styles.supportIcon}>
-                    <i className={icon} aria-hidden="true"></i>
-                  </div>
-                  <h3 className="h5 fw-bold">{title}</h3>
+                  <h3 className="h5 fw-bold mf-card-heading">
+                    <span className={styles.supportIcon} aria-hidden="true">
+                      <i className={icon} aria-hidden="true"></i>
+                    </span>
+                    <span>{title}</span>
+                  </h3>
                   <p className="text-secondary">{text}</p>
                   <Link href={href} className={styles.supportLink}>
                     {linkLabel} <i className="bi bi-arrow-right" aria-hidden="true"></i>

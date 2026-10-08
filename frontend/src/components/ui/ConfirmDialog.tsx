@@ -99,26 +99,37 @@ function DialogContent({
   // Échap ferme + scroll de page gelé tant que le dialogue est monté.
   useEffect(() => {
     const previousFocus = document.activeElement;
+    // inert retire le fond du clavier et de l'arbre des lecteurs d'écran.
+    const background = Array.from(document.body.children)
+      .filter((node): node is HTMLElement => node instanceof HTMLElement && node.getAttribute("aria-hidden") !== "true" && !node.contains(dialogRef.current))
+      .map((node) => ({ node, wasInert: node.inert }));
+    background.forEach(({ node }) => { node.inert = true; });
+    const keepFocusInside = () => {
+      if (!dialogRef.current?.contains(document.activeElement)) cancelButtonRef.current?.focus();
+    };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") { event.preventDefault(); onClose(); }
       if (event.key === "Tab") {
         const elements = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
           'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex="0"]',
         ) ?? []).filter((element) => element.getClientRects().length > 0);
         const first = elements[0];
         const last = elements[elements.length - 1];
-        if (first && (event.shiftKey ? document.activeElement === first : document.activeElement === last)) {
+        if (first && (!dialogRef.current?.contains(document.activeElement) || (event.shiftKey ? document.activeElement === first : document.activeElement === last))) {
           event.preventDefault();
           (event.shiftKey ? last : first).focus();
         }
       }
     };
     document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("focusin", keepFocusInside);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     cancelButtonRef.current?.focus();
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("focusin", keepFocusInside);
+      background.forEach(({ node, wasInert }) => { node.inert = wasInert; });
       document.body.style.overflow = previousOverflow;
       if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
     };

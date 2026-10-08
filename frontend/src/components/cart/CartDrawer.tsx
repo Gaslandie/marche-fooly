@@ -49,30 +49,41 @@ function DrawerContent({ onClose }: { onClose: () => void }) {
   const { lines, totalQuantity, subtotalDisplay, updateQuantity, removeItem } =
     useCart();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
-  const drawerRef = useRef<HTMLElement>(null);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const previousFocus = document.activeElement;
+    // inert retire le fond du clavier et de l'arbre des lecteurs d'écran.
+    const background = Array.from(document.body.children)
+      .filter((node): node is HTMLElement => node instanceof HTMLElement && node.getAttribute("aria-hidden") !== "true" && !node.contains(drawerRef.current))
+      .map((node) => ({ node, wasInert: node.inert }));
+    background.forEach(({ node }) => { node.inert = true; });
+    const keepFocusInside = () => {
+      if (!drawerRef.current?.contains(document.activeElement)) closeButtonRef.current?.focus();
+    };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") { event.preventDefault(); onClose(); }
       if (event.key === "Tab") {
         const elements = Array.from(drawerRef.current?.querySelectorAll<HTMLElement>(
           'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
         ) ?? []).filter((element) => element.getClientRects().length > 0);
         const first = elements[0];
         const last = elements[elements.length - 1];
-        if (first && (event.shiftKey ? document.activeElement === first : document.activeElement === last)) {
+        if (first && (!drawerRef.current?.contains(document.activeElement) || (event.shiftKey ? document.activeElement === first : document.activeElement === last))) {
           event.preventDefault();
           (event.shiftKey ? last : first).focus();
         }
       }
     };
     document.addEventListener("keydown", onKeyDown);
+    document.addEventListener("focusin", keepFocusInside);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeButtonRef.current?.focus();
     return () => {
       document.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("focusin", keepFocusInside);
+      background.forEach(({ node, wasInert }) => { node.inert = wasInert; });
       document.body.style.overflow = previousOverflow;
       if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus();
     };
@@ -84,7 +95,7 @@ function DrawerContent({ onClose }: { onClose: () => void }) {
   return createPortal(
     <>
       <div className={styles.backdrop} onClick={onClose} aria-hidden="true"></div>
-      <aside
+      <div
         ref={drawerRef}
         className={styles.drawer}
         role="dialog"
@@ -125,8 +136,9 @@ function DrawerContent({ onClose }: { onClose: () => void }) {
               <DrawerLine
                 key={line.productId}
                 line={line}
-                onQuantityChange={(qty) => updateQuantity(line.productId, qty)}
-                onRemove={() => removeItem(line.productId)}
+                onQuantityChange={(qty) => { if (qty === 0) closeButtonRef.current?.focus(); updateQuantity(line.productId, qty); }}
+                onRemove={() => { closeButtonRef.current?.focus(); removeItem(line.productId); }}
+                onNavigate={onClose}
               />
             ))
           )}
@@ -172,7 +184,7 @@ function DrawerContent({ onClose }: { onClose: () => void }) {
             </button>
           </div>
         </div>
-      </aside>
+      </div>
     </>,
     document.body,
   );
@@ -182,10 +194,12 @@ function DrawerLine({
   line,
   onQuantityChange,
   onRemove,
+  onNavigate,
 }: {
   line: CartLine;
   onQuantityChange: (quantity: number) => void;
   onRemove: () => void;
+  onNavigate: () => void;
 }) {
   return (
     <div className={styles.line}>
@@ -200,7 +214,7 @@ function DrawerLine({
 
       <div>
         <h3 className={styles.lineName}>
-          <Link href={`/produit/${encodeURIComponent(line.productSlug)}`}>
+          <Link href={`/produit/${encodeURIComponent(line.productSlug)}`} onClick={onNavigate}>
             {line.name}
           </Link>
         </h3>
@@ -224,6 +238,7 @@ function DrawerLine({
           type="button"
           className="btn btn-link btn-sm p-0 mt-2 text-danger text-decoration-none"
           onClick={onRemove}
+          aria-label={`Retirer ${line.name} du panier`}
         >
           <i className="bi bi-trash me-1" aria-hidden="true"></i>
           Retirer

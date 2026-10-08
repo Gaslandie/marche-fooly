@@ -92,7 +92,7 @@ export default async function MonComptePage() {
               <p className="fs-5 mb-0" style={{ color: "rgba(255,255,255,0.75)" }}>
                 {user
                   ? "Gérez votre profil, suivez vos commandes et personnalisez votre expérience Marché Fooly."
-                  : "Connectez-vous ou créez un compte pour suivre vos commandes et vos favoris."}
+                  : "Connectez-vous ou créez un compte pour suivre vos commandes."}
               </p>
             </div>
             <CartNotEmpty>
@@ -177,18 +177,19 @@ export default async function MonComptePage() {
                 {/* Notification settings */}
                 <div className={styles.infoCard}>
                   <h2 className={styles.infoCardTitle}>Notifications</h2>
-                  {NOTIF_SETTINGS.map(({ label, desc }) => (
+                  {NOTIF_SETTINGS.map(({ label, desc }, index) => (
                     <div key={label} className={styles.notifRow}>
                       <div>
-                        <p className={styles.notifLabel}>{label}</p>
-                        <p className={styles.notifDesc}>{desc}</p>
+                        <label className={styles.notifLabel} htmlFor={`notif-${index}`}>{label}</label>
+                        <p className={styles.notifDesc} id={`notif-desc-${index}`}>{desc}</p>
                       </div>
                       <div className="form-check form-switch mb-0">
                         <input
                           className="form-check-input"
                           type="checkbox"
                           role="switch"
-                          id={`notif-${label}`}
+                          id={`notif-${index}`}
+                          aria-describedby={`notif-desc-${index}`}
                           defaultChecked
                           style={{ width: "2.5rem", height: "1.25rem", cursor: "pointer" }}
                         />

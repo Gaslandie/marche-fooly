@@ -24,8 +24,8 @@
  */
 
 const { body, param, query } = require("express-validator");
+const { normalizeGuineaPhone } = require("../models/shared/validators");
 
-const PHONE_REGEX = /^(?=(?:\D*\d){8})\+?[0-9\s\-()]{8,20}$/;
 const HTTP_URL_REGEX = /^https?:\/\/.+/i;
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -85,9 +85,10 @@ const applyValidators = [
     .optional({ values: "falsy" })
     .isString()
     .bail()
-    .trim()
-    .matches(PHONE_REGEX)
-    .withMessage("Telephone de contact invalide"),
+    .custom((value) => normalizeGuineaPhone(value) !== null)
+    .withMessage("Téléphone de contact : saisissez 9 chiffres, avec ou sans +224.")
+    .bail()
+    .customSanitizer(normalizeGuineaPhone),
   body("address").optional().isObject().withMessage("Adresse invalide"),
   body("address.street").optional().isString().trim().isLength({ max: 180 }),
   body("address.city").optional().isString().trim().isLength({ max: 80 }),
@@ -140,9 +141,10 @@ const updateMeSellerValidators = [
     .optional({ values: "falsy" })
     .isString()
     .bail()
-    .trim()
-    .matches(PHONE_REGEX)
-    .withMessage("Telephone de contact invalide"),
+    .custom((value) => normalizeGuineaPhone(value) !== null)
+    .withMessage("Téléphone de contact : saisissez 9 chiffres, avec ou sans +224.")
+    .bail()
+    .customSanitizer(normalizeGuineaPhone),
   body("address").optional().isObject().withMessage("Adresse invalide"),
   body("address.street").optional().isString().trim().isLength({ max: 180 }),
   body("address.city").optional().isString().trim().isLength({ max: 80 }),

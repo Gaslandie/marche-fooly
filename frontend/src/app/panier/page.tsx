@@ -97,10 +97,12 @@ export default function PanierPage() {
             {SERVICE_CARDS.map(({ icon, title, text }) => (
               <div key={title} className="col-md-4">
                 <div className={styles.serviceCard}>
-                  <div className={styles.serviceIcon}>
-                    <i className={icon} aria-hidden="true"></i>
-                  </div>
-                  <h3 className="h5 fw-bold">{title}</h3>
+                  <h3 className="h5 fw-bold mf-card-heading">
+                    <span className={styles.serviceIcon} aria-hidden="true">
+                      <i className={icon} aria-hidden="true"></i>
+                    </span>
+                    <span>{title}</span>
+                  </h3>
                   <p className="text-secondary mb-0">{text}</p>
                 </div>
               </div>

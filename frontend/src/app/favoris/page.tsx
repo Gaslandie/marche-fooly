@@ -97,7 +97,7 @@ export default async function FavorisPage() {
 
             {/* Right column – summary + tip */}
             <div className="col-lg-3">
-              <aside className={styles.wishlistSummary}>
+              <section className={styles.wishlistSummary} aria-label="Récapitulatif des favoris">
                 <h2 className="h4 fw-bold mb-3">Résumé favoris</h2>
 
                 <div className={styles.summaryStat}>
@@ -123,7 +123,7 @@ export default async function FavorisPage() {
                 <Link href="/boutique" className="btn btn-outline-dark w-100 mt-2">
                   Ajouter d&apos;autres produits
                 </Link>
-              </aside>
+              </section>
 
               {/* Tip card */}
               <div className={`${styles.tipCard} text-center`}>

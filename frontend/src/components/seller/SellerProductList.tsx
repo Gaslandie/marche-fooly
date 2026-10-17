@@ -21,6 +21,7 @@
 
 import Link from "next/link";
 import DeleteProductButton from "@/components/seller/DeleteProductButton";
+import ProductImage from "@/components/product/ProductImage";
 import type { ApiProduct } from "@/types/api";
 import { formatPrice } from "@/utils/formatPrice";
 import styles from "@/styles/seller.module.css";
@@ -84,10 +85,12 @@ export default function SellerProductList({ products }: Props) {
                     <div className={styles.productRowIdentity}>
                       <div className={styles.productThumb}>
                         {product.coverImageUrl ? (
-                          <img
-                            src={product.coverImageUrl}
+                          <ProductImage
+                            src={product.coverImage?.thumbUrl || product.coverImageUrl}
                             alt={product.name}
                             loading="lazy"
+                            width={52}
+                            height={52}
                           />
                         ) : (
                           <i className="bi bi-box-seam" aria-hidden="true"></i>

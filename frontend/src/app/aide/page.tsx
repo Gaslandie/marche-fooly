@@ -4,16 +4,17 @@ import AccordionFaq from "@/components/common/AccordionFaq";
 import { siteConfig } from "@/config/site";
 import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
+import { publicMetadata } from "@/lib/seo";
 import styles from "@/styles/aide.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
-export const metadata: Metadata = {
-  title: "Centre d'aide",
-  description:
-    "Centre d'aide Marché Fooly : réponses aux questions sur les achats, commandes, vendeurs, livraison, paiement, compte client et support à Sangarédi.",
-};
+export const metadata: Metadata = publicMetadata(
+  "/aide",
+  "Centre d'aide",
+  "Centre d'aide Marché Fooly : réponses aux questions sur les achats, commandes, vendeurs, livraison, paiement, compte client et support à Sangarédi.",
+);
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const CATEGORIES = [
   {

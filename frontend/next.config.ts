@@ -19,14 +19,13 @@ import type { NextConfig } from "next";
 
 /**
  * Construit le `remotePattern` autorisant l'optimiseur d'images à charger les
- * médias servis par l'API backend (photos produits en `/api/uploads/...`).
+ * médias publics servis par l'API backend (`/api/media/images/...`).
  * Dérivé de NEXT_PUBLIC_API_URL pour rester correct en dev comme en prod.
  */
 function apiImageRemotePatterns(): NonNullable<
   NonNullable<NextConfig["images"]>["remotePatterns"]
 > {
-  const raw = process.env.NEXT_PUBLIC_API_URL;
-  if (!raw) return [];
+  const raw = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000";
   try {
     const url = new URL(raw);
     return [
@@ -34,7 +33,7 @@ function apiImageRemotePatterns(): NonNullable<
         protocol: url.protocol === "https:" ? "https" : "http",
         hostname: url.hostname,
         port: url.port || undefined,
-        pathname: "/api/**",
+        pathname: "/api/media/images/**",
       },
     ];
   } catch {
@@ -43,6 +42,8 @@ function apiImageRemotePatterns(): NonNullable<
 }
 
 const securityHeaders = [
+  // Même durée que la protection HTTPS déjà fournie par Vercel.
+  { key: "Strict-Transport-Security", value: "max-age=63072000" },
   // Empêche le navigateur de « deviner » un type MIME différent (anti-sniffing).
   { key: "X-Content-Type-Options", value: "nosniff" },
   // Anti-clickjacking : le site ne peut être embarqué que par lui-même.
@@ -66,14 +67,38 @@ const nextConfig: NextConfig = {
     // AVIF (meilleure compression) avec repli WebP puis format d'origine.
     formats: ["image/avif", "image/webp"],
     remotePatterns: apiImageRemotePatterns(),
-    // Garde les variantes optimisées en cache au moins 1h côté CDN/navigateur.
-    minimumCacheTTL: 3600,
+    // Recontrôler rapidement une photo dont le produit n'est plus public.
+    minimumCacheTTL: 60,
+  },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "marche-fooly\\.vercel\\.app" }],
+        destination: "https://www.marchefooly.com/:path*",
+        permanent: true,
+      },
+      { source: "/favicon.ico", destination: "/icon.png", permanent: true },
+      { source: "/apple-touch-icon.png", destination: "/apple-icon.png", permanent: true },
+    ];
   },
   async headers() {
     return [
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      },
+      {
+        source: "/images/:path*",
+        // Ces noms ne sont pas versionnés : revalidation après une heure.
+        headers: [{ key: "Cache-Control", value: "public, max-age=3600, must-revalidate" }],
       },
     ];
   },

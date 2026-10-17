@@ -486,8 +486,8 @@ const create = async (req, res, next) => {
     const imagesToAttach = pendingImages ?? (pendingCoverImage ? [created.coverImage] : []);
     await Promise.all(
       imagesToAttach.map((image) =>
-        markProductImageAttached(image, created._id).catch((error) => {
-          console.warn("Attachement image produit:", error?.message || error);
+        markProductImageAttached(image, created._id).catch(() => {
+          console.warn("Attachement image produit indisponible");
         }),
       ),
     );
@@ -588,8 +588,8 @@ const update = async (req, res, next) => {
     const imagesToAttach = pendingImages ?? (pendingCoverImage ? [product.coverImage] : []);
     await Promise.all(
       imagesToAttach.map((image) =>
-        markProductImageAttached(image, product._id).catch((error) => {
-          console.warn("Attachement image produit:", error?.message || error);
+        markProductImageAttached(image, product._id).catch(() => {
+          console.warn("Attachement image produit indisponible");
         }),
       ),
     );

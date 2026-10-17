@@ -62,6 +62,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import type { ReactNode } from "react";
+import dynamic from "next/dynamic";
 import type { AddCartInput, AddResult, CartLine, CartState } from "@/types/cart";
 import {
   CART_MAX_LINES,
@@ -71,6 +72,11 @@ import {
   getCurrentSellerSlug,
   safeParseStored,
 } from "@/lib/cart";
+
+// Télécharger le panneau et son sélecteur seulement à la première ouverture.
+const CartDrawer = dynamic(() => import("@/components/cart/CartDrawer"), {
+  ssr: false,
+});
 
 /* ──────────────────────────────────────────────────────────────────
  * Store de module (source de vérité hors React)
@@ -349,5 +355,10 @@ export default function CartProvider({ children }: { children: ReactNode }) {
     closeDrawer,
   ]);
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      {drawerOpen && <CartDrawer />}
+    </CartContext.Provider>
+  );
 }

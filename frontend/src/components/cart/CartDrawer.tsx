@@ -10,7 +10,7 @@
  *   quitter la page où il naviguait.
  *
  * Où il est utilisé :
- *   - app/layout.tsx, une seule fois, à l'intérieur de <CartProvider>.
+ *   - CartProvider, chargé à la demande à la première ouverture.
  *
  * Règles techniques :
  *   - Ouverture pilotée par `drawerOpen` du CartProvider (état d'interface).
@@ -35,6 +35,7 @@ import Link from "next/link";
 import { createPortal } from "react-dom";
 import { useCart } from "@/components/cart/CartProvider";
 import QuantitySelector from "@/components/product/QuantitySelector";
+import ProductImage from "@/components/product/ProductImage";
 import type { CartLine } from "@/types/cart";
 import { formatPrice } from "@/utils/formatPrice";
 import styles from "@/styles/cartDrawer.module.css";
@@ -205,8 +206,7 @@ function DrawerLine({
     <div className={styles.line}>
       <div className={styles.lineMedia}>
         {line.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={line.imageUrl} alt="" className={styles.lineImage} />
+          <ProductImage src={line.imageUrl} alt="" className={styles.lineImage} width={56} height={56} />
         ) : (
           <i className={line.icon} aria-hidden="true"></i>
         )}

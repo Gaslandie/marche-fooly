@@ -5,6 +5,7 @@ import ProductFilters from "@/components/product/ProductFilters";
 import ProductSort from "@/components/product/ProductSort";
 import { getCategories, getProducts } from "@/lib/api";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
+import { publicMetadata } from "@/lib/seo";
 import styles from "@/styles/catalog.module.css";
 import type { ProductItem, ProductSortKey, ProductViewMode } from "@/types/catalog";
 
@@ -12,15 +13,33 @@ type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-// Cette page dépend d'une API live (GET /api/products) : on force le rendu
-// dynamique (à la requête). Le build Next.js ne contacte donc plus le backend.
-export const dynamic = "force-dynamic";
+// Rendu par visiteur ; le catalogue public garde son cache de 60 secondes.
+export const revalidate = 0;
 
-export const metadata: Metadata = {
-  title: "Boutique",
-  description:
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const params = (await searchParams) ?? {};
+  const metadata = publicMetadata(
+    "/boutique",
+    "Boutique",
     "Découvrez les produits disponibles sur Marché Fooly : téléphones, électroménager, mode, maison, accessoires et bonnes affaires à Sangarédi.",
-};
+  );
+  // Une recherche ou un filtre personnel ne crée pas une page Google supplémentaire.
+  if (readParam(params.q)?.trim() || params.maxPrice || params.stock) {
+    return { ...metadata, alternates: { canonical: null }, robots: { index: false, follow: true } };
+  }
+  const categorySlug = readParam(params.category);
+  if (!categorySlug) return metadata;
+  const category = (await getCategories()).find((item) => item.slug === categorySlug);
+  if (!category) return { ...metadata, robots: { index: false, follow: true } };
+  const categoryMetadata = publicMetadata(
+    `/boutique?category=${encodeURIComponent(category.slug)}`,
+    `${category.name} à Sangarédi`,
+    `Découvrez les produits de la catégorie ${category.name} sur Marché Fooly. Achetez auprès des vendeurs locaux à Sangarédi, Guinée.`,
+  );
+  return category.productCount > 0
+    ? categoryMetadata
+    : { ...categoryMetadata, robots: { index: false, follow: true } };
+}
 
 function readParam(value?: string | string[]) {
   return Array.isArray(value) ? value[0] : value;

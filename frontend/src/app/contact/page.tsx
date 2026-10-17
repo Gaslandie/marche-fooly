@@ -5,16 +5,17 @@ import AccordionFaq from "@/components/common/AccordionFaq";
 import { siteConfig } from "@/config/site";
 import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
+import { publicMetadata } from "@/lib/seo";
 import styles from "@/styles/contact.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Contactez Marché Fooly à Sangarédi, Guinée. Assistance clients, vendeurs, commandes, partenariats et informations sur la marketplace locale.",
-};
+export const metadata: Metadata = publicMetadata(
+  "/contact",
+  "Contact",
+  "Contactez Marché Fooly à Sangarédi, Guinée. Assistance clients, vendeurs, commandes, partenariats et informations sur la marketplace locale.",
+);
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const HERO_CARDS = [
   { icon: "bi bi-clock", title: "À votre écoute", text: "Une assistance pour vos achats, vos ventes et vos commandes." },

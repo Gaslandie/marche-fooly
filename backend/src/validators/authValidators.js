@@ -19,6 +19,13 @@ const phoneValidator = (optional = false) => {
     .bail().customSanitizer(normalizeGuineaPhone);
 };
 
+// bcrypt ignore les octets au-delà de 72 : ne jamais tronquer un nouveau secret.
+const newPasswordValidator = () => body("password")
+  .isString().withMessage("Mot de passe requis").bail()
+  .isLength({ min: 8, max: 72 }).withMessage("Mot de passe : entre 8 et 72 caractères").bail()
+  .custom(value => Buffer.byteLength(value, "utf8") <= 72)
+  .withMessage("Mot de passe trop long. Raccourcissez-le : les accents et emojis prennent plus de place.");
+
 const registerValidators = [
   nameValidator("firstName", "Prénom"),
   nameValidator("lastName", "Nom"),
@@ -33,12 +40,7 @@ const registerValidators = [
     .isLength({ max: 160 })
     .withMessage("Email trop long"),
   phoneValidator(),
-  body("password")
-    .isString()
-    .withMessage("Mot de passe requis")
-    .bail()
-    .isLength({ min: 8, max: 128 })
-    .withMessage("Mot de passe: entre 8 et 128 caracteres"),
+  newPasswordValidator(),
 ];
 
 const loginValidators = [
@@ -80,12 +82,7 @@ const resetPasswordValidators = [
     .trim()
     .matches(/^[a-f0-9]{64}$/)
     .withMessage("Lien invalide"),
-  body("password")
-    .isString()
-    .withMessage("Mot de passe requis")
-    .bail()
-    .isLength({ min: 8, max: 128 })
-    .withMessage("Mot de passe: entre 8 et 128 caracteres"),
+  newPasswordValidator(),
 ];
 
 const HTTP_URL_REGEX = /^https?:\/\/.+/i;

@@ -31,6 +31,9 @@ import { notFound } from "next/navigation";
 import ProductCard from "@/components/product/ProductCard";
 import ProductDetails from "@/components/product/ProductDetails";
 import { getProductBySlug, getProducts } from "@/lib/api";
+import { publicMetadata } from "@/lib/seo";
+import { siteConfig } from "@/config/site";
+import StructuredData from "@/components/common/StructuredData";
 import styles from "@/styles/product.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
@@ -38,19 +41,20 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-// Cette page dépend d'une API live (GET /api/products) : on force le rendu
-// dynamique (à la requête). Le build Next.js ne contacte donc plus le backend.
-export const dynamic = "force-dynamic";
+// Rendu par visiteur ; le catalogue public garde son cache de 60 secondes.
+export const revalidate = 0;
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   // fetch identique mémoïsé par Next : pas de second appel réseau ici.
   const product = await getProductBySlug(slug);
-  if (!product) return { title: "Produit introuvable" };
-  return {
-    title: product.name,
-    description: `Achetez ${product.name} sur Marché Fooly, marketplace locale à Sangarédi. Vendeur : ${product.vendor}.`,
-  };
+  if (!product) notFound();
+  return publicMetadata(
+    `/produit/${encodeURIComponent(product.slug)}`,
+    product.name,
+    `Achetez ${product.name} sur Marché Fooly, marketplace locale à Sangarédi. Vendeur : ${product.vendor}.`,
+    product.coverImageUrl ? { url: product.coverImageUrl, alt: product.name } : undefined,
+  );
 }
 
 export default async function ProduitPage({ params }: PageProps) {
@@ -59,6 +63,13 @@ export default async function ProduitPage({ params }: PageProps) {
   if (!product) notFound();
 
   const categoryLabel = product.categoryName || product.categorySlug;
+  const productUrl = `${siteConfig.url}/produit/${encodeURIComponent(product.slug)}`;
+  const breadcrumb = [
+    { name: "Accueil", item: `${siteConfig.url}/` },
+    { name: "Boutique", item: `${siteConfig.url}/boutique` },
+    ...(product.categorySlug ? [{ name: categoryLabel, item: `${siteConfig.url}/boutique?category=${encodeURIComponent(product.categorySlug)}` }] : []),
+    { name: product.name, item: productUrl },
+  ];
 
   // Produits similaires : même catégorie via l'API, produit courant exclu.
   const similarPool = product.categorySlug
@@ -70,6 +81,33 @@ export default async function ProduitPage({ params }: PageProps) {
 
   return (
     <>
+      <StructuredData data={{
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Product",
+            "@id": `${productUrl}#product`,
+            url: productUrl,
+            name: product.name,
+            description: product.description.trim() || product.shortDescription.trim() || undefined,
+            image: product.coverImageUrl ? [new URL(product.coverImageUrl, siteConfig.url).href] : undefined,
+            sku: product.sku || undefined,
+            category: categoryLabel || undefined,
+            offers: {
+              "@type": "Offer",
+              url: productUrl,
+              price: product.price,
+              priceCurrency: product.currency,
+              availability: `https://schema.org/${product.inStock ? "InStock" : "OutOfStock"}`,
+              seller: product.sellerSlug ? { "@type": "Organization", name: product.vendor } : undefined,
+            },
+          },
+          {
+            "@type": "BreadcrumbList",
+            itemListElement: breadcrumb.map((entry, index) => ({ "@type": "ListItem", position: index + 1, ...entry })),
+          },
+        ],
+      }} />
       {/* ── Breadcrumb hero ───────────────────────────────────────── */}
       <section className={styles.pageHero}>
         <div className="container">

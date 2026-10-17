@@ -29,14 +29,15 @@ const authenticate = async (req, res, next) => {
     });
   }
 
-  const [scheme, token] = authHeader.split(" ");
-  if (scheme !== "Bearer" || !token) {
+  const match = /^Bearer ([^\s]+)$/i.exec(authHeader);
+  if (!match) {
     return res.status(401).json({
       success: false,
       message: "Format d'authentification invalide",
       data: null,
     });
   }
+  const token = match[1];
 
   let payload;
   try {
@@ -50,7 +51,8 @@ const authenticate = async (req, res, next) => {
     });
   }
 
-  if (!payload || !payload.sub) {
+  if (!payload || typeof payload.sub !== "string" || !/^[a-f0-9]{24}$/i.test(payload.sub) ||
+      typeof payload.exp !== "number" || !Number.isFinite(payload.exp)) {
     return res.status(401).json({
       success: false,
       message: "Token invalide",
@@ -73,10 +75,10 @@ const authenticate = async (req, res, next) => {
     });
   }
 
-  if (user.status === "suspended") {
+  if (user.status !== "active") {
     return res.status(403).json({
       success: false,
-      message: "Ce compte est suspendu",
+      message: user.status === "suspended" ? "Ce compte est suspendu" : "Ce compte n'est pas actif",
       data: null,
     });
   }

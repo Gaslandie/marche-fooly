@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { hasBackOfficeAccess } from "@/lib/admin";
 import { getCurrentUser } from "@/lib/auth";
 import { getMySellerProfile } from "@/lib/seller";
@@ -10,7 +11,8 @@ export type SellerNavigationState = {
   showSellerEntry: boolean;
 };
 
-export async function getSellerNavigationState(): Promise<SellerNavigationState> {
+// Mémoïsation limitée au rendu courant, jamais partagée entre deux comptes.
+export const getSellerNavigationState = cache(async (): Promise<SellerNavigationState> => {
   const [user, sellerProfile] = await Promise.all([
     getCurrentUser(),
     getMySellerProfile(),
@@ -24,4 +26,4 @@ export async function getSellerNavigationState(): Promise<SellerNavigationState>
     sellerStatus,
     showSellerEntry,
   };
-}
+});

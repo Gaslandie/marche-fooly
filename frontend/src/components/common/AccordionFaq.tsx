@@ -55,7 +55,7 @@ export default function AccordionFaq({ items, defaultOpen = 0 }: Props) {
             >
               {item.question}
               <i
-                className={`bi bi-chevron-${isOpen ? "up" : "down"}`}
+                className={`bi ${isOpen ? "bi-chevron-up" : "bi-chevron-down"}`}
                 aria-hidden="true"
                 style={{ flexShrink: 0 }}
               ></i>

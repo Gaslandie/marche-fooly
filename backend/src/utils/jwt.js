@@ -7,11 +7,11 @@ const signAuthToken = (user) => {
     sub: user._id.toString(),
     role: user.role,
   };
-  return jwt.sign(payload, jwtSecret, { expiresIn: jwtExpiresIn });
+  return jwt.sign(payload, jwtSecret, { algorithm: "HS256", expiresIn: jwtExpiresIn });
 };
 
 const verifyAuthToken = (token) => {
-  return jwt.verify(token, jwtSecret);
+  return jwt.verify(token, jwtSecret, { algorithms: ["HS256"] });
 };
 
 module.exports = {

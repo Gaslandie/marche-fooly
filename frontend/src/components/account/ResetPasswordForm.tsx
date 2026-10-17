@@ -66,6 +66,11 @@ export default function ResetPasswordForm() {
       setMessage("Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
+    if (new TextEncoder().encode(password).length > 72) {
+      setStatus("error");
+      setMessage("Mot de passe trop long. Raccourcissez-le : les accents et emojis prennent plus de place.");
+      return;
+    }
     if (password !== confirm) {
       setStatus("error");
       setMessage("Les deux mots de passe ne correspondent pas.");
@@ -133,7 +138,7 @@ export default function ResetPasswordForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
-                maxLength={128}
+                maxLength={72}
                 disabled={loading}
               />
               <button
@@ -169,7 +174,7 @@ export default function ResetPasswordForm() {
               onChange={(e) => setConfirm(e.target.value)}
               required
               minLength={8}
-                maxLength={128}
+              maxLength={72}
               disabled={loading}
             />
 

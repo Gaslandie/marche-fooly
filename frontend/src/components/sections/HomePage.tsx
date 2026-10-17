@@ -230,8 +230,9 @@ export default function HomePage({
                   alt="Marché local avec vendeurs et produits disponibles sur Marché Fooly"
                   fill
                   className={styles.heroImage}
-                  priority
-                  sizes="(max-width: 991px) 100vw, 50vw"
+                  loading="eager"
+                  fetchPriority="high"
+                  sizes="(max-width: 575px) calc(100vw - 24px), (max-width: 991px) 696px, (max-width: 1399px) 50vw, 636px"
                 />
                 <div className={styles.heroOverlay}>
                   <div>

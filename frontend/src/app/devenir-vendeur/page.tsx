@@ -7,16 +7,17 @@ import { getCurrentUser } from "@/lib/auth";
 import { hasBackOfficeAccess } from "@/lib/admin";
 import { getMySellerProfile } from "@/lib/seller";
 import { getSellerCta, hasSellerProfileStatus } from "@/lib/sellerCta";
+import { publicMetadata } from "@/lib/seo";
 import styles from "@/styles/seller.module.css";
 import catalogStyles from "@/styles/catalog.module.css";
 
-export const metadata: Metadata = {
-  title: "Devenir vendeur",
-  description:
-    "Créez votre boutique sur Marché Fooly et commencez à vendre vos produits en ligne à Sangarédi. Marketplace locale pour commerçants et vendeurs indépendants.",
-};
+export const metadata: Metadata = publicMetadata(
+  "/devenir-vendeur",
+  "Devenir vendeur",
+  "Créez votre boutique sur Marché Fooly et vendez vos produits à Sangarédi. Une marketplace locale pour commerçants et vendeurs indépendants.",
+);
 
-export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const BENEFITS = [
   {

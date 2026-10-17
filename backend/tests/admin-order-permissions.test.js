@@ -8,6 +8,7 @@ process.env.MONGODB_URI ||= "mongodb://127.0.0.1:27017/test-not-used";
 process.env.JWT_SECRET ||= "local-test-only-secret-not-used";
 const Order = require("../src/models/Order");
 const Product = require("../src/models/Product");
+const SellerProfile = require("../src/models/SellerProfile");
 const events = require("../src/services/notificationEvents");
 const notify = events.notifyOrderStatusChanged;
 events.notifyOrderStatusChanged = async () => {};
@@ -99,4 +100,21 @@ test("staff peut annuler son propre achat mais ne peut pas le confirmer", async 
   assert.equal(res.statusCode, 200);
   assert.equal(order.cancelledBy, "customer");
   assert.equal(stockWrites, 1);
+});
+
+test("un client ne lit ni ne modifie la commande d'un autre compte", async t => {
+  const findSeller = SellerProfile.findOne;
+  SellerProfile.findOne = () => ({ select: () => ({ lean: async () => null }) });
+  t.after(() => { SellerProfile.findOne = findSeller; });
+  const otherCustomer = new mongoose.Types.ObjectId();
+  const order = fixture();
+  const deniedRead = await run(getByReference, order, "customer", otherCustomer);
+  assert.equal(deniedRead.res.statusCode, 404);
+  assert.equal(deniedRead.res.body.data, null);
+  const deniedWrite = await run(updateStatus, order, "customer", otherCustomer, { status: "cancelled" });
+  assert.equal(deniedWrite.res.statusCode, 404);
+  assert.equal(order.saved, undefined);
+  assert.equal(deniedWrite.stockWrites, 0);
+  const ownRead = await run(getByReference, order, "customer", customerId);
+  assert.equal(ownRead.res.statusCode, 200);
 });

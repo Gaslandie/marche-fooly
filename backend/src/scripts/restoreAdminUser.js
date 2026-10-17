@@ -79,7 +79,7 @@ const run = async () => {
     }
 
     await SellerProfile.deleteOne({ _id: sellerProfile._id });
-    console.log(`[OK] Fiche vendeur supprimee: ${sellerProfile._id}`);
+    console.log("[OK] Fiche vendeur supprimee");
   } else {
     console.log("[INFO] Aucune fiche vendeur liee a ce compte.");
   }
@@ -88,7 +88,7 @@ const run = async () => {
   user.status = "active";
   await user.save();
 
-  console.log(`[OK] Compte restaure en admin actif: ${restoreEmail}`);
+  console.log("[OK] Compte restaure en admin actif");
 };
 
 run()
@@ -97,7 +97,7 @@ run()
     process.exit(0);
   })
   .catch(async (error) => {
-    console.error("Erreur admin:restore:", error && error.message);
+    console.error("Restauration admin impossible. Verifiez la configuration, le compte et les donnees liees.");
     try {
       await mongoose.disconnect();
     } catch {

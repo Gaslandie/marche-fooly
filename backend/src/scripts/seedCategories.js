@@ -192,7 +192,6 @@ const run = async () => {
 run()
   .then(() => process.exit(0))
   .catch((error) => {
-    console.error("Erreur seed:", error && error.message);
-    if (error && error.stack) console.error(error.stack);
+    console.error("Initialisation des categories impossible. Verifiez la configuration et la base.");
     process.exit(1);
   });

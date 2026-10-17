@@ -305,7 +305,22 @@ export type GetProductsParams = {
   category?: string;
   q?: string;
   limit?: number;
+  page?: number;
 };
+
+/** Pagination publique, utilisée aussi pour parcourir tout le sitemap. */
+export async function getPublicProductsPage(
+  params: GetProductsParams = {},
+): Promise<ApiListData<ApiProduct>> {
+  const query = buildQuery({
+    category: params.category,
+    q: params.q,
+    limit: params.limit ?? 100,
+    page: params.page,
+  });
+  const body = await request<ApiListData<ApiProduct>>(`/api/products${query}`);
+  return body.data;
+}
 
 /**
  * Récupère la liste publique des produits.
@@ -316,13 +331,8 @@ export type GetProductsParams = {
 export async function getProducts(
   params: GetProductsParams = {},
 ): Promise<ProductItem[]> {
-  const query = buildQuery({
-    category: params.category,
-    q: params.q,
-    limit: params.limit ?? 100,
-  });
-  const body = await request<ApiListData<ApiProduct>>(`/api/products${query}`);
-  return body.data.items.map(toProductItem);
+  const data = await getPublicProductsPage(params);
+  return data.items.map(toProductItem);
 }
 
 /**

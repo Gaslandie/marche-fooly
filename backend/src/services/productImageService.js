@@ -16,6 +16,7 @@ const INTERNAL_PRODUCT_IMAGE_URL_REGEX =
   /^\/api\/media\/images\/[a-f0-9]{24}\?v=[A-Za-z0-9._-]{1,120}$/;
 
 let fileTypeModulePromise = null;
+let activeImageProcessing = 0;
 
 class ProductImageError extends Error {
   constructor(message, status = 422) {
@@ -77,7 +78,12 @@ const ensureValidUploadBuffer = async (buffer) => {
     throw new ProductImageError("Image trop lourde. Taille maximum: 4 Mo.");
   }
 
-  const detected = await getFileTypeFromBuffer(buffer);
+  let detected;
+  try {
+    detected = await getFileTypeFromBuffer(buffer);
+  } catch {
+    throw new ProductImageError("Image invalide ou corrompue.");
+  }
   if (!detected || !ALLOWED_IMAGE_MIME_TYPES.has(detected.mime)) {
     throw new ProductImageError(
       "Format image non supporte. Utilisez JPG, PNG, WebP ou AVIF.",
@@ -96,6 +102,9 @@ const ensureValidUploadBuffer = async (buffer) => {
 
   if ((metadata.pages || 1) > 1) {
     throw new ProductImageError("Les images animees ne sont pas supportees.");
+  }
+  if (!metadata.width || !metadata.height || metadata.width * metadata.height > MAX_INPUT_PIXELS) {
+    throw new ProductImageError("Image trop grande. Maximum : 20 millions de pixels.");
   }
 
   return { mimeType: detected.mime };
@@ -136,13 +145,12 @@ const uploadBufferToGridFs = (bucket, buffer, filename, metadata) =>
     uploadStream.end(buffer);
   });
 
-const createProductImageAsset = async ({
+const processProductImageAsset = async ({
   buffer,
   originalName,
   sellerProfileId,
 }) => {
   const { mimeType: sourceMimeType } = await ensureValidUploadBuffer(buffer);
-  const bucket = getBucket();
   const assetId = crypto.randomUUID();
   const version = `${Date.now().toString(36)}-${crypto
     .randomBytes(4)
@@ -151,10 +159,16 @@ const createProductImageAsset = async ({
   const originalBase = sanitizeFilename(originalName);
   const createdIds = [];
 
-  const [large, thumb] = await Promise.all([
-    processVariant(buffer, { width: 1200, quality: 78 }),
-    processVariant(buffer, { width: 480, quality: 72 }),
-  ]);
+  let large, thumb;
+  try {
+    [large, thumb] = await Promise.all([
+      processVariant(buffer, { width: 1200, quality: 78 }),
+      processVariant(buffer, { width: 480, quality: 72 }),
+    ]);
+  } catch {
+    throw new ProductImageError("Image invalide ou corrompue.");
+  }
+  const bucket = getBucket();
 
   const now = new Date();
   const commonMetadata = {
@@ -221,6 +235,20 @@ const createProductImageAsset = async ({
       createdIds.map((id) => bucket.delete(id).catch(() => null)),
     );
     throw error;
+  }
+};
+
+// Le formulaire envoie déjà ses trois photos l'une après l'autre. Ce verrou
+// borne aussi les décodages simultanés lorsque plusieurs clients envoient en rafale.
+const createProductImageAsset = async (input) => {
+  if (activeImageProcessing >= 1) {
+    throw new ProductImageError("Un traitement image est deja en cours. Reessayez dans quelques secondes.", 503);
+  }
+  activeImageProcessing += 1;
+  try {
+    return await processProductImageAsset(input);
+  } finally {
+    activeImageProcessing -= 1;
   }
 };
 

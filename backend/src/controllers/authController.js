@@ -130,10 +130,10 @@ const login = async (req, res, next) => {
       return res.status(401).json(genericFailure);
     }
 
-    if (user.status === "suspended") {
+    if (user.status !== "active") {
       return res.status(403).json({
         success: false,
-        message: "Ce compte est suspendu",
+        message: user.status === "suspended" ? "Ce compte est suspendu" : "Ce compte n'est pas actif",
         data: null,
       });
     }
@@ -213,23 +213,18 @@ const forgotPassword = async (req, res, next) => {
     })
       .then((result) => {
         if (result?.sent) {
-          console.log(
-            "[forgotPassword] email de reinitialisation envoye, id:",
-            result.messageId,
-          );
+          console.log("[forgotPassword] email de reinitialisation envoye");
         } else {
           console.warn(
             "[forgotPassword] email NON envoye (mailer desactive ou destinataire vide)",
           );
         }
       })
-      .catch((mailError) => {
+      .catch(() => {
         // Echec SMTP: on journalise sans casser l'anti-enumeration (une
         // erreur cote client revelerait que le compte existe).
-        console.error(
-          "[forgotPassword] envoi email impossible:",
-          mailError?.message || mailError,
-        );
+        // Une erreur SMTP peut contenir l'adresse privée du destinataire.
+        console.error("[forgotPassword] envoi email impossible");
       });
 
     return res.status(200).json(genericResponse);
@@ -262,22 +257,34 @@ const resetPassword = async (req, res, next) => {
       });
     }
 
-    if (user.status === "suspended") {
+    if (user.status !== "active") {
       return res.status(403).json({
         success: false,
-        message: "Ce compte est suspendu",
+        message: user.status === "suspended" ? "Ce compte est suspendu" : "Ce compte n'est pas actif",
         data: null,
       });
     }
 
     const passwordHash = await hashPassword(password);
-    await User.updateOne(
-      { _id: user._id },
+    const result = await User.updateOne(
+      {
+        _id: user._id,
+        status: "active",
+        passwordResetTokenHash: hashResetToken(token),
+        passwordResetExpiresAt: { $gt: new Date() },
+      },
       {
         $set: { passwordHash },
         $unset: { passwordResetTokenHash: "", passwordResetExpiresAt: "" },
       },
     );
+    if (result.modifiedCount !== 1) {
+      return res.status(400).json({
+        success: false,
+        message: "Ce lien de reinitialisation est invalide ou expire. Refaites une demande depuis « Mot de passe oublie ».",
+        data: null,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -356,11 +363,10 @@ const updateMe = async (req, res, next) => {
 };
 
 /**
- * Logout sans etat: avec un JWT pur (sans refresh token), la revocation
- * cote serveur n'est pas possible sans store partage (Redis + jti).
- * L'endpoint existe pour homogeneite cote client (qui doit supprimer
- * son token local) et pour permettre d'ajouter plus tard une blacklist
- * sans casser le contrat d'API.
+ * Logout sans etat : le frontend supprime le cookie, mais le jeton reste
+ * utilisable jusqu'a expiration. La revocation persistante demande un etat
+ * serveur supplementaire. Gassama conserve le modele actuel pour le moment
+ * (17 octobre 2026) : ne pas ajouter de champ de session sans son accord.
  */
 const logout = async (req, res) => {
   return res.status(200).json({

@@ -348,8 +348,8 @@ const create = async (req, res, next) => {
       }
     }
 
-    await notifyOrderCreated({ order: created }).catch((error) => {
-      console.warn("Notifications creation commande:", error?.message || error);
+    await notifyOrderCreated({ order: created }).catch(() => {
+      console.warn("Notifications creation commande indisponibles");
     });
 
     return res.status(201).json({
@@ -624,8 +624,8 @@ const updateStatus = async (req, res, next) => {
       order,
       previousStatus,
       actor,
-    }).catch((error) => {
-      console.warn("Notifications statut commande:", error?.message || error);
+    }).catch(() => {
+      console.warn("Notifications statut commande indisponibles");
     });
 
     // Repopulate seller pour le retour.

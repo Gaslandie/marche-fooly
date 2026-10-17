@@ -35,6 +35,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import ProductImage from "@/components/product/ProductImage";
 import type { CategoryOption } from "@/lib/api";
 
 export type SellerProductFormValues = {
@@ -506,11 +507,13 @@ export default function SellerProductForm({
                     className="border rounded-3 position-relative overflow-hidden bg-light"
                     style={{ aspectRatio: "1 / 1" }}
                   >
-                    <img
+                    <ProductImage
                       src={image.thumbUrl || image.url}
                       alt={`Photo ${index + 1} du produit`}
                       className="w-100 h-100"
                       style={{ objectFit: "contain", background: "#ffffff" }}
+                      fill
+                      sizes="(max-width: 767px) 50vw, 320px"
                     />
                     {index === 0 && (
                       <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-2">

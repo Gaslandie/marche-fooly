@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import AddToCartButton from "@/components/cart/AddToCartButton";
+import ProductImage from "@/components/product/ProductImage";
 import styles from "@/styles/catalog.module.css";
 import type { ProductItem, ProductViewMode } from "@/types/catalog";
 import { formatPrice } from "@/utils/formatPrice";
@@ -24,12 +25,14 @@ export default function ProductCard({ product, view = "grid", mediaAction, headi
         {product.badge ? <span className={styles.productBadge}>{product.badge}</span> : null}
         {mediaAction}
         {hasImage ? (
-          <img
+          <ProductImage
             src={cardImageUrl}
             alt={product.name}
             className={styles.productImage}
             loading="lazy"
             decoding="async"
+            fill
+            sizes={view === "list" ? "(max-width: 575px) 40vw, 256px" : "(max-width: 575px) calc(100vw - 24px), (max-width: 1199px) 50vw, 416px"}
           />
         ) : (
           <i className={product.icon} aria-hidden="true"></i>

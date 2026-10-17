@@ -4,17 +4,17 @@ import CategoryCard from "@/components/category/CategoryCard";
 import { getCategories } from "@/lib/api";
 import { getSellerCta } from "@/lib/sellerCta";
 import { getSellerNavigationState } from "@/lib/sellerNavigation";
+import { publicMetadata } from "@/lib/seo";
 import styles from "@/styles/catalog.module.css";
 
-// Cette page dépend d'une API live (GET /api/categories) : on force le rendu
-// dynamique (à la requête). Le build Next.js ne contacte donc plus le backend.
-export const dynamic = "force-dynamic";
+// Rendu par visiteur ; le catalogue public garde son cache de 60 secondes.
+export const revalidate = 0;
 
-export const metadata: Metadata = {
-  title: "Catégories",
-  description:
-    "Explorez toutes les catégories de Marché Fooly : alimentation, téléphones, électroménagers, mode, maison, automobile, meubles, bijoux et plus à Sangarédi.",
-};
+export const metadata: Metadata = publicMetadata(
+  "/categories",
+  "Catégories",
+  "Explorez les catégories de Marché Fooly : alimentation, téléphones, mode, maison, automobile et autres produits disponibles à Sangarédi.",
+);
 
 export default async function CategoriesPage() {
   // Données réelles : API backend (GET /api/categories), déjà triées côté

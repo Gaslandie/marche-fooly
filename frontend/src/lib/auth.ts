@@ -31,6 +31,7 @@
  */
 
 import { cookies } from "next/headers";
+import { cache } from "react";
 import type { AuthUser } from "@/types/auth";
 
 /** Nom du cookie de session (contient le JWT, httpOnly). */
@@ -99,7 +100,8 @@ export async function backendJson(
  *          Ne lève jamais : toute erreur (réseau, token expiré...) est
  *          traitée comme « non connecté ».
  */
-export async function getCurrentUser(): Promise<AuthUser | null> {
+// React cache déduplique dans une requête ; aucun cache persistant de session.
+export const getCurrentUser = cache(async (): Promise<AuthUser | null> => {
   const token = await readAuthToken();
   if (!token) return null;
 
@@ -114,4 +116,4 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   } catch {
     return null;
   }
-}
+});

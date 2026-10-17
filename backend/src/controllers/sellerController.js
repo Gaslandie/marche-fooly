@@ -150,8 +150,8 @@ const apply = async (req, res, next) => {
     });
 
     await notifySellerApplicationCreated({ profile: created, applicant: user })
-      .catch((error) => {
-        console.warn("Notifications candidature vendeur:", error?.message || error);
+      .catch(() => {
+        console.warn("Notifications candidature vendeur indisponibles");
       });
 
     return res.status(201).json({

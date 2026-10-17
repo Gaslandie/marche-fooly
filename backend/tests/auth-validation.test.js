@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { registerValidators, updateMeValidators } = require('../src/validators/authValidators');
+const { registerValidators, resetPasswordValidators, updateMeValidators } = require('../src/validators/authValidators');
 const { runValidators } = require('../src/middlewares/validate');
 const { guineaPhoneMatch } = require('../src/models/shared/validators');
 const { shouldSkipAuthRateLimit } = require('../src/middlewares/rateLimiters');
@@ -73,4 +73,17 @@ test('le limiteur anti-force brute ne compte pas les lectures de session', () =>
   assert.equal(shouldSkipAuthRateLimit({ method: 'GET', path: '/me' }), true);
   assert.equal(shouldSkipAuthRateLimit({ method: 'PATCH', path: '/me' }), true);
   assert.equal(shouldSkipAuthRateLimit({ method: 'POST', path: '/logout' }), true);
+});
+
+test('nouveaux mots de passe : aucune partie du secret ne sera ignorée par bcrypt', async () => {
+  for (const validators of [registerValidators, resetPasswordValidators]) {
+    for (const password of ['a'.repeat(72), 'é'.repeat(36), '🔒'.repeat(18)]) {
+      assert.equal((await validate({ ...valid, token: 'a'.repeat(64), password }, validators)).passed, true);
+    }
+    for (const password of ['a'.repeat(73), 'é'.repeat(37), '🔒'.repeat(19)]) {
+      const result = await validate({ ...valid, token: 'a'.repeat(64), password }, validators);
+      assert.equal(result.status, 422);
+      assert.ok(!JSON.stringify(result.response).includes(password));
+    }
+  }
 });

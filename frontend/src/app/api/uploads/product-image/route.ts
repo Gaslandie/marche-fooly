@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import { getBackendUrl, readAuthToken } from "@/lib/auth";
+import { getBackendUrl, getCurrentUser, readAuthToken } from "@/lib/auth";
+import { getMySellerProfile } from "@/lib/seller";
 
 export const runtime = "nodejs";
 
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+const MAX_REQUEST_BYTES = MAX_IMAGE_BYTES + 64 * 1024;
 const ALLOWED_IMAGE_MIME_TYPES = new Set([
   "image/jpeg",
   "image/png",
@@ -37,7 +39,14 @@ type BackendImage = NonNullable<NonNullable<BackendUploadBody["data"]>["image"]>
 
 function resolveBackendMediaUrl(value: string | undefined) {
   if (!value) return value;
-  if (value.startsWith("/api/")) return `${getBackendUrl()}${value}`;
+  // Les uploads ne sont pas encore publics : aperçu authentifié sur notre domaine.
+  if (value.startsWith("/api/media/images/")) return value;
+  try {
+    const url = new URL(value);
+    if (url.origin === new URL(getBackendUrl()).origin && url.pathname.startsWith("/api/media/images/")) {
+      return `${url.pathname}${url.search}`;
+    }
+  } catch { /* Une ancienne URL externe reste inchangée. */ }
   return value;
 }
 
@@ -53,16 +62,40 @@ function normalizeImage(image?: BackendImage) {
 
 export async function POST(request: Request) {
   const token = await readAuthToken();
-  if (!token) {
+  const user = token ? await getCurrentUser() : null;
+  if (!token || !user) {
     return NextResponse.json(
       { success: false, message: "Authentification requise.", image: null },
       { status: 401 },
     );
   }
+  const profile = user.role === "seller" ? await getMySellerProfile() : null;
+  if (profile?.status !== "approved") {
+    return NextResponse.json({ success: false, message: "Seuls les vendeurs approuvés peuvent envoyer une image.", image: null }, { status: 403 });
+  }
+
+  const tooLarge = () => NextResponse.json({ success: false, message: "Image trop lourde. Taille maximum : 4 Mo.", image: null }, { status: 413 });
+  if (Number(request.headers.get("content-length")) > MAX_REQUEST_BYTES) return tooLarge();
 
   let form: FormData;
   try {
-    form = await request.formData();
+    if (!request.body) throw new Error("Corps absent");
+    const reader = request.body.getReader();
+    const chunks: Uint8Array<ArrayBuffer>[] = [];
+    let bytes = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      bytes += value.byteLength;
+      if (bytes > MAX_REQUEST_BYTES) {
+        void reader.cancel().catch(() => {});
+        return tooLarge();
+      }
+      chunks.push(new Uint8Array(value));
+    }
+    form = await new Response(new Blob(chunks), {
+      headers: { "Content-Type": request.headers.get("content-type") ?? "" },
+    }).formData();
   } catch {
     return NextResponse.json(
       { success: false, message: "Fichier image invalide.", image: null },
@@ -71,7 +104,7 @@ export async function POST(request: Request) {
   }
 
   const fileEntry = form.get("image");
-  if (!(fileEntry instanceof File)) {
+  if (!(fileEntry instanceof File) || Array.from(form.keys()).length !== 1) {
     return NextResponse.json(
       { success: false, message: "Image requise.", image: null },
       { status: 422 },

@@ -40,13 +40,15 @@ const createNotification = async ({
 
   if (!user?.email) return notification;
 
-  deliverNotificationEmail({
+  void deliverNotificationEmail({
     notification,
     to: user.email,
     subject: emailSubject || title,
     title,
     message,
     href,
+  }).catch(() => {
+    console.warn("Suivi de notification email indisponible");
   });
 
   return notification;
@@ -74,13 +76,9 @@ const deliverNotificationEmail = async ({
       await notification.save();
     }
   } catch (error) {
-    notification.emailError = error?.message || "Erreur email";
+    notification.emailError = "Envoi email impossible";
     await notification.save();
-    console.warn(
-      "Notification email non envoyee:",
-      notification._id.toString(),
-      notification.emailError,
-    );
+    console.warn("Notification email non envoyee");
   }
 };
 
@@ -88,7 +86,7 @@ const safeCreateNotification = async (payload) => {
   try {
     return await createNotification(payload);
   } catch (error) {
-    console.warn("Notification interne non creee:", error?.message || error);
+    console.warn("Notification interne non creee");
     return null;
   }
 };

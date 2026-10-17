@@ -254,8 +254,8 @@ const updateSellerStatus = async (req, res, next) => {
 
     await profile.populate("user", "firstName lastName email");
 
-    await notifySellerStatusChanged({ profile, status: target }).catch((error) => {
-      console.warn("Notifications statut vendeur:", error?.message || error);
+    await notifySellerStatusChanged({ profile, status: target }).catch(() => {
+      console.warn("Notifications statut vendeur indisponibles");
     });
 
     return res.status(200).json({

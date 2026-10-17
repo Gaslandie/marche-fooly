@@ -30,14 +30,14 @@ const run = async () => {
 
   const user = await User.findOne({ email: ownerEmail });
   if (!user) {
-    throw new Error(`Compte introuvable pour ${ownerEmail}`);
+    throw new Error("Compte proprietaire introuvable");
   }
 
   user.role = "owner";
   user.status = "active";
   await user.save();
 
-  console.log(`[OK] Compte proprietaire promu owner: ${ownerEmail}`);
+  console.log("[OK] Compte proprietaire promu owner");
 };
 
 run()
@@ -46,7 +46,7 @@ run()
     process.exit(0);
   })
   .catch(async (error) => {
-    console.error("Erreur owner:promote:", error && error.message);
+    console.error("Promotion owner impossible. Verifiez la configuration et le compte cible.");
     try {
       await mongoose.disconnect();
     } catch {

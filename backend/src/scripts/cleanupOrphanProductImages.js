@@ -26,7 +26,7 @@ const run = async () => {
 
 run()
   .catch((error) => {
-    console.error("Erreur images:cleanup:", error && error.message);
+    console.error("Nettoyage des images impossible. Verifiez la configuration et le stockage.");
     process.exitCode = 1;
   })
   .finally(async () => {

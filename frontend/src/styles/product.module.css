@@ -77,6 +77,7 @@
 }
 
 .thumbItem {
+  position: relative;
   aspect-ratio: 1 / 1;
   border-radius: 18px;
   border: 2px solid var(--mf-border);

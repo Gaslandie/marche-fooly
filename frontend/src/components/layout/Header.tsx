@@ -47,7 +47,7 @@ export default function Header({
                 width={48}
                 height={48}
                 style={{ display: "block" }}
-                priority
+                loading="eager"
               />
             </span>
             <div>

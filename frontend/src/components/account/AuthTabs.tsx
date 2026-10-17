@@ -74,8 +74,11 @@ function registrationError(field: RegisterField, value: string): string {
     if (value.length > 32 || !/^[+0-9\s().-]+$/.test(value) || !/^[1-9][0-9]{8}$/.test(compact))
       return "Saisissez 9 chiffres, avec ou sans +224. Exemple : 612 34 56 78.";
   }
-  if (field === "password" && (value.length < 8 || value.length > 128))
-    return "Choisissez un mot de passe de 8 à 128 caractères.";
+  if (field === "password") {
+    if (value.length < 8) return "Choisissez un mot de passe d’au moins 8 caractères.";
+    if (new TextEncoder().encode(value).length > 72)
+      return "Mot de passe trop long. Raccourcissez-le : les accents et emojis prennent plus de place.";
+  }
   return "";
 }
 
@@ -497,7 +500,7 @@ export default function AuthTabs() {
                 onBlur={(e) => checkField("password", e.target.value)}
                 required
                 minLength={8}
-                maxLength={128}
+                maxLength={72}
                 disabled={registerLoading}
                 {...fieldAccessibility("password", "reg-password-hint")}
               />

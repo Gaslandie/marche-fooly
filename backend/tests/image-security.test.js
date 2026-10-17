@@ -26,7 +26,8 @@ class MemoryBucket {
     const stream = new Writable({ write(buffer, _encoding, done) {
       if (options.metadata.variant === failVariant) return done(new Error("Stockage fictif indisponible"));
       const finish = () => {
-        files.set(String(id), { _id: id, filename, ...options, length: buffer.length, buffer, uploadDate: new Date() });
+        // Comme le pilote MongoDB 7 : le type est dans metadata, pas à la racine.
+        files.set(String(id), { _id: id, filename, metadata: options.metadata, length: buffer.length, buffer, uploadDate: new Date() });
         done();
       };
       if (holdUpload) holdUpload(finish); else finish();
@@ -70,7 +71,8 @@ test("vrais JPG/PNG/WebP/AVIF : conversion, noms aléatoires et suppression des 
     for (const id of [result.largeFileId, result.thumbFileId]) {
       const file = files.get(id);
       assert.match(file.filename, /^[a-f0-9-]+-(large|thumb)\.webp$/);
-      assert.equal(file.contentType, "image/webp");
+      assert.equal(file.contentType, undefined);
+      assert.equal(file.metadata.mimeType, "image/webp");
       assert.equal(file.metadata.status, "temporary");
       const metadata = await sharp(file.buffer).metadata();
       assert.equal(metadata.format, "webp");
@@ -161,6 +163,17 @@ test("photos privées : propriétaire, équipe, autre compte, publication et ré
   const published = await get(null);
   assert.equal(published.status, 200);
   assert.match(published.headers.get("cache-control"), /public.*max-age=60.*must-revalidate/);
+  assert.equal(published.headers.get("content-type"), "image/webp");
+  const file = files.get(image.largeFileId);
+  file.contentType = "image/webp";
+  delete file.metadata.mimeType;
+  assert.equal((await get(null)).status, 200, "ancien fichier avec contentType à la racine");
+  delete file.contentType;
+  assert.equal((await get(null)).status, 404, "un fichier sans format connu reste refusé");
+  file.metadata.mimeType = "image/svg+xml";
+  assert.equal((await get(null)).status, 404, "un format actif n'est pas autorisé");
+  file.metadata.mimeType = "image/webp";
+  assert.equal((await get(null)).status, 200, "fichier MongoDB 7 avec mimeType dans metadata");
   product.status = "out_of_stock";
   assert.equal((await get(null)).status, 200);
   product.status = "archived";

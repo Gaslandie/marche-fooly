@@ -62,7 +62,10 @@ const getProductImage = async (req, res, next) => {
       .limit(1)
       .toArray();
 
-    if (!file || file.contentType !== "image/webp" ||
+    // MongoDB 7 ne conserve plus contentType à la racine. Nos uploads
+    // enregistrent déjà le format vérifié dans metadata.mimeType.
+    const contentType = file?.contentType ?? file?.metadata?.mimeType;
+    if (!file || contentType !== "image/webp" ||
         !mongoose.Types.ObjectId.isValid(file.metadata?.ownerSeller)) {
       return res.status(404).json({
         success: false,
@@ -88,7 +91,7 @@ const getProductImage = async (req, res, next) => {
       : new Date().toUTCString();
 
     res.set({
-      "Content-Type": file.contentType || "image/webp",
+      "Content-Type": contentType,
       "Content-Length": String(file.length || 0),
       "Cache-Control": privateResponse
         ? "private, no-store, max-age=0"

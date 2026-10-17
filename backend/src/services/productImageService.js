@@ -137,7 +137,6 @@ const processVariant = async (buffer, { width, quality }) => {
 const uploadBufferToGridFs = (bucket, buffer, filename, metadata) =>
   new Promise((resolve, reject) => {
     const uploadStream = bucket.openUploadStream(filename, {
-      contentType: "image/webp",
       metadata,
     });
     uploadStream.once("error", reject);
